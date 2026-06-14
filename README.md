@@ -239,11 +239,11 @@ Distributed under the MIT License.
 
 **Walid Rahman**
 
-* GitHub: <https://github.com/yourusername>
+* GitHub: <https://github.com/10bitsofwalid>
 
-* Portfolio: <https://yourportfolio.com>
+* Portfolio: <https://walid-rahman-portfolio.vercel.app>
 
-* LinkedIn: <https://linkedin.com/in/yourprofile>
+* LinkedIn: <https://www.linkedin.com/in/mohammad-walid-rahman>
 
 ***
 
