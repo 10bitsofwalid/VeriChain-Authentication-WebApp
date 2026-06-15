@@ -17,6 +17,7 @@ interface AuthContextType {
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   signup: (data: SignupData) => Promise<void>;
+  acceptInvitation: (inviteToken: string, password: string) => Promise<void>;
   logout: () => void;
   error: string | null;
   clearError: () => void;
@@ -91,6 +92,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const acceptInvitation = async (inviteToken: string, password: string) => {
+    try {
+      setError(null);
+      const res = await client.post('/auth/accept-invite', { token: inviteToken, password });
+      const { token: newToken, user: userData } = res.data;
+
+      localStorage.setItem('verichain_token', newToken);
+      localStorage.setItem('verichain_user', JSON.stringify(userData));
+      setToken(newToken);
+      setUser(userData);
+    } catch (err: any) {
+      const msg = err.response?.data?.message || 'Accepting invitation failed.';
+      setError(msg);
+      throw new Error(msg);
+    }
+  };
+
   const logout = () => {
     localStorage.removeItem('verichain_token');
     localStorage.removeItem('verichain_user');
@@ -101,7 +119,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearError = () => setError(null);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, signup, logout, error, clearError }}>
+    <AuthContext.Provider value={{ user, token, loading, login, signup, acceptInvitation, logout, error, clearError }}>
       {children}
     </AuthContext.Provider>
   );

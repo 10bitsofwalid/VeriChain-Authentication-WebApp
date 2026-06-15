@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Package, ArrowLeft, Loader, Plus, Trash2, AlertTriangle } from 'lucide-react';
+import FileUpload from '../../components/FileUpload';
 
 export default function RegisterProduct() {
   const navigate = useNavigate();
@@ -107,15 +108,24 @@ export default function RegisterProduct() {
           </div>
         </div>
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="reg-image">Image URL *</label>
-          <input id="reg-image" className="form-input" placeholder="https://..." value={form.imageUrl} onChange={e => update('imageUrl', e.target.value)} required />
-        </div>
+        <FileUpload
+          label="Product Image"
+          accept=".jpg,.jpeg,.png,.webp"
+          maxSizeMB={5}
+          value={form.imageUrl}
+          onChange={(url) => update('imageUrl', url)}
+          required
+          type="image"
+        />
 
-        <div className="form-group">
-          <label className="form-label" htmlFor="reg-cert">Certificate URL (optional)</label>
-          <input id="reg-cert" className="form-input" placeholder="https://ipfs.io/..." value={form.certificateUrl} onChange={e => update('certificateUrl', e.target.value)} />
-        </div>
+        <FileUpload
+          label="Factory Certificate (optional)"
+          accept=".jpg,.jpeg,.png,.webp,.pdf"
+          maxSizeMB={5}
+          value={form.certificateUrl}
+          onChange={(url) => update('certificateUrl', url)}
+          type="any"
+        />
 
         {/* Dynamic specs */}
         <div>

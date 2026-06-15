@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Mail, Lock, User, Loader, MapPin, Award, Hash } from 'lucide-react';
+import FileUpload from '../components/FileUpload';
 import './Auth.css';
 
 export default function Signup() {
@@ -15,6 +16,8 @@ export default function Signup() {
     factoryLocation: '',
     factoryCapacity: '',
     factoryCertificateNo: '',
+    logoUrl: '',
+    certificateUrl: '',
   });
   const [submitting, setSubmitting] = useState(false);
 
@@ -120,8 +123,21 @@ export default function Signup() {
             </select>
           </div>
 
+          {form.role === 'seller' && (
+            <div className="seller-fields animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+              <FileUpload
+                label="Store/Brand Logo"
+                accept=".jpg,.jpeg,.png,.webp"
+                maxSizeMB={2}
+                value={form.logoUrl}
+                onChange={(url) => update('logoUrl', url)}
+                type="image"
+              />
+            </div>
+          )}
+
           {form.role === 'factory' && (
-            <div className="factory-fields animate-fade-in">
+            <div className="factory-fields animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
               <div className="form-group">
                 <label className="form-label" htmlFor="signup-location">Factory Location</label>
                 <div className="input-icon-wrapper">
@@ -164,6 +180,22 @@ export default function Signup() {
                   />
                 </div>
               </div>
+              <FileUpload
+                label="Company/Brand Logo"
+                accept=".jpg,.jpeg,.png,.webp"
+                maxSizeMB={2}
+                value={form.logoUrl}
+                onChange={(url) => update('logoUrl', url)}
+                type="image"
+              />
+              <FileUpload
+                label="Factory Certificate Document"
+                accept=".jpg,.jpeg,.png,.webp,.pdf"
+                maxSizeMB={5}
+                value={form.certificateUrl}
+                onChange={(url) => update('certificateUrl', url)}
+                type="any"
+              />
             </div>
           )}
 

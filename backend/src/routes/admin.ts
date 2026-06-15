@@ -6,6 +6,8 @@ import { AuditLog } from '../models/AuditLog';
 import { Complaint } from '../models/Complaint';
 import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
+import crypto from 'crypto';
+import { Invitation } from '../models/Invitation';
 
 const router = Router();
 
@@ -214,6 +216,113 @@ router.get('/dashboard', async (_req: AuthRequest, res: Response, next) => {
         recentActivity: recentAuditLogs,
       },
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   POST /api/admin/invitations
+// @desc    Create and send an invitation
+router.post('/invitations', async (req: AuthRequest, res: Response, next) => {
+  try {
+    const { email, name, role } = req.body;
+
+    if (!email || !name || !role) {
+      return res.status(400).json({ success: false, message: 'Please provide email, name, and role' });
+    }
+
+    if (!['moderator', 'admin'].includes(role)) {
+      return res.status(400).json({ success: false, message: 'Role must be admin or moderator' });
+    }
+
+    // Check if user already exists
+    const userExists = await User.findOne({ email });
+    if (userExists) {
+      return res.status(400).json({ success: false, message: 'User already exists with this email' });
+    }
+
+    // Check if invitation already exists
+    const existingInvite = await Invitation.findOne({ email });
+    if (existingInvite && existingInvite.status === 'pending' && existingInvite.expiresAt > new Date()) {
+      return res.status(400).json({ success: false, message: 'A pending invitation already exists for this email' });
+    }
+
+    // Generate token
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date();
+    expiresAt.setHours(expiresAt.getHours() + 48); // 48 hours expiry
+
+    // Save invitation
+    const invitation = await Invitation.create({
+      email,
+      name,
+      role,
+      token,
+      invitedBy: new Types.ObjectId(req.user!.id),
+      expiresAt,
+    });
+
+    await AuditLog.create({
+      action: 'INVITATION_SENT',
+      actor: new Types.ObjectId(req.user!.id),
+      targetType: 'user',
+      targetId: invitation._id.toString(),
+      details: `Admin invited ${name} (${email}) as ${role}`,
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Invitation generated successfully',
+      invitation,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   GET /api/admin/invitations
+// @desc    List all invitations
+router.get('/invitations', async (req: AuthRequest, res: Response, next) => {
+  try {
+    const invitations = await Invitation.find()
+      .populate('invitedBy', 'name email')
+      .sort({ createdAt: -1 });
+
+    res.json({ success: true, invitations });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   DELETE /api/admin/invitations/:id
+// @desc    Revoke/delete a pending invitation
+router.delete('/invitations/:id', async (req: AuthRequest, res: Response, next) => {
+  try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid invitation ID' });
+    }
+
+    const invitation = await Invitation.findById(req.params.id);
+    if (!invitation) {
+      return res.status(404).json({ success: false, message: 'Invitation not found' });
+    }
+
+    if (invitation.status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Can only revoke pending invitations' });
+    }
+
+    invitation.status = 'expired'; // Revoke it
+    await invitation.save();
+
+    await AuditLog.create({
+      action: 'INVITATION_REVOKED',
+      actor: new Types.ObjectId(req.user!.id),
+      targetType: 'user',
+      targetId: invitation._id.toString(),
+      details: `Admin revoked invitation for ${invitation.name} (${invitation.email})`,
+    });
+
+    res.json({ success: true, message: 'Invitation revoked successfully', invitation });
   } catch (error) {
     next(error);
   }

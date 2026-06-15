@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import FileUpload from '../components/FileUpload';
 import {
   AlertTriangle,
   Plus,
@@ -95,41 +96,8 @@ export default function Complaints() {
     setSuccess('');
 
     try {
-      // Find the seller of this item from its journey or owner details
-      // Wait, how do we get the seller ID?
-      // Since myItems lists the current owned items, let's see: how is the seller ID determined?
-      // We can fetch the full item verification journey to find who the seller was (the actor before the buyer),
-      // or we can query the details of this item from the `/items/verify/:serialNumber` endpoint first!
-      // Let's do that:
-      const selectedItem = myItems.find(i => i._id === selectedItemInstanceId);
-      if (!selectedItem) throw new Error('Selected item not found in inventory');
-
-      const itemRes = await client.get(`/items/verify/${encodeURIComponent(selectedItem.serialNumber)}`);
-      const itemData = itemRes.data.item;
-
-      // The seller is the actor in the last journey step that transferred the item
-      // or we can find the actor whose role was 'seller' or 'factory' in the journey.
-      // Let's look at the journey steps in reverse order and find the first actor who is NOT the current buyer.
-      let sellerId = '';
-      if (itemData.journey && itemData.journey.length > 0) {
-        for (let i = itemData.journey.length - 1; i >= 0; i--) {
-          const step = itemData.journey[i];
-          if (step.actor && step.actor._id !== user?.id) {
-            sellerId = step.actor._id;
-            break;
-          }
-        }
-      }
-
-      // Fallback: If no journey actor, set to system owner or factory
-      if (!sellerId) {
-        // Let's use the currentOwner in the verify response, or if it is buyer, fallback to the factory
-        sellerId = itemData.product?.factory || itemData.journey[0]?.actor?._id || user?.id;
-      }
-
       await client.post('/complaints', {
         productInstanceId: selectedItemInstanceId,
-        sellerId,
         reason,
         description,
         evidenceUrl: evidenceUrl || undefined,
@@ -363,17 +331,14 @@ export default function Complaints() {
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="evidence-url">Evidence Image/Link (Optional)</label>
-                <input
-                  id="evidence-url"
-                  type="url"
-                  className="form-input"
-                  placeholder="https://ipfs.io/ipfs/... or photo link"
-                  value={evidenceUrl}
-                  onChange={e => setEvidenceUrl(e.target.value)}
-                />
-              </div>
+              <FileUpload
+                label="Evidence File (optional)"
+                accept=".jpg,.jpeg,.png,.webp,.pdf"
+                maxSizeMB={5}
+                value={evidenceUrl}
+                onChange={(url) => setEvidenceUrl(url)}
+                type="any"
+              />
 
               <div className="modal-footer">
                 <button type="button" className="btn btn-secondary" onClick={() => setShowFileModal(false)} disabled={submitting}>

@@ -14,6 +14,9 @@ import AuditLogs from './pages/admin/AuditLogs';
 import SellerDashboard from './pages/seller/SellerDashboard';
 import BuyerDashboard from './pages/buyer/BuyerDashboard';
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AcceptInvite from './pages/AcceptInvite';
+import InviteAdmin from './pages/admin/InviteAdmin';
+import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
 import './index.css';
 
 function AppRoutes() {
@@ -34,6 +37,7 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/verify" element={<VerifyItem />} />
+      <Route path="/accept-invite" element={<AcceptInvite />} />
 
       {/* Protected routes — wrapped in Layout */}
       <Route
@@ -87,6 +91,14 @@ function AppRoutes() {
           }
         />
         <Route
+          path="/dashboard/invite"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <InviteAdmin />
+            </ProtectedRoute>
+          }
+        />
+        <Route
           path="/dashboard/users"
           element={
             <ProtectedRoute roles={['admin']}>
@@ -99,6 +111,30 @@ function AppRoutes() {
           element={
             <ProtectedRoute roles={['admin']}>
               <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/product-verification"
+          element={
+            <ProtectedRoute roles={['moderator', 'admin']}>
+              <ModeratorDashboard defaultTab="verification" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/complaints-moderator"
+          element={
+            <ProtectedRoute roles={['moderator', 'admin']}>
+              <ModeratorDashboard defaultTab="complaints" />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/fake-listings"
+          element={
+            <ProtectedRoute roles={['moderator', 'admin']}>
+              <ModeratorDashboard defaultTab="fake-listings" />
             </ProtectedRoute>
           }
         />

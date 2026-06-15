@@ -122,12 +122,15 @@ function getNavItems(role: string): NavItem[] {
       { to: '/dashboard/complaints', label: 'Complaints', icon: AlertTriangle },
     ],
     moderator: [
-      { to: '/dashboard/complaints', label: 'Complaints', icon: AlertTriangle },
+      { to: '/dashboard/product-verification', label: 'Verification Queue', icon: Shield },
+      { to: '/dashboard/complaints-moderator', label: 'Complaint Queue', icon: AlertTriangle },
+      { to: '/dashboard/fake-listings', label: 'Fake Listings', icon: AlertTriangle },
     ],
     admin: [
       { to: '/dashboard/users', label: 'Users', icon: Users },
       { to: '/dashboard/products-admin', label: 'Products', icon: Package },
       { to: '/dashboard/complaints', label: 'Complaints', icon: AlertTriangle },
+      { to: '/dashboard/invite', label: 'Invite Users', icon: FileText },
       { to: '/dashboard/audit-logs', label: 'Audit Logs', icon: FileText },
     ],
   };

@@ -3,6 +3,7 @@ import FactoryDashboard from './factory/FactoryDashboard';
 import SellerDashboard from './seller/SellerDashboard';
 import BuyerDashboard from './buyer/BuyerDashboard';
 import AdminDashboard from './admin/AdminDashboard';
+import ModeratorDashboard from './moderator/ModeratorDashboard';
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -15,8 +16,9 @@ export default function Dashboard() {
     case 'buyer':
       return <BuyerDashboard />;
     case 'admin':
-    case 'moderator':
       return <AdminDashboard />;
+    case 'moderator':
+      return <ModeratorDashboard />;
     default:
       return <BuyerDashboard />;
   }

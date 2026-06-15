@@ -2,6 +2,7 @@ import { Router, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
+import { Invitation } from '../models/Invitation';
 import { protect, AuthRequest } from '../middleware/auth';
 
 const router = Router();
@@ -16,7 +17,7 @@ const signToken = (id: string, role: string, verified: boolean) => {
 // @desc    Register a new buyer, seller, or factory
 router.post('/signup', async (req, res, next) => {
   try {
-    const { name, email, password, role, factoryLocation, factoryCapacity, factoryCertificateNo } = req.body;
+    const { name, email, password, role, factoryLocation, factoryCapacity, factoryCertificateNo, logoUrl, certificateUrl } = req.body;
 
     if (!name || !email || !password || !role) {
       return res.status(400).json({ success: false, message: 'Please provide all required fields' });
@@ -50,6 +51,8 @@ router.post('/signup', async (req, res, next) => {
       passwordHash,
       verified: role === 'buyer', // Buyers are verified by default; Sellers and Factories need Admin verification
       factoryDetails,
+      logoUrl,
+      certificateUrl,
     });
 
     const token = signToken(user._id.toString(), user.role, user.verified);
@@ -161,6 +164,77 @@ router.post('/invite', protect, async (req: AuthRequest, res: Response, next) =>
     res.status(201).json({
       success: true,
       message: `${role} account created successfully.`,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        verified: user.verified,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   POST /api/auth/accept-invite
+// @desc    Accept invitation and activate account
+router.post('/accept-invite', async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+
+    if (!token || !password) {
+      return res.status(400).json({ success: false, message: 'Please provide token and password' });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
+    }
+
+    const invitation = await Invitation.findOne({ token });
+    if (!invitation) {
+      return res.status(404).json({ success: false, message: 'Invalid invitation token' });
+    }
+
+    if (invitation.status !== 'pending') {
+      return res.status(400).json({ success: false, message: `This invitation has already been ${invitation.status}` });
+    }
+
+    if (invitation.expiresAt < new Date()) {
+      invitation.status = 'expired';
+      await invitation.save();
+      return res.status(400).json({ success: false, message: 'This invitation has expired' });
+    }
+
+    // Check if user already exists
+    const userExists = await User.findOne({ email: invitation.email });
+    if (userExists) {
+      invitation.status = 'accepted';
+      await invitation.save();
+      return res.status(400).json({ success: false, message: 'User already exists' });
+    }
+
+    // Create user account
+    const salt = await bcrypt.genSalt(10);
+    const passwordHash = await bcrypt.hash(password, salt);
+
+    const user = await User.create({
+      name: invitation.name,
+      email: invitation.email,
+      role: invitation.role,
+      passwordHash,
+      verified: true, // Invited accounts are auto-verified
+    });
+
+    invitation.status = 'accepted';
+    await invitation.save();
+
+    const jwtToken = signToken(user._id.toString(), user.role, user.verified);
+
+    res.status(200).json({
+      success: true,
+      message: 'Account activated successfully',
+      token: jwtToken,
       user: {
         id: user._id,
         name: user.name,

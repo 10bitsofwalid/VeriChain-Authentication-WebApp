@@ -1,6 +1,8 @@
 import { Router, Response } from 'express';
 import { Complaint } from '../models/Complaint';
 import { AuditLog } from '../models/AuditLog';
+import { ItemInstance } from '../models/ItemInstance';
+import { Product } from '../models/Product';
 import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
 
@@ -10,30 +12,73 @@ const router = Router();
 // @desc    File a complaint (buyer only)
 router.post('/', protect, authorize('buyer'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
-    const { productInstanceId, sellerId, reason, description, evidenceUrl } = req.body;
+    const { productInstanceId, reason, description, evidenceUrl } = req.body;
 
     if (!productInstanceId || !Types.ObjectId.isValid(productInstanceId)) {
       return res.status(400).json({ success: false, message: 'Please provide a valid productInstanceId' });
     }
 
-    if (!sellerId || !Types.ObjectId.isValid(sellerId)) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid sellerId' });
-    }
-
-    if (!productInstanceId || !sellerId || !reason || !description) {
+    if (!reason || !description) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide productInstanceId, sellerId, reason, and description',
+        message: 'Please provide reason and description',
       });
+    }
+
+    const item = await ItemInstance.findById(productInstanceId);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Product item instance not found.' });
+    }
+
+    // Verify ownership
+    if (item.currentOwner.toString() !== req.user!.id) {
+      return res.status(403).json({ success: false, message: 'You can only file complaints for items you currently own.' });
+    }
+
+    // Search journey in reverse chronological order to find the purchase or transfer step
+    let sellerId: Types.ObjectId | null = null;
+    let transactionHash = '';
+
+    const buyerIdStr = req.user!.id;
+
+    for (let i = item.journey.length - 1; i >= 0; i--) {
+      const step = item.journey[i];
+      if (step.action === 'purchased' && step.actor.toString() === buyerIdStr) {
+        transactionHash = step.txHash;
+        // Search preceding steps for the owner/seller
+        for (let j = i - 1; j >= 0; j--) {
+          if (item.journey[j].actor.toString() !== buyerIdStr) {
+            sellerId = item.journey[j].actor;
+            break;
+          }
+        }
+        break;
+      } else if (step.action === 'transferred') {
+        // In a transfer, the actor who triggered the transfer is the sender (seller/previous owner)
+        sellerId = step.actor;
+        transactionHash = step.txHash;
+        break;
+      }
+    }
+
+    // Fallbacks if not resolved in journey
+    if (!sellerId) {
+      const product = await Product.findById(item.product);
+      sellerId = product?.factory || item.journey[0].actor;
+    }
+
+    if (!transactionHash && item.journey.length > 0) {
+      transactionHash = item.journey[item.journey.length - 1].txHash;
     }
 
     const complaint = await Complaint.create({
       buyer: new Types.ObjectId(req.user!.id),
       productInstance: new Types.ObjectId(productInstanceId),
-      seller: new Types.ObjectId(sellerId),
+      seller: sellerId,
       reason,
       description,
       evidenceUrl: evidenceUrl || undefined,
+      transactionHash,
       status: 'pending',
     });
 

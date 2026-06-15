@@ -7,6 +7,8 @@ export interface IUser extends Document {
   role: 'buyer' | 'seller' | 'factory' | 'moderator' | 'admin';
   verified: boolean;
   trustScore: number;
+  logoUrl?: string;
+  certificateUrl?: string;
   factoryDetails?: {
     location: string;
     capacity: string;
@@ -28,6 +30,8 @@ const UserSchema = new Schema<IUser>(
     },
     verified: { type: Boolean, default: false },
     trustScore: { type: Number, default: 100, min: 0, max: 100 },
+    logoUrl: { type: String },
+    certificateUrl: { type: String },
     factoryDetails: {
       location: { type: String },
       capacity: { type: String },

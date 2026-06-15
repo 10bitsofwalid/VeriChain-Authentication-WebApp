@@ -7,6 +7,7 @@ export interface IComplaint extends Document {
   reason: string;
   description: string;
   evidenceUrl?: string;
+  transactionHash?: string;
   status: 'pending' | 'under_review' | 'resolved' | 'dismissed';
   moderatorNotes?: string;
   createdAt: Date;
@@ -21,6 +22,7 @@ const ComplaintSchema = new Schema<IComplaint>(
     reason: { type: String, required: true },
     description: { type: String, required: true },
     evidenceUrl: { type: String },
+    transactionHash: { type: String },
     status: {
       type: String,
       enum: ['pending', 'under_review', 'resolved', 'dismissed'],
