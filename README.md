@@ -139,7 +139,7 @@ Ownership Transfer
 ## Clone
 
 ```bash
-git clone https://github.com/yourusername/verichain.git
+git clone https://github.com/10bitsofwalid/VeriChain-Authentication-WebApps
 cd verichain
 ```
 
@@ -251,6 +251,6 @@ Distributed under the MIT License.
 
 ### ⭐ If you found this project useful, please consider starring the repository!
 
-Made with ❤️ using the MERN Stack.
+Made using the MERN Stack.
 
 </div>
