@@ -3,14 +3,14 @@ import { Product } from '../models/Product';
 import { ItemInstance } from '../models/ItemInstance';
 import { User } from '../models/User';
 import { AuditLog } from '../models/AuditLog';
-import { protect, authorize, AuthRequest } from '../middleware/auth';
+import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
 
 const router = Router();
 
 // @route   POST /api/products/register
 // @desc    Register a new product template (Factory only)
-router.post('/register', protect, authorize('factory'), async (req: AuthRequest, res: Response, next) => {
+router.post('/register', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
     const { name, description, category, sku, imageUrl, certificateUrl, specs } = req.body;
 
@@ -52,7 +52,7 @@ router.post('/register', protect, authorize('factory'), async (req: AuthRequest,
 
 // @route   GET /api/products/factory
 // @desc    Get all registered products for current factory
-router.get('/factory', protect, authorize('factory'), async (req: AuthRequest, res: Response, next) => {
+router.get('/factory', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
     const products = await Product.find({ factory: req.user?.id });
     res.json({ success: true, products });
@@ -63,8 +63,11 @@ router.get('/factory', protect, authorize('factory'), async (req: AuthRequest, r
 
 // @route   POST /api/products/:id/batch
 // @desc    Generate a serialized batch of items (Factory only)
-router.post('/:id/batch', protect, authorize('factory'), async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/batch', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid product template ID' });
+    }
     const { count, prefix, startingSerial } = req.body;
     const countNum = parseInt(count) || 10;
     const startSerialNum = parseInt(startingSerial) || 100001;
@@ -125,8 +128,11 @@ router.post('/:id/batch', protect, authorize('factory'), async (req: AuthRequest
 
 // @route   POST /api/products/:id/recall
 // @desc    Recall all items of a product catalog (Factory or Admin)
-router.post('/:id/recall', protect, authorize('factory', 'admin'), async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/recall', protect, authorize('factory', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid product ID' });
+    }
     const product = await Product.findById(req.params.id);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
@@ -175,7 +181,7 @@ router.post('/:id/recall', protect, authorize('factory', 'admin'), async (req: A
 
 // @route   GET /api/products/analytics
 // @desc    Get manufacturing analytics (Factory only)
-router.get('/analytics', protect, authorize('factory'), async (req: AuthRequest, res: Response, next) => {
+router.get('/analytics', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
     const productsCount = await Product.countDocuments({ factory: req.user?.id });
     const userProducts = await Product.find({ factory: req.user?.id });

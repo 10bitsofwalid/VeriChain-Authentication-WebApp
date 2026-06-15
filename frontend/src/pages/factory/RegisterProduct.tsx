@@ -1,10 +1,12 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import client from '../../api/client';
-import { Package, ArrowLeft, Loader, Plus, Trash2 } from 'lucide-react';
+import { useAuth } from '../../context/AuthContext';
+import { Package, ArrowLeft, Loader, Plus, Trash2, AlertTriangle } from 'lucide-react';
 
 export default function RegisterProduct() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -73,6 +75,16 @@ export default function RegisterProduct() {
       {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>{error}</div>}
       {success && <div className="alert alert-success" style={{ marginBottom: 'var(--space-md)' }}>{success}</div>}
 
+      {user && !user.verified && (
+        <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>
+          <AlertTriangle size={18} />
+          <span>
+            <strong>Account Verification Pending:</strong> Your manufacturer account is pending administrator approval.
+            You cannot register new products until verified.
+          </span>
+        </div>
+      )}
+
       <form onSubmit={handleSubmit} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
         <div className="form-group">
           <label className="form-label" htmlFor="reg-name">Product Name *</label>
@@ -124,8 +136,13 @@ export default function RegisterProduct() {
           ))}
         </div>
 
-        <button type="submit" className="btn btn-primary btn-lg" disabled={submitting} style={{ marginTop: 'var(--space-sm)' }}>
-          {submitting ? <Loader size={18} className="spin" /> : 'Register Product'}
+        <button 
+          type="submit" 
+          className="btn btn-primary btn-lg" 
+          disabled={submitting || !user?.verified} 
+          style={{ marginTop: 'var(--space-sm)' }}
+        >
+          {submitting ? <Loader size={18} className="spin" /> : user?.verified ? 'Register Product' : 'Register Product (Unverified)'}
         </button>
       </form>
     </div>

@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import { ItemInstance } from '../models/ItemInstance';
 import { Product } from '../models/Product';
 import { AuditLog } from '../models/AuditLog';
-import { protect, authorize, AuthRequest } from '../middleware/auth';
+import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
 
 const router = Router();
@@ -67,12 +67,15 @@ router.get('/my', protect, async (req: AuthRequest, res: Response, next) => {
 
 // @route   POST /api/items/:id/transfer
 // @desc    Transfer item ownership (e.g. factory → seller, seller → buyer)
-router.post('/:id/transfer', protect, async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/transfer', protect, ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid item ID' });
+    }
     const { toUserId, location } = req.body;
 
-    if (!toUserId) {
-      return res.status(400).json({ success: false, message: 'Please provide the recipient user ID' });
+    if (!toUserId || !Types.ObjectId.isValid(toUserId)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid recipient user ID' });
     }
 
     const item = await ItemInstance.findById(req.params.id);
@@ -119,8 +122,11 @@ router.post('/:id/transfer', protect, async (req: AuthRequest, res: Response, ne
 
 // @route   PATCH /api/items/:id/status
 // @desc    Update item status (factory/seller/admin)
-router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), async (req: AuthRequest, res: Response, next) => {
+router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid item ID' });
+    }
     const { status, location } = req.body;
     const validStatuses = ['manufactured', 'in_transit', 'listed', 'sold', 'recalled'];
 
@@ -162,8 +168,11 @@ router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), as
 
 // @route   GET /api/items/product/:productId
 // @desc    Get all items for a specific product (factory owner)
-router.get('/product/:productId', protect, authorize('factory', 'admin'), async (req: AuthRequest, res: Response, next) => {
+router.get('/product/:productId', protect, authorize('factory', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.productId)) {
+      return res.status(400).json({ success: false, message: 'Invalid product ID' });
+    }
     const product = await Product.findById(req.params.productId);
     if (!product) {
       return res.status(404).json({ success: false, message: 'Product not found' });
@@ -201,8 +210,11 @@ router.get('/marketplace', protect, async (req: AuthRequest, res: Response, next
 
 // @route   POST /api/items/:id/buy
 // @desc    Purchase a listed item from the marketplace (buyer only)
-router.post('/:id/buy', protect, authorize('buyer'), async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/buy', protect, authorize('buyer'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid item ID' });
+    }
     const item = await ItemInstance.findById(req.params.id);
     if (!item) {
       return res.status(404).json({ success: false, message: 'Item not found' });

@@ -3,11 +3,9 @@ import client from '../../api/client';
 import {
   FileText,
   Clock,
-  User,
   ShieldAlert,
   ChevronLeft,
   ChevronRight,
-  Info,
 } from 'lucide-react';
 
 interface AuditLogEntry {

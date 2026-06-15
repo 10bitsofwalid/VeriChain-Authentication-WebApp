@@ -46,6 +46,9 @@ router.get('/users', async (req: AuthRequest, res: Response, next) => {
 // @desc    Verify or reject a seller/factory account
 router.patch('/users/:id/verify', async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid user ID' });
+    }
     const { verified } = req.body;
     if (typeof verified !== 'boolean') {
       return res.status(400).json({ success: false, message: 'Please provide a boolean `verified` field' });
@@ -135,6 +138,9 @@ router.get('/products', async (req: AuthRequest, res: Response, next) => {
 // @desc    Verify or reject a product template
 router.patch('/products/:id/verify', async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid product ID' });
+    }
     const { verifiedStatus } = req.body;
 
     if (!verifiedStatus || !['verified', 'rejected'].includes(verifiedStatus)) {

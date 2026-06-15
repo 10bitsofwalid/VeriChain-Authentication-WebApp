@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import {
   Package,
   Boxes,
@@ -30,6 +31,7 @@ interface Product {
 }
 
 export default function FactoryDashboard() {
+  const { user } = useAuth();
   const [analytics, setAnalytics] = useState<Analytics | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -130,11 +132,28 @@ export default function FactoryDashboard() {
           <h1>Factory Dashboard</h1>
           <p>Manage your products and monitor manufacturing activity</p>
         </div>
-        <Link to="/dashboard/register-product" className="btn btn-primary">
-          <Plus size={18} />
-          New Product
-        </Link>
+        {user?.verified ? (
+          <Link to="/dashboard/register-product" className="btn btn-primary">
+            <Plus size={18} />
+            New Product
+          </Link>
+        ) : (
+          <button className="btn btn-primary" disabled style={{ opacity: 0.5 }}>
+            <Plus size={18} />
+            New Product (Unverified)
+          </button>
+        )}
       </div>
+
+      {user && !user.verified && (
+        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
+          <AlertTriangle size={18} />
+          <span>
+            <strong>Account Verification Pending:</strong> Your manufacturer account is pending administrator approval.
+            You cannot register new products or generate batch serials until verified.
+          </span>
+        </div>
+      )}
 
       {/* Stats */}
       <div className="grid-stats" style={{ marginBottom: 'var(--space-xl)' }}>
@@ -189,6 +208,8 @@ export default function FactoryDashboard() {
                     <button
                       className="btn btn-sm btn-secondary"
                       onClick={() => handleOpenBatchModal(product._id)}
+                      disabled={!user?.verified}
+                      title={!user?.verified ? "Account pending verification" : undefined}
                     >
                       <Plus size={14} /> Generate Batch
                     </button>

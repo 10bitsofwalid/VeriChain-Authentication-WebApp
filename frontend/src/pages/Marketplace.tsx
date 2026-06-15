@@ -5,12 +5,10 @@ import {
   ShoppingBag,
   Search,
   Tag,
-  Shield,
-  ShieldCheck,
   AlertTriangle,
   User,
-  ExternalLink,
   Loader,
+  ExternalLink,
   CheckCircle,
 } from 'lucide-react';
 

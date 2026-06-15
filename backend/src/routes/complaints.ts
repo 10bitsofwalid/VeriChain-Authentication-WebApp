@@ -1,16 +1,24 @@
 import { Router, Response } from 'express';
 import { Complaint } from '../models/Complaint';
 import { AuditLog } from '../models/AuditLog';
-import { protect, authorize, AuthRequest } from '../middleware/auth';
+import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
 
 const router = Router();
 
 // @route   POST /api/complaints
 // @desc    File a complaint (buyer only)
-router.post('/', protect, authorize('buyer'), async (req: AuthRequest, res: Response, next) => {
+router.post('/', protect, authorize('buyer'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
     const { productInstanceId, sellerId, reason, description, evidenceUrl } = req.body;
+
+    if (!productInstanceId || !Types.ObjectId.isValid(productInstanceId)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid productInstanceId' });
+    }
+
+    if (!sellerId || !Types.ObjectId.isValid(sellerId)) {
+      return res.status(400).json({ success: false, message: 'Please provide a valid sellerId' });
+    }
 
     if (!productInstanceId || !sellerId || !reason || !description) {
       return res.status(400).json({
@@ -71,8 +79,11 @@ router.get('/', protect, async (req: AuthRequest, res: Response, next) => {
 
 // @route   PATCH /api/complaints/:id
 // @desc    Update complaint status and moderator notes (moderator/admin)
-router.patch('/:id', protect, authorize('moderator', 'admin'), async (req: AuthRequest, res: Response, next) => {
+router.patch('/:id', protect, authorize('moderator', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid complaint ID' });
+    }
     const { status, moderatorNotes } = req.body;
     const validStatuses = ['pending', 'under_review', 'resolved', 'dismissed'];
 

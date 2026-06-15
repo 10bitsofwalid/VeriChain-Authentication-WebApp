@@ -6,13 +6,7 @@ import {
   Plus,
   Loader,
   CheckCircle,
-  FileText,
-  User,
-  Shield,
-  Clock,
-  ChevronRight,
   Eye,
-  Settings,
 } from 'lucide-react';
 
 interface Complaint {

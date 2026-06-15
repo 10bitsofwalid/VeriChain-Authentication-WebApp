@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import client from '../../api/client';
+import { useAuth } from '../../context/AuthContext';
 import {
   ShoppingBag,
   Package,
@@ -28,6 +29,7 @@ interface Item {
 }
 
 export default function SellerDashboard() {
+  const { user } = useAuth();
   const [items, setItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -177,6 +179,16 @@ export default function SellerDashboard() {
         <p>Update statuses, dispatch items, or list products directly onto the Verified Marketplace</p>
       </div>
 
+      {user && !user.verified && (
+        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
+          <AlertTriangle size={18} />
+          <span>
+            <strong>Account Verification Pending:</strong> Your seller account is pending administrator approval.
+            You cannot list items on the marketplace or transfer ownership until verified.
+          </span>
+        </div>
+      )}
+
       {success && (
         <div className="alert alert-success" style={{ marginBottom: 'var(--space-lg)' }}>
           <CheckCircle size={18} />
@@ -239,7 +251,8 @@ export default function SellerDashboard() {
                           <button
                             className="btn btn-sm btn-primary"
                             onClick={() => handleListOnMarketplace(item._id)}
-                            disabled={submitting}
+                            disabled={submitting || !user?.verified}
+                            title={!user?.verified ? "Account pending verification" : undefined}
                           >
                             <Tag size={12} /> List
                           </button>
@@ -247,14 +260,16 @@ export default function SellerDashboard() {
                         <button
                           className="btn btn-sm btn-secondary"
                           onClick={() => handleOpenStatus(item)}
-                          disabled={submitting}
+                          disabled={submitting || !user?.verified}
+                          title={!user?.verified ? "Account pending verification" : undefined}
                         >
                           <Settings size={12} /> Status
                         </button>
                         <button
                           className="btn btn-sm btn-secondary"
                           onClick={() => handleOpenTransfer(item)}
-                          disabled={submitting}
+                          disabled={submitting || !user?.verified}
+                          title={!user?.verified ? "Account pending verification" : undefined}
                         >
                           <Share2 size={12} /> Transfer
                         </button>
