@@ -8,6 +8,12 @@ import Signup from './pages/Signup';
 import VerifyItem from './pages/VerifyItem';
 import Dashboard from './pages/Dashboard';
 import RegisterProduct from './pages/factory/RegisterProduct';
+import Marketplace from './pages/Marketplace';
+import Complaints from './pages/Complaints';
+import AuditLogs from './pages/admin/AuditLogs';
+import SellerDashboard from './pages/seller/SellerDashboard';
+import BuyerDashboard from './pages/buyer/BuyerDashboard';
+import AdminDashboard from './pages/admin/AdminDashboard';
 import './index.css';
 
 function AppRoutes() {
@@ -38,6 +44,8 @@ function AppRoutes() {
         }
       >
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/dashboard/marketplace" element={<Marketplace />} />
+        <Route path="/dashboard/complaints" element={<Complaints />} />
         <Route
           path="/dashboard/register-product"
           element={
@@ -51,6 +59,46 @@ function AppRoutes() {
           element={
             <ProtectedRoute roles={['factory']}>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/inventory"
+          element={
+            <ProtectedRoute roles={['seller']}>
+              <SellerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/my-items"
+          element={
+            <ProtectedRoute roles={['buyer']}>
+              <BuyerDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/audit-logs"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AuditLogs />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/users"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/dashboard/products-admin"
+          element={
+            <ProtectedRoute roles={['admin']}>
+              <AdminDashboard />
             </ProtectedRoute>
           }
         />

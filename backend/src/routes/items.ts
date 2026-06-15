@@ -184,4 +184,66 @@ router.get('/product/:productId', protect, authorize('factory', 'admin'), async 
   }
 });
 
+// @route   GET /api/items/marketplace
+// @desc    Get all items listed on the marketplace
+router.get('/marketplace', protect, async (req: AuthRequest, res: Response, next) => {
+  try {
+    const items = await ItemInstance.find({ status: 'listed' })
+      .populate('product', 'name description category sku imageUrl certificateUrl verifiedStatus')
+      .populate('currentOwner', 'name email role')
+      .sort({ updatedAt: -1 });
+
+    res.json({ success: true, items });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   POST /api/items/:id/buy
+// @desc    Purchase a listed item from the marketplace (buyer only)
+router.post('/:id/buy', protect, authorize('buyer'), async (req: AuthRequest, res: Response, next) => {
+  try {
+    const item = await ItemInstance.findById(req.params.id);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Item not found' });
+    }
+
+    if (item.status !== 'listed') {
+      return res.status(400).json({ success: false, message: 'This item is not listed for sale' });
+    }
+
+    if (item.currentOwner.toString() === req.user?.id) {
+      return res.status(400).json({ success: false, message: 'You already own this item' });
+    }
+
+    const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+
+    const oldOwnerId = item.currentOwner;
+    item.currentOwner = new Types.ObjectId(req.user!.id);
+    item.status = 'sold';
+    item.journey.push({
+      location: 'VeriChain Marketplace',
+      action: 'purchased',
+      actor: new Types.ObjectId(req.user!.id),
+      timestamp: new Date(),
+      txHash,
+    });
+
+    await item.save();
+
+    // Create Audit Log
+    await AuditLog.create({
+      action: 'ITEM_PURCHASED',
+      actor: new Types.ObjectId(req.user!.id),
+      targetType: 'item',
+      targetId: item._id.toString(),
+      details: `Item ${item.serialNumber} purchased by buyer ${req.user!.id} from seller ${oldOwnerId}`,
+    });
+
+    res.json({ success: true, message: 'Item purchased successfully', item });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

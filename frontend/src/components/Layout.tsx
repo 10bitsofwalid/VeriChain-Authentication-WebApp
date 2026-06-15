@@ -105,6 +105,7 @@ interface NavItem {
 function getNavItems(role: string): NavItem[] {
   const common: NavItem[] = [
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
+    { to: '/dashboard/marketplace', label: 'Marketplace', icon: ShoppingBag },
     { to: '/verify', label: 'Verify Item', icon: Search },
   ];
 

@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import client from '../../api/client';
 import {
   Users,
@@ -53,6 +54,18 @@ export default function AdminDashboard() {
   const [products, setProducts] = useState<ProductEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'overview' | 'users' | 'products'>('overview');
+  
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.pathname.endsWith('/users')) {
+      setTab('users');
+    } else if (location.pathname.endsWith('/products-admin')) {
+      setTab('products');
+    } else {
+      setTab('overview');
+    }
+  }, [location.pathname]);
 
   useEffect(() => {
     fetchDashboard();
