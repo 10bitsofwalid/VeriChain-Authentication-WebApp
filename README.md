@@ -12,7 +12,7 @@
 
 </div>
 
-***
+---
 
 # 📖 Overview
 
@@ -20,23 +20,23 @@ VeriChain is a full-stack MERN platform that helps manufacturers, sellers, buyer
 
 ## ✨ Highlights
 
-* 🔐 JWT Authentication
+- 🔐 JWT Authentication
 
-* 🏭 Manufacturer Dashboard
+- 🏭 Manufacturer Dashboard
 
-* 🛒 Verified Marketplace
+- 🛒 Verified Marketplace
 
-* 📦 Supply Chain Tracking
+- 📦 Supply Chain Tracking
 
-* 📱 QR Code Verification
+- 📱 QR Code Verification
 
-* ⭐ Reputation System
+- ⭐ Reputation System
 
-* 📊 Analytics Dashboard
+- 📊 Analytics Dashboard
 
-* 🛡️ Role-Based Access Control
+- 🛡️ Role-Based Access Control
 
-***
+---
 
 # 👥 User Roles
 
@@ -48,71 +48,76 @@ VeriChain is a full-stack MERN platform that helps manufacturers, sellers, buyer
 | Moderator | Review reports and verification |
 | Admin     | Manage platform and users       |
 
-***
+---
 
 # 🏗️ Tech Stack
 
 ## Frontend
 
-* React
+- React
 
-* TypeScript
+- TypeScript
 
-* Vite
+- Vite
 
-* Tailwind CSS
+- Tailwind CSS
 
-* Shadcn UI
+- Shadcn UI
 
-* TanStack Query
+- TanStack Query
 
-* Zustand
+- Zustand
 
 ## Backend
 
-* Node.js
+- Node.js
 
-* Express.js
+- Express.js
 
-* JWT
+- JWT
 
-* Bcrypt
+- Bcrypt
 
-* Multer
+- Multer
 
-* Nodemailer
+- Nodemailer
 
 ## Database
 
-* MongoDB Atlas
+- MongoDB Atlas
 
 ## Storage
 
-* Cloudinary
+- Cloudinary
 
-***
+---
 
 # 📂 Folder Structure
 
 ```text
 VeriChain
-├── client
+├── frontend
 │   ├── src
+│   │   ├── api
+│   │   ├── assets
+│   │   ├── components
+│   │   ├── config
+│   │   ├── context
+│   │   ├── pages
+│   │   └── tests
 │   ├── public
 │   └── package.json
-├── server
+├── backend
 │   ├── src
-│   │   ├── controllers
+│   │   ├── config
 │   │   ├── middleware
 │   │   ├── models
-│   │   ├── routes
-│   │   ├── services
-│   │   └── utils
+│   │   └── routes
 │   └── package.json
 └── README.md
 ```
 
-***
+---
 
 # 🔄 Product Lifecycle
 
@@ -132,7 +137,7 @@ Buyer Purchase
 Ownership Transfer
 ```
 
-***
+---
 
 # 🚀 Installation
 
@@ -161,7 +166,7 @@ npm install
 npm run dev
 ```
 
-***
+---
 
 # 🔑 Environment Variables
 
@@ -187,35 +192,35 @@ EMAIL_PASS=
 VITE_API_URL=
 ```
 
-***
+---
 
 # 📈 Roadmap
 
 ## Phase 1
 
-* Authentication
+- Authentication
 
-* Product Verification
+- Product Verification
 
-* Marketplace
+- Marketplace
 
 ## Phase 2
 
-* Analytics
+- Analytics
 
-* Notifications
+- Notifications
 
-* Complaints
+- Complaints
 
 ## Phase 3
 
-* AI Counterfeit Detection
+- AI Counterfeit Detection
 
-* Blockchain Integration
+- Blockchain Integration
 
-* Mobile Application
+- Mobile Application
 
-***
+---
 
 # 🤝 Contributing
 
@@ -227,25 +232,25 @@ git push origin feature/my-feature
 
 Open a Pull Request after pushing your branch.
 
-***
+---
 
 # 📄 License
 
 Distributed under the MIT License.
 
-***
+---
 
 # 👨‍💻 Author
 
 **Walid Rahman**
 
-* GitHub: <https://github.com/10bitsofwalid>
+- GitHub: <https://github.com/10bitsofwalid>
 
-* Portfolio: <https://walid-rahman-portfolio.vercel.app>
+- Portfolio: <https://walid-rahman-portfolio.vercel.app>
 
-* LinkedIn: <https://www.linkedin.com/in/mohammad-walid-rahman>
+- LinkedIn: <https://www.linkedin.com/in/mohammad-walid-rahman>
 
-***
+---
 
 <div align="center">
 
