@@ -110,11 +110,11 @@ Create a `.env` file inside the `backend` folder:
 
 ```env
 PORT=5000
-MONGO_URI=mongodb://127.0.0.1:27017/verichain
-JWT_SECRET=verichain-super-secret-key-12345
-CLOUDINARY_CLOUD_NAME=your_cloudinary_name_here
-CLOUDINARY_API_KEY=your_cloudinary_key_here
-CLOUDINARY_API_SECRET=your_cloudinary_secret_here
+MONGO_URI=mongodb:
+JWT_SECRET=
+CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY= 
+CLOUDINARY_API_SECRET= 
 ```
 
 ### Frontend (`frontend/.env`)
