@@ -581,6 +581,19 @@ img {
   animation: spin-slow 0.8s linear infinite;
 }
 
+/* --- Grid Layouts for Sourcing --- */
+.factory-grid, .product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-md);
+}
+
+.factory-grid .factory-card, .product-grid .product-card {
+  /* Ensure cards stretch to fill grid cell */
+  width: 100%;
+  height: 100%;
+}
+
 .loading-container {
   display: flex;
   align-items: center;
