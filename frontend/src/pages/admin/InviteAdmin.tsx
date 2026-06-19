@@ -77,7 +77,7 @@ export default function InviteAdmin() {
     setError('');
     setSuccess('');
     try {
-      const res = await client.delete(`/admin/invitations/${id}`);
+      await client.delete(`/admin/invitations/${id}`);
       setSuccess('Invitation revoked successfully.');
       setInvitations(prev =>
         prev.map(invite => (invite._id === id ? { ...invite, status: 'expired' } : invite))

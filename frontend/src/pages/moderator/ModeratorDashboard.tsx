@@ -4,11 +4,9 @@ import client from '../../api/client';
 import {
   Shield,
   AlertTriangle,
-  Package,
   CheckCircle,
   XCircle,
   Eye,
-  FileText,
   Loader,
   AlertOctagon,
   TrendingUp,

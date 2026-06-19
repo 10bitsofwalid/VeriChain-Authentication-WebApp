@@ -16,37 +16,29 @@
 
 # 📖 Overview
 
-VeriChain is a full-stack MERN platform that helps manufacturers, sellers, buyers, moderators, and administrators verify product authenticity, manage supply chains, and combat counterfeit goods.
+VeriChain is a full-stack Web Application that helps manufacturers, sellers, buyers, moderators, and administrators verify product authenticity, manage supply chains, and combat counterfeit goods.
 
 ## ✨ Highlights
 
 - 🔐 JWT Authentication
-
-- 🏭 Manufacturer Dashboard
-
-- 🛒 Verified Marketplace
-
-- 📦 Supply Chain Tracking
-
-- 📱 QR Code Verification
-
-- ⭐ Reputation System
-
-- 📊 Analytics Dashboard
-
-- 🛡️ Role-Based Access Control
+- 🏭 Manufacturer Dashboard (Product template registration & batch generation)
+- 🛒 Verified Marketplace (Listing, purchase, and ownership transfer)
+- 📦 Supply Chain Tracking (Comprehensive tracking history for every item)
+- 📱 Serial Number Verification (Public lookup page)
+- 🛡️ Separate Moderator Control Center (Review disputes, verify manufacturers, manage flagged listings)
+- 📊 Admin Control Center (Audit logs, invite admins/moderators, manage user statuses)
 
 ---
 
 # 👥 User Roles
 
-| Role      | Responsibilities                |
-| --------- | ------------------------------- |
-| Buyer     | Verify and purchase products    |
-| Seller    | Sell verified products          |
-| Factory   | Register and certify products   |
-| Moderator | Review reports and verification |
-| Admin     | Manage platform and users       |
+| Role      | Responsibilities                                                |
+| --------- | --------------------------------------------------------------- |
+| Buyer     | Verify authenticity, buy items, file disputes/complaints        |
+| Seller    | Accept items, list items on marketplace                         |
+| Factory   | Create product templates, generate item batches                 |
+| Moderator | Verify product templates, resolve complaints, flag risky items  |
+| Admin     | Verification of factories, invite system roles, view audit logs |
 
 ---
 
@@ -54,183 +46,128 @@ VeriChain is a full-stack MERN platform that helps manufacturers, sellers, buyer
 
 ## Frontend
 
-- React
-
+- React (v19)
 - TypeScript
-
 - Vite
-
-- Tailwind CSS
-
-- Shadcn UI
-
-- TanStack Query
-
-- Zustand
+- Axios
+- Lucide React (Icons)
+- Vitest & React Testing Library (Unit & Integration Testing)
 
 ## Backend
 
-- Node.js
-
-- Express.js
-
-- JWT
-
-- Bcrypt
-
-- Multer
-
-- Nodemailer
-
-## Database
-
-- MongoDB Atlas
-
-## Storage
-
-- Cloudinary
+- Node.js & Express
+- Mongoose (MongoDB ODM)
+- TypeScript
+- JWT & Bcryptjs (Authentication & Cryptography)
+- Multer (File upload handler)
+- Jest & Supertest (Integration Testing)
 
 ---
 
 # 📂 Folder Structure
 
 ```text
-VeriChain
+VeriChain product authenticity webapp
 ├── frontend
 │   ├── src
 │   │   ├── api
 │   │   ├── assets
 │   │   ├── components
-│   │   ├── config
 │   │   ├── context
 │   │   ├── pages
 │   │   └── tests
 │   ├── public
+│   ├── index.html
+│   ├── vite.config.ts
 │   └── package.json
 ├── backend
 │   ├── src
 │   │   ├── config
 │   │   ├── middleware
 │   │   ├── models
-│   │   └── routes
+│   │   ├── routes
+│   │   └── tests
 │   └── package.json
 └── README.md
 ```
 
 ---
 
-# 🔄 Product Lifecycle
+# 🚀 Installation & Local Setup
 
-```text
-Factory
-   │
-Register Product
-   │
-Generate QR Code
-   │
-Verification
-   │
-Marketplace Listing
-   │
-Buyer Purchase
-   │
-Ownership Transfer
-```
-
----
-
-# 🚀 Installation
-
-## Clone
+## 1. Clone the Repository
 
 ```bash
-git clone https://github.com/10bitsofwalid/VeriChain-Authentication-WebApps
-cd verichain
+git clone https://github.com/10bitsofwalid/VeriChain-Authentication-WebApp.git
+cd "VeriChain product authenticity webapp"
 ```
 
-## Install
+## 2. Set Up Environment Variables
 
-### Frontend
+### Backend (`backend/.env`)
+
+Create a `.env` file inside the `backend` folder:
+
+```env
+PORT=5000
+MONGO_URI=mongodb://127.0.0.1:27017/verichain
+JWT_SECRET=verichain-super-secret-key-12345
+CLOUDINARY_CLOUD_NAME=your_cloudinary_name_here
+CLOUDINARY_API_KEY=your_cloudinary_key_here
+CLOUDINARY_API_SECRET=your_cloudinary_secret_here
+```
+
+### Frontend (`frontend/.env`)
+
+Create a `.env` file inside the `frontend` folder:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+## 3. Run the Services
+
+### Start Backend
 
 ```bash
-cd client
+cd backend
 npm install
 npm run dev
 ```
 
-### Backend
+The backend server will run on `http://localhost:5000`.
+
+### Start Frontend
 
 ```bash
-cd ../server
+cd frontend
 npm install
 npm run dev
 ```
 
----
-
-# 🔑 Environment Variables
-
-## Backend
-
-```env
-PORT=
-MONGODB_URI=
-JWT_SECRET=
-JWT_EXPIRES_IN=
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-EMAIL_HOST=
-EMAIL_PORT=
-EMAIL_USER=
-EMAIL_PASS=
-```
-
-## Frontend
-
-```env
-VITE_API_URL=
-```
+The frontend application will start on `http://localhost:5173`.
 
 ---
 
-# 📈 Roadmap
+# 🧪 Running Tests
 
-## Phase 1
+### Backend Tests
 
-- Authentication
-
-- Product Verification
-
-- Marketplace
-
-## Phase 2
-
-- Analytics
-
-- Notifications
-
-- Complaints
-
-## Phase 3
-
-- AI Counterfeit Detection
-
-- Blockchain Integration
-
-- Mobile Application
-
----
-
-# 🤝 Contributing
+To run the Jest/Supertest backend suite:
 
 ```bash
-git checkout -b feature/my-feature
-git commit -m "Add feature"
-git push origin feature/my-feature
+cd backend
+npm test
 ```
 
-Open a Pull Request after pushing your branch.
+### Frontend Tests
+
+To run the Vitest/React Testing Library suite:
+
+```bash
+cd frontend
+npm test
+```
 
 ---
 
@@ -245,17 +182,5 @@ Distributed under the MIT License.
 **Walid Rahman**
 
 - GitHub: <https://github.com/10bitsofwalid>
-
 - Portfolio: <https://walid-rahman-portfolio.vercel.app>
-
 - LinkedIn: <https://www.linkedin.com/in/mohammad-walid-rahman>
-
----
-
-<div align="center">
-
-### ⭐ If you found this project useful, please consider starring the repository!
-
-Made using the MERN Stack.
-
-</div>

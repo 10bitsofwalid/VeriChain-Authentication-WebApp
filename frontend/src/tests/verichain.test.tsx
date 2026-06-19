@@ -1,4 +1,3 @@
-import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
@@ -124,7 +123,7 @@ describe('VeriChain Frontend Test Suite', () => {
       );
 
       const searchInput = screen.getByPlaceholderText(/Enter Serial Number/i);
-      const searchButton = screen.getByRole('button', { name: /verify authenticity/i });
+      const searchButton = screen.getByRole('button', { name: /^verify$/i });
 
       // Search for mock serial number
       fireEvent.change(searchInput, { target: { value: 'VC-SKU-10001' } });
@@ -136,7 +135,7 @@ describe('VeriChain Frontend Test Suite', () => {
 
       // Verify that the UI displays product info
       await waitFor(() => {
-        expect(screen.getByText('Authenticity Confirmed')).toBeInTheDocument();
+        expect(screen.getByText('Authentic Product')).toBeInTheDocument();
         expect(screen.getByText('Premium Headphones')).toBeInTheDocument();
         expect(screen.getByText('VC-SKU-10001')).toBeInTheDocument();
       });
