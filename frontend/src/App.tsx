@@ -1,22 +1,29 @@
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { ToastProvider } from './components/ToastProvider';
 import Layout from './components/Layout';
-import Landing from './pages/Landing';
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import VerifyItem from './pages/VerifyItem';
-import Dashboard from './pages/Dashboard';
-import RegisterProduct from './pages/factory/RegisterProduct';
-import Marketplace from './pages/Marketplace';
-import Complaints from './pages/Complaints';
-import AuditLogs from './pages/admin/AuditLogs';
-import SellerDashboard from './pages/seller/SellerDashboard';
-import BuyerDashboard from './pages/buyer/BuyerDashboard';
-import AdminDashboard from './pages/admin/AdminDashboard';
-import AcceptInvite from './pages/AcceptInvite';
-import InviteAdmin from './pages/admin/InviteAdmin';
-import ModeratorDashboard from './pages/moderator/ModeratorDashboard';
+import LoadingSpinner from './components/LoadingSpinner';
+import ErrorBoundary from './components/ErrorBoundary';
+
+// Lazy-loaded page components
+const Landing = lazy(() => import('./pages/Landing'));
+const Login = lazy(() => import('./pages/Login'));
+const Signup = lazy(() => import('./pages/Signup'));
+const VerifyItem = lazy(() => import('./pages/VerifyItem'));
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const RegisterProduct = lazy(() => import('./pages/factory/RegisterProduct'));
+const Marketplace = lazy(() => import('./pages/Marketplace'));
+const Complaints = lazy(() => import('./pages/Complaints'));
+const AuditLogs = lazy(() => import('./pages/admin/AuditLogs'));
+const SellerDashboard = lazy(() => import('./pages/seller/SellerDashboard'));
+const BuyerDashboard = lazy(() => import('./pages/buyer/BuyerDashboard'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const AcceptInvite = lazy(() => import('./pages/AcceptInvite'));
+const InviteAdmin = lazy(() => import('./pages/admin/InviteAdmin'));
+const ModeratorDashboard = lazy(() => import('./pages/moderator/ModeratorDashboard'));
+
 import './index.css';
 
 function AppRoutes() {
@@ -151,8 +158,15 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <AppRoutes />
+        <ToastProvider>
+          <ErrorBoundary fallback={<div className="glass-card" style={{ padding: 'var(--space-lg)', textAlign: 'center' }}>Something went wrong.</div>}>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AppRoutes />
+            </Suspense>
+          </ErrorBoundary>
+        </ToastProvider>
       </AuthProvider>
     </BrowserRouter>
   );
 }
+

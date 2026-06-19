@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, ExternalLink, CheckCircle } from 'lucide-react';
+import { ShoppingBag, ExternalLink, Tag, User } from 'lucide-react';
+import LazyImage from './LazyImage';
 
 interface ProductCardProps {
   item: any; // using any due to existing structure
@@ -43,7 +44,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
     <div className="glass-card animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Image */}
       <div style={{ position: 'relative', width: '100%', height: '180px', borderRadius: 'var(--radius-md)', overflow: 'hidden', background: 'rgba(15,20,36,0.4)', border: '1px solid var(--border-subtle)', marginBottom: 'var(--space-md)' }}>
-        <img
+        <LazyImage
           src={item.product?.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80'}
           alt={item.product?.name}
           style={{ width: '100%', height: '100%', objectFit: 'cover' }}
@@ -125,4 +126,4 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
   );
 };
 
-export default ProductCard;
+export default memo(ProductCard);
