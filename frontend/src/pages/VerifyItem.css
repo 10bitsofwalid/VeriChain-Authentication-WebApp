@@ -17,8 +17,8 @@
   width: 700px;
   height: 500px;
   background: radial-gradient(ellipse at center,
-    rgba(6, 182, 212, 0.08) 0%,
-    rgba(139, 92, 246, 0.05) 40%,
+    rgba(0, 88, 188, 0.05) 0%,
+    rgba(0, 112, 235, 0.02) 40%,
     transparent 70%);
   pointer-events: none;
   filter: blur(60px);
@@ -156,21 +156,21 @@
 
 .banner-verified {
   background: var(--color-success-bg);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  color: var(--color-success);
+  border: 1px solid var(--border-accent);
+  color: var(--color-success-text);
 }
 
-.banner-verified h2 { color: #6ee7b7; }
-.banner-verified p { color: #a7f3d0; opacity: 0.8; }
+.banner-verified h2 { color: var(--color-success-text); }
+.banner-verified p { color: var(--text-secondary); opacity: 0.95; }
 
 .banner-unverified {
   background: var(--color-warning-bg);
-  border: 1px solid rgba(245, 158, 11, 0.3);
+  border: 1px solid var(--border-default);
   color: var(--color-warning);
 }
 
-.banner-unverified h2 { color: #fde68a; }
-.banner-unverified p { color: #fcd34d; opacity: 0.8; }
+.banner-unverified h2 { color: var(--color-warning); }
+.banner-unverified p { color: var(--text-secondary); opacity: 0.95; }
 
 .verify-banner h2 {
   font-size: 18px;
