@@ -12,7 +12,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 
-interface ListedItem {
+export interface ListedItem {
   _id: string;
   serialNumber: string;
   counterfeitRisk: string;

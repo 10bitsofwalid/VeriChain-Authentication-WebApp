@@ -1,4 +1,5 @@
-import React, { createContext, useContext, useReducer, ReactNode } from 'react';
+import React, { createContext, useContext, useReducer } from 'react';
+import type { ReactNode } from 'react';
 import { persistState, retrieveState } from '../utils/storage';
 
 // Types for cart items – assuming product has at least id, name, price, image

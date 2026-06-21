@@ -1,5 +1,4 @@
 import React from 'react';
-import { Icon } from 'lucide-react'; // Icon type for generic usage
 
 interface AnalyticsCardProps {
   icon: React.ReactNode;

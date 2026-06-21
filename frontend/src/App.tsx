@@ -1,4 +1,4 @@
-import React, { lazy, Suspense } from 'react';
+import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -9,7 +9,6 @@ import ErrorBoundary from './components/ErrorBoundary';
 import { ShoppingProvider } from './context/ShoppingContext';
 
 // Lazy-loaded page components
-const Landing = lazy(() => import('./pages/Landing'));
 const ProductDetailsPage = lazy(() => import('./pages/ProductDetailsPage'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));

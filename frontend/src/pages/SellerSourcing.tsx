@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import FactoryCard from '../components/FactoryCard';
@@ -6,7 +6,7 @@ import SellerProductCard from '../components/SellerProductCard';
 import SkeletonFactoryCard from '../components/SkeletonFactoryCard';
 import SkeletonProductCard from '../components/SkeletonProductCard';
 import EmptyState from '../components/EmptyState';
-import { Search, Tag, Loader, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 interface Factory {
   _id: string;
@@ -53,7 +53,7 @@ export default function SellerSourcing() {
       .get('/users?role=factory&verified=true')
       .then((res) => setFactories(res.data.users))
       .catch(() => setError('Failed to load factories'))
-      .finally(() => setLoadingFactories(false);
+      .finally(() => setLoadingFactories(false));
   }, []);
 
   // Fetch products when a factory is selected
@@ -67,7 +67,7 @@ export default function SellerSourcing() {
       .get(`/products/factory?factoryId=${selectedFactory._id}`)
       .then((res) => setProducts(res.data.products))
       .catch(() => setError('Failed to load products'))
-      .finally(() => setLoadingProducts(false);
+      .finally(() => setLoadingProducts(false));
   }, [selectedFactory]);
 
   // Filtering & sorting

@@ -1,4 +1,3 @@
-import React from 'react';
 import { useShopping } from '../context/ShoppingContext';
 import './CartModal.css';
 import { X } from 'lucide-react';

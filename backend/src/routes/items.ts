@@ -258,4 +258,47 @@ router.post('/:id/buy', protect, authorize('buyer'), ensureVerified, async (req:
   }
 });
 
+// @route   GET /api/items/:id
+// @desc    Get item details by Mongo ID (Public)
+router.get('/:id', async (req: Request, res: Response, next) => {
+  try {
+    if (!Types.ObjectId.isValid(req.params.id)) {
+      return res.status(400).json({ success: false, message: 'Invalid item ID' });
+    }
+    const item = await ItemInstance.findById(req.params.id)
+      .populate({
+        path: 'product',
+        populate: { path: 'factory', select: 'name email role trustScore factoryDetails logoUrl verified' }
+      })
+      .populate('currentOwner', 'name email role trustScore logoUrl verified');
+
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Item not found' });
+    }
+
+    const productInfo = item.product as any;
+    const factoryInfo = productInfo?.factory;
+    const sellerInfo = item.currentOwner;
+
+    res.json({
+      _id: item._id,
+      product: productInfo,
+      item: {
+        _id: item._id,
+        serialNumber: item.serialNumber,
+        qrCodeUrl: item.qrCodeUrl,
+        status: item.status,
+        counterfeitRisk: item.counterfeitRisk,
+        journey: item.journey,
+        createdAt: item.createdAt,
+        updatedAt: item.updatedAt
+      },
+      factory: factoryInfo,
+      seller: sellerInfo
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

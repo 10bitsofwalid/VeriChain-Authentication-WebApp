@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import CartModal from './CartModal';
 import { useShopping } from '../context/ShoppingContext';

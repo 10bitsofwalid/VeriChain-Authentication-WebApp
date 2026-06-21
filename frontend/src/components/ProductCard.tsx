@@ -7,29 +7,7 @@ interface ProductCardProps {
   item: any; // using any due to existing structure
 }
 
-const riskBadge = (risk: string) => {
-  switch (risk) {
-    case 'low':
-      return 'badge-success';
-    case 'medium':
-      return 'badge-warning';
-    case 'high':
-      return 'badge-danger';
-    default:
-      return 'badge-neutral';
-  }
-};
-
-const verificationBadge = (status: string) => {
-  switch (status) {
-    case 'verified':
-      return 'badge-success';
-    case 'rejected':
-      return 'badge-danger';
-    default:
-      return 'badge-warning';
-  }
-};
+import { riskBadge, verificationBadge } from '../utils/badges';
 
 export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
   const placeholder = {

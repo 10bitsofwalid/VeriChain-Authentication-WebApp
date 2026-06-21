@@ -1,5 +1,6 @@
 // src/components/ErrorBoundary.tsx
-import React, { Component, ReactNode } from 'react';
+import React, { Component } from 'react';
+import type { ReactNode } from 'react';
 import { toast } from 'react-hot-toast';
 
 interface ErrorBoundaryProps {

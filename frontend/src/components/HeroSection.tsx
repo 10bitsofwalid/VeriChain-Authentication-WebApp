@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircle, Award, ShieldCheck } from 'lucide-react';
 
 interface HeroSectionProps {

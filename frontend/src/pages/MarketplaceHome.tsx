@@ -5,7 +5,7 @@ import HeroBanner from '../components/HeroBanner';
 import CategoriesSection from '../components/CategoriesSection';
 import ProductSection from '../components/ProductSection';
 import Footer from '../components/Footer';
-import { ListedItem } from '../pages/Marketplace'; // reuse type if exported, else define inline
+import type { ListedItem } from '../pages/Marketplace'; // reuse type if exported, else define inline
 
 const MarketplaceHome: React.FC = () => {
   const [items, setItems] = useState<ListedItem[]>([]);
@@ -27,7 +27,10 @@ const MarketplaceHome: React.FC = () => {
 
   // Derive sections (simple mock logic)
   const featured = items.slice(0, 6);
-  const trending = [...items].sort((a, b) => (b.trustScore || 0) - (a.trustScore || 0)).slice(0, 6);
+  const trending = [...items].sort((a, b) => {
+    const score = (x: ListedItem) => x.counterfeitRisk === 'low' ? 3 : (x.counterfeitRisk === 'medium' ? 2 : 1);
+    return score(b) - score(a);
+  }).slice(0, 6);
   const recentlyVerified = [...items].sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()).slice(0, 6);
   const recommended = items.slice(6, 12);
 
