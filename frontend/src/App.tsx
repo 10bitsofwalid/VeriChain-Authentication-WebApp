@@ -14,7 +14,7 @@ const Signup = lazy(() => import('./pages/Signup'));
 const VerifyItem = lazy(() => import('./pages/VerifyItem'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const RegisterProduct = lazy(() => import('./pages/factory/RegisterProduct'));
-const Marketplace = lazy(() => import('./pages/Marketplace'));
+const MarketplaceHome = lazy(() => import('./pages/MarketplaceHome'));
 const Complaints = lazy(() => import('./pages/Complaints'));
 const AuditLogs = lazy(() => import('./pages/admin/AuditLogs'));
 const SellerDashboard = lazy(() => import('./pages/seller/SellerDashboard'));
@@ -40,7 +40,7 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Landing />} />
+      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <MarketplaceHome />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/verify" element={<VerifyItem />} />
