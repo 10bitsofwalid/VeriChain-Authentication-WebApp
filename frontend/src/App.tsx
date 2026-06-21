@@ -6,13 +6,16 @@ import { ToastProvider } from './components/ToastProvider';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
 import ErrorBoundary from './components/ErrorBoundary';
+import { ShoppingProvider } from './context/ShoppingContext';
 
 // Lazy-loaded page components
 const Landing = lazy(() => import('./pages/Landing'));
+const ProductDetailsPage = lazy(() => import('./pages/ProductDetailsPage'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const VerifyItem = lazy(() => import('./pages/VerifyItem'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
+const Marketplace = lazy(() => import('./pages/Marketplace'));
 const RegisterProduct = lazy(() => import('./pages/factory/RegisterProduct'));
 const MarketplaceHome = lazy(() => import('./pages/MarketplaceHome'));
 const Complaints = lazy(() => import('./pages/Complaints'));
@@ -44,6 +47,7 @@ function AppRoutes() {
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/verify" element={<VerifyItem />} />
+      <Route path="/product/:id" element={<ProductDetailsPage />} />
       <Route path="/accept-invite" element={<AcceptInvite />} />
 
       {/* Protected routes — wrapped in Layout */}
@@ -158,15 +162,16 @@ export default function App() {
   return (
     <BrowserRouter>
       <AuthProvider>
-        <ToastProvider>
-          <ErrorBoundary fallback={<div className="glass-card" style={{ padding: 'var(--space-lg)', textAlign: 'center' }}>Something went wrong.</div>}>
-            <Suspense fallback={<LoadingSpinner />}>
-              <AppRoutes />
-            </Suspense>
-          </ErrorBoundary>
-        </ToastProvider>
+        <ShoppingProvider>
+          <ToastProvider>
+            <ErrorBoundary fallback={<div className="glass-card" style={{ padding: 'var(--space-lg)', textAlign: 'center' }}>Something went wrong.</div>}>
+              <Suspense fallback={<LoadingSpinner />}>
+                <AppRoutes />
+              </Suspense>
+            </ErrorBoundary>
+          </ToastProvider>
+        </ShoppingProvider>
       </AuthProvider>
     </BrowserRouter>
   );
 }
-

@@ -16,6 +16,8 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import './Layout.css';
+// Import the new CartIcon component
+import CartIcon from './CartIcon';
 
 export default function Layout() {
   const { user, logout } = useAuth();
@@ -88,6 +90,7 @@ export default function Layout() {
       )}
 
       {/* Main Content */}
+      <CartIcon />
       <main className="main-content">
         <Outlet />
       </main>
