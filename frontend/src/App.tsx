@@ -42,7 +42,7 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <MarketplaceHome />} />
+      <Route path="/" element={<MarketplaceHome />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/verify" element={<VerifyItem />} />
