@@ -8,8 +8,11 @@ interface ProductCardProps {
 }
 
 import { riskBadge, verificationBadge } from '../utils/badges';
+import { useShopping } from '../context/ShoppingContext';
+import { Heart, Scale } from 'lucide-react';
 
 export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
+  const { dispatch, wishlist, compare } = useShopping();
   const placeholder = {
     factoryName: 'Acme Factory',
     trustScore: Math.round(Math.random() * 100),
@@ -87,19 +90,42 @@ export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
       </div>
 
       {/* Action footer */}
-      <div style={{ marginTop: 'var(--space-lg)', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--border-default)', display: 'flex', gap: 'var(--space-xs)' }}>
-        <Link to={`/verify?serial=${item.serialNumber}`} className="btn btn-outline" style={{ flex: '1' }}>
-          Verify
-        </Link>
-        <button className="btn btn-primary" style={{ flex: '1' }} onClick={() => console.log('Buy clicked', item._id)}>
-          <ShoppingBag size={14} /> Buy
-        </button>
-        {item.product?.certificateUrl && (
-          <a href={item.product.certificateUrl} target="_blank" rel="noreferrer" className="btn btn-secondary" title="View Authenticity Certificate">
-            <ExternalLink size={14} />
-          </a>
-        )}
-      </div>
+        <div style={{ marginTop: 'var(--space-lg)', paddingTop: 'var(--space-md)', borderTop: '1px solid var(--border-default)', display: 'flex', gap: 'var(--space-xs)', flexWrap: 'wrap' }}>
+          <Link to={`/verify?serial=${item.serialNumber}`} className="btn btn-outline" style={{ flex: '1' }}>
+            Verify
+          </Link>
+          <button className="btn btn-primary" style={{ flex: '1' }} onClick={() => console.log('Buy clicked', item._id)}>
+            <ShoppingBag size={14} /> Buy
+          </button>
+          {item.product?.certificateUrl && (
+            <a href={item.product.certificateUrl} target="_blank" rel="noreferrer" className="btn btn-secondary" title="View Authenticity Certificate">
+              <ExternalLink size={14} />
+            </a>
+          )}
+          {/* Wishlist and Compare buttons */}
+          <button className="btn btn-ghost" title="Add to Wishlist" onClick={() => {
+            const exists = wishlist.some(p => p.id === item.product?.id);
+            if (exists) {
+              dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: item.product.id });
+            } else {
+              dispatch({ type: 'ADD_TO_WISHLIST', payload: { id: item.product.id, name: item.product.name, price: parseFloat(item.product.price), imageUrl: item.product.imageUrl } });
+            }
+          }}>
+            <Heart size={16} fill={wishlist.some(p => p.id === item.product?.id) ? "currentColor" : "none"} />
+          </button>
+          <button className="btn btn-ghost" title="Add to Compare" onClick={() => {
+            const exists = compare.some(p => p.id === item.product?.id);
+            if (exists) {
+              dispatch({ type: 'REMOVE_FROM_COMPARE', payload: item.product.id });
+            } else if (compare.length < 4) {
+              dispatch({ type: 'ADD_TO_COMPARE', payload: { id: item.product.id, name: item.product.name, price: parseFloat(item.product.price), imageUrl: item.product.imageUrl } });
+            } else {
+              alert('Compare list can contain up to 4 items');
+            }
+          }}>
+            <Scale size={16} />
+          </button>
+        </div>
     </div>
   );
 };

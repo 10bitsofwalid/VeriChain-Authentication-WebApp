@@ -1,4 +1,4 @@
-import { CheckCircle, Award, ShieldCheck } from 'lucide-react';
+import { Award, ShieldCheck } from 'lucide-react';
 import { formatCurrency } from '../utils/format';
 
 interface ProductInfoCardProps {

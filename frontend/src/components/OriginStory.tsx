@@ -1,6 +1,3 @@
-import React from 'react';
-import OriginStoryTimeline from './OriginStoryTimeline';
-
 interface OriginStoryProps {
   journey: any[]; // raw journey data
 }

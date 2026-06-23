@@ -10,6 +10,8 @@ import { ShoppingProvider } from './context/ShoppingContext';
 
 // Lazy-loaded page components
 const ProductDetailsPage = lazy(() => import('./pages/ProductDetailsPage'));
+const Wishlist = lazy(() => import('./pages/Wishlist'));
+const Compare = lazy(() => import('./pages/Compare'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const VerifyItem = lazy(() => import('./pages/VerifyItem'));
@@ -43,6 +45,8 @@ function AppRoutes() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<MarketplaceHome />} />
+        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/compare" element={<Compare />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/verify" element={<VerifyItem />} />

@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 interface OwnershipTimelineProps {
   milestones: { label: string; date?: string }[];
