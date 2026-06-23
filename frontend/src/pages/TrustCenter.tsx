@@ -5,6 +5,9 @@ import FactoryCard from '../components/FactoryCard';
 import SellerInfoCard from '../components/SellerInfoCard';
 import AnalyticsCard from '../components/AnalyticsCard';
 import { useNavigate } from 'react-router-dom';
+import TrustCenterFeed from './TrustCenterFeed';
+import RecallAlerts from './RecallAlerts';
+import VerificationActivity from './VerificationActivity';
 
 // Types for fetched data
 interface Product {
@@ -143,6 +146,16 @@ const TrustCenter: React.FC = () => {
           ))}
         </div>
       </section>
+
+      {/* Live Verification Feed */}
+      <TrustCenterFeed />
+
+      {/* Recall Alerts */}
+      <RecallAlerts />
+
+      {/* Verification Activity */}
+      <VerificationActivity />
+
     </section>
   );
 };
