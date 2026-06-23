@@ -33,13 +33,20 @@ export default function CartModal({ onClose }: CartModalProps) {
                   <span className="cart-item-name">{item.name}</span>
                   <span className="cart-item-price">${item.price.toFixed(2)}</span>
                 </div>
-                <button className="remove-btn" onClick={() => handleRemove(item.id)} aria-label="Remove item">
-                  ×
-                </button>
+                <div className="quantity-controls">
+                  <button className="decrease-btn" onClick={() => dispatch({ type: 'UPDATE_QUANTITY', payload: { id: item.id, quantity: (item.quantity ?? 1) - 1 } })} aria-label="Decrease quantity">−</button>
+                  <span className="item-quantity">{item.quantity ?? 1}</span>
+                  <button className="increase-btn" onClick={() => dispatch({ type: 'UPDATE_QUANTITY', payload: { id: item.id, quantity: (item.quantity ?? 1) + 1 } })} aria-label="Increase quantity">+</button>
+                </div>
+                <button className="remove-btn" onClick={() => handleRemove(item.id)} aria-label="Remove item">×</button>
               </li>
             ))}
           </ul>
         )}
+        <div className="cart-actions">
+          <button className="clear-cart-btn" onClick={() => dispatch({ type: 'CLEAR_CART' })}>Clear Cart</button>
+          {/* Placeholder for checkout button; will navigate to /cart or checkout page */}
+        </div>
         {/* Future: Add checkout button */}
       </div>
     </div>

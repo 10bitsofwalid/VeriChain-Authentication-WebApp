@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import CartIcon from '../components/CartIcon';
 import './NavBar.css';
 
 const NavBar: React.FC = () => {
@@ -40,6 +41,7 @@ const NavBar: React.FC = () => {
           </>
         )}
       </ul>
+      <CartIcon />
       <form className="navbar-search" onSubmit={handleSearch}>
         <input type="text" name="search" placeholder="Search products..." />
         <button type="submit">Search</button>

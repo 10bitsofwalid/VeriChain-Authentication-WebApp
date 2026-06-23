@@ -8,6 +8,7 @@ export interface Product {
   name: string;
   price: number;
   imageUrl?: string;
+  quantity?: number; // optional quantity for cart handling
   // Extend as needed
 }
 
@@ -20,6 +21,8 @@ export interface ShoppingState {
 export type ShoppingAction =
   | { type: 'ADD_TO_CART'; payload: Product }
   | { type: 'REMOVE_FROM_CART'; payload: string } // payload = product id
+  | { type: 'UPDATE_QUANTITY'; payload: { id: string; quantity: number } }
+  | { type: 'CLEAR_CART' }
   | { type: 'ADD_TO_WISHLIST'; payload: Product }
   | { type: 'REMOVE_FROM_WISHLIST'; payload: string }
   | { type: 'ADD_TO_COMPARE'; payload: Product }
@@ -34,10 +37,17 @@ const initialState: ShoppingState = {
 function shoppingReducer(state: ShoppingState, action: ShoppingAction): ShoppingState {
   switch (action.type) {
     case 'ADD_TO_CART': {
-      // Avoid duplicates
-      const exists = state.cart.some((p) => p.id === action.payload.id);
-      if (exists) return state;
-      const newCart = [...state.cart, action.payload];
+      // If item exists, increase quantity; otherwise add with quantity 1
+      const existing = state.cart.find((p) => p.id === action.payload.id);
+      let newCart;
+      if (existing) {
+        newCart = state.cart.map((p) =>
+          p.id === action.payload.id ? { ...p, quantity: (p.quantity ?? 1) + 1 } : p,
+        );
+      } else {
+        const itemWithQty = { ...action.payload, quantity: 1 };
+        newCart = [...state.cart, itemWithQty];
+      }
       persistState('shopping_cart', newCart);
       return { ...state, cart: newCart };
     }
@@ -45,6 +55,24 @@ function shoppingReducer(state: ShoppingState, action: ShoppingAction): Shopping
       const newCart = state.cart.filter((p) => p.id !== action.payload);
       persistState('shopping_cart', newCart);
       return { ...state, cart: newCart };
+    }
+    case 'UPDATE_QUANTITY': {
+      const { id, quantity } = action.payload;
+      if (quantity <= 0) {
+        // Remove if quantity zero or negative
+        const newCart = state.cart.filter((p) => p.id !== id);
+        persistState('shopping_cart', newCart);
+        return { ...state, cart: newCart };
+      }
+      const newCart = state.cart.map((p) =>
+        p.id === id ? { ...p, quantity } : p,
+      );
+      persistState('shopping_cart', newCart);
+      return { ...state, cart: newCart };
+    }
+    case 'CLEAR_CART': {
+      persistState('shopping_cart', []);
+      return { ...state, cart: [] };
     }
     case 'ADD_TO_WISHLIST': {
       const exists = state.wishlist.some((p) => p.id === action.payload.id);
