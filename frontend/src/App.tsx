@@ -30,6 +30,7 @@ const ModeratorDashboard = lazy(() => import('./pages/moderator/ModeratorDashboa
 const SellerDashboard = lazy(() => import('./pages/seller/SellerDashboard'));
 const BuyerDashboard = lazy(() => import('./pages/buyer/BuyerDashboard'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+const RegisterProduct = lazy(() => import('./pages/factory/RegisterProduct'));
 // const QRVerification = lazy(() => import('./pages/QRVerification'));
 
 

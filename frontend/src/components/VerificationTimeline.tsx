@@ -1,6 +1,3 @@
-import React from 'react';
-import { ShieldCheck } from 'lucide-react';
-
 interface VerificationTimelineProps {
   history: any[]; // expects same shape as VerificationHistoryTimeline
 }

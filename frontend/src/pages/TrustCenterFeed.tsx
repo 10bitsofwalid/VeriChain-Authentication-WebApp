@@ -1,5 +1,6 @@
 import React from 'react';
-import { verificationFeed, FeedEvent } from '../mock/verificationFeed';
+import { verificationFeed } from '../mock/verificationFeed';
+import type { FeedEvent } from '../mock/verificationFeed';
 
 const TrustCenterFeed: React.FC = () => {
   return (

@@ -46,10 +46,6 @@ export default function FactoryDashboard() {
   const [modalError, setModalError] = useState('');
   const [modalSuccess, setModalSuccess] = useState('');
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
   const fetchData = async () => {
     try {
       const [analyticsRes, productsRes] = await Promise.all([
@@ -64,6 +60,10 @@ export default function FactoryDashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleOpenBatchModal = (productId: string) => {
     setActiveProductId(productId);

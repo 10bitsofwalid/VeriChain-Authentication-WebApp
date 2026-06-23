@@ -67,10 +67,6 @@ export default function AdminDashboard() {
     }
   }, [location.pathname]);
 
-  useEffect(() => {
-    fetchDashboard();
-  }, []);
-
   const fetchDashboard = async () => {
     try {
       const [dashRes, usersRes, productsRes] = await Promise.all([
@@ -87,6 +83,10 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchDashboard();
+  }, []);
 
   const handleVerifyUser = async (userId: string, verified: boolean) => {
     try {

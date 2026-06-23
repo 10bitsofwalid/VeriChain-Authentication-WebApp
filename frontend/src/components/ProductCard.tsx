@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React, { memo, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingBag, ExternalLink, Tag, User } from 'lucide-react';
 import LazyImage from './LazyImage';
@@ -13,13 +13,18 @@ import { Heart, Scale } from 'lucide-react';
 
 export const ProductCard: React.FC<ProductCardProps> = ({ item }) => {
   const { dispatch, wishlist, compare } = useShopping();
-  const placeholder = {
-    factoryName: 'Acme Factory',
-    trustScore: Math.round(Math.random() * 100),
-    rating: (Math.random() * 5).toFixed(1),
-    stock: Math.floor(Math.random() * 100),
-    price: (Math.random() * 500 + 20).toFixed(2),
-  };
+  const placeholder = useMemo(() => {
+    const hash = item.serialNumber
+      ? item.serialNumber.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)
+      : 0;
+    return {
+      factoryName: 'Acme Factory',
+      trustScore: 70 + (hash % 30),
+      rating: (4.0 + (hash % 11) / 10).toFixed(1),
+      stock: 5 + (hash % 95),
+      price: (20 + (hash % 480)).toFixed(2),
+    };
+  }, [item.serialNumber]);
 
   return (
     <div className="glass-card animate-fade-in-up" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>

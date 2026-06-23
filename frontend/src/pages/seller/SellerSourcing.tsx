@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import client from '../../api/client';
 import FactoryCard from '../../components/FactoryCard';
 import SellerProductCard from '../../components/SellerProductCard';
-import { useAuth } from '../../context/AuthContext';
 
 // Types (reuse existing where possible)
 interface Factory {
@@ -31,7 +30,6 @@ interface Product {
 }
 
 const SellerSourcing: React.FC = () => {
-  const { user } = useAuth();
   const [factories, setFactories] = useState<Factory[]>([]);
   const [selectedFactoryId, setSelectedFactoryId] = useState<string | null>(null);
   const [products, setProducts] = useState<Product[]>([]);

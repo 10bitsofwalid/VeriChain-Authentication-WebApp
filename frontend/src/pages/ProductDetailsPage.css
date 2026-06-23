@@ -5,6 +5,8 @@
   max-width: 1400px;
   margin: 0 auto;
   padding: var(--space-2xl) var(--space-xl);
+  min-height: 100vh;
+  background: var(--bg-primary);
 }
 
 /* Sticky panel stays at top */
@@ -30,12 +32,6 @@
     grid-template-columns: 2fr 350px;
     gap: var(--space-lg);
   }
-}
-
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: var(--bg-primary);
 }
 
 .product-details-page .main-content {

@@ -76,8 +76,9 @@ export default function SellerDashboard() {
       });
       setSuccess('Item listed on marketplace successfully.');
       await fetchItems();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to list item on marketplace.');
+    } catch (err: unknown) {
+      const message = (err as any).response?.data?.message || 'Failed to list item on marketplace.';
+      setError(message);
     } finally {
       setSubmitting(false);
     }
@@ -107,8 +108,9 @@ export default function SellerDashboard() {
       setShowTransferModal(false);
       setSelectedItem(null);
       await fetchItems();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to transfer item.');
+    } catch (err: unknown) {
+      const message = (err as any).response?.data?.message || 'Failed to transfer item.';
+      setError(message);
     } finally {
       setSubmitting(false);
     }
@@ -138,8 +140,9 @@ export default function SellerDashboard() {
       setShowStatusModal(false);
       setSelectedItem(null);
       await fetchItems();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update status.');
+    } catch (err: unknown) {
+      const message = (err as any).response?.data?.message || 'Failed to update status.';
+      setError(message);
     } finally {
       setSubmitting(false);
     }

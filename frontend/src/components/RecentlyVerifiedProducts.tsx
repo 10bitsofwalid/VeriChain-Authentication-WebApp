@@ -1,4 +1,5 @@
 
+import { useState, useEffect } from 'react';
 import client from '../api/client';
 import ProductCard from './ProductCard';
 
@@ -26,7 +27,7 @@ export default function RecentlyVerifiedProducts() {
         Recently Verified Products
       </h3>
       <div className="grid-cards">
-        {items.map(item => (
+        {items.map((item: any) => (
           <ProductCard key={item._id} item={item} />
         ))}
       </div>

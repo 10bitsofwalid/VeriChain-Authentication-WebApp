@@ -22,7 +22,7 @@ export default function AcceptInvite() {
     if (!token) {
       setLocalError('Invitation token is missing. Please check your invitation link.');
     }
-  }, [token]);
+  }, [token, clearError]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,7 +51,7 @@ export default function AcceptInvite() {
       setTimeout(() => {
         navigate('/dashboard');
       }, 3000);
-    } catch (err: any) {
+    } catch {
       // Error handled by AuthContext
     } finally {
       setSubmitting(false);
