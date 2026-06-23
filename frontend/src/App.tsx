@@ -12,23 +12,26 @@ import { ShoppingProvider } from './context/ShoppingContext';
 const ProductDetailsPage = lazy(() => import('./pages/ProductDetailsPage'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const Compare = lazy(() => import('./pages/Compare'));
+
+const SellerSourcing = lazy(() => import('./pages/seller/SellerSourcing'));
+const AuditLogs = lazy(() => import('./pages/admin/AuditLogs'));
 const Login = lazy(() => import('./pages/Login'));
 const Signup = lazy(() => import('./pages/Signup'));
 const VerifyItem = lazy(() => import('./pages/VerifyItem'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
-const Marketplace = lazy(() => import('./pages/Marketplace'));
-const RegisterProduct = lazy(() => import('./pages/factory/RegisterProduct'));
 const MarketplaceHome = lazy(() => import('./pages/MarketplaceHome'));
+const Marketplace = lazy(() => import('./pages/Marketplace'));
+const TrustCenter = lazy(() => import('./pages/TrustCenter'));
 const Complaints = lazy(() => import('./pages/Complaints'));
-const AuditLogs = lazy(() => import('./pages/admin/AuditLogs'));
-const SellerDashboard = lazy(() => import('./pages/seller/SellerDashboard'));
-const BuyerDashboard = lazy(() => import('./pages/buyer/BuyerDashboard'));
-const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+
 const AcceptInvite = lazy(() => import('./pages/AcceptInvite'));
 const InviteAdmin = lazy(() => import('./pages/admin/InviteAdmin'));
 const ModeratorDashboard = lazy(() => import('./pages/moderator/ModeratorDashboard'));
+const SellerDashboard = lazy(() => import('./pages/seller/SellerDashboard'));
+const BuyerDashboard = lazy(() => import('./pages/buyer/BuyerDashboard'));
+const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
+// const QRVerification = lazy(() => import('./pages/QRVerification'));
 
-const QRVerification = lazy(() => import('./pages/QRVerification'));
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -44,15 +47,17 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={<MarketplaceHome />} />
-      <Route path="/trust-center" element={<TrustCenter />} />
-        <Route path="/wishlist" element={<Wishlist />} />
+        <Route path="/" element={<MarketplaceHome />} />
+        <Route path="/trust-center" element={<TrustCenter />} />
         <Route path="/compare" element={<Compare />} />
+        <Route path="/complaints" element={<Complaints />} />
+        <Route path="/register-product" element={<RegisterProduct />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/verify" element={<VerifyItem />} />
       <Route path="/product/:id" element={<ProductDetailsPage />} />
       <Route path="/accept-invite" element={<AcceptInvite />} />
+        <Route path="/wishlist" element={<Wishlist />} />
 
       {/* Protected routes — wrapped in Layout */}
       <Route
@@ -155,6 +160,7 @@ function AppRoutes() {
         />
         <Route path="/dashboard/*" element={<Dashboard />} />
       </Route>
+        <Route path="/seller/sourcing" element={<ProtectedRoute roles={['seller']}><SellerSourcing /></ProtectedRoute>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -8,7 +8,8 @@ interface Factory {
   verificationStatus: string;
   trustScore?: number;
   country?: string;
-  yearsVerified?: number;
+  certifications?: string[];
+  categories?: string[];
 }
 
 interface FactoryCardProps {
@@ -53,10 +54,14 @@ const FactoryCard: React.FC<FactoryCardProps> = ({ factory, selected, onSelect }
         {selected && <CheckCircle size={20} color="var(--accent-primary)" />}
       </div>
       <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-        {factory.country && <div>{factory.country}</div>}
+        {factory.country && <div>Location: {factory.country}</div>}
         {factory.trustScore !== undefined && <div>Trust Score: {factory.trustScore}</div>}
-        {factory.yearsVerified !== undefined && <div>Years Verified: {factory.yearsVerified}</div>}
+        {factory.certifications?.length !== undefined && (<div>Certifications: {factory.certifications.length}</div>)}
+        {factory.categories?.length && (<div>Categories: {factory.categories.join(', ')}</div>)}
       </div>
+      <button className="btn btn-primary" onClick={onSelect} style={{ marginTop: 'var(--space-sm)' }}>
+        View Inventory
+      </button>
     </div>
   );
 };
