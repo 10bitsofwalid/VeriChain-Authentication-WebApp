@@ -45,6 +45,7 @@ function AppRoutes() {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<MarketplaceHome />} />
+      <Route path="/trust-center" element={<TrustCenter />} />
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/compare" element={<Compare />} />
       <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />

@@ -27,6 +27,7 @@ const NavBar: React.FC = () => {
         <li><NavLink to="/marketplace" className={({ isActive }) => (isActive ? 'active' : undefined)}>Marketplace</NavLink></li>
         <li><NavLink to="/verify" className={({ isActive }) => (isActive ? 'active' : undefined)}>Verify Product</NavLink></li>
         <li><NavLink to="/categories" className={({ isActive }) => (isActive ? 'active' : undefined)}>Categories</NavLink></li>
+            <li><NavLink to="/trust-center" className={({ isActive }) => (isActive ? 'active' : undefined)}>Trust Center</NavLink></li>
         {user ? (
           <>
             <li><NavLink to="/notifications" className={({ isActive }) => (isActive ? 'active' : undefined)}>Notifications</NavLink></li>
