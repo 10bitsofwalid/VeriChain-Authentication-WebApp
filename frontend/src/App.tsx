@@ -28,7 +28,7 @@ const AcceptInvite = lazy(() => import('./pages/AcceptInvite'));
 const InviteAdmin = lazy(() => import('./pages/admin/InviteAdmin'));
 const ModeratorDashboard = lazy(() => import('./pages/moderator/ModeratorDashboard'));
 
-import './index.css';
+const QRVerification = lazy(() => import('./pages/QRVerification'));
 
 function AppRoutes() {
   const { user, loading } = useAuth();
