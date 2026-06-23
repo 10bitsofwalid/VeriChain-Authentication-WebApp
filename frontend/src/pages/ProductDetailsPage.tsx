@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import client from '../api/client';
 import HeroSection from '../components/HeroSection';
 import ImageGallery from '../components/ImageGallery';
+import ProductInfoCard from '../components/ProductInfoCard';
 import DigitalBirthCertificateCard from '../components/DigitalBirthCertificateCard';
 import OriginStoryTimeline from '../components/OriginStoryTimeline';
 import ProductSpecsPanel from '../components/ProductSpecsPanel';
@@ -42,16 +43,21 @@ export default function ProductDetailsPage() {
     <div className="product-details-page">
       <StickyInfoPanel product={product} />
       <div className="main-content">
-        <HeroSection product={product} />
-        <ImageGallery images={product.product?.imageGallery || []} />
-        <DigitalBirthCertificateCard product={product} />
-        <OriginStoryTimeline journey={product.item?.journey || []} />
-        <ProductSpecsPanel specs={product.product?.specifications || {}} />
-        <FactoryInfoCard factory={product.factory} />
-        <SellerInfoCard seller={product.seller} />
-        <VerificationHistoryTimeline history={product.item?.journey || []} />
-        <RelatedProductsSection category={product.product?.category} />
-        <SimilarProductsSection productId={product._id} />
+        <div className="left-column">
+          <section className="glass-card"><HeroSection product={product} /></section>
+          <section className="glass-card"><ImageGallery images={product.product?.imageGallery || []} /></section>
+          <section className="glass-card"><ProductSpecsPanel specs={product.product?.specifications || {}} /></section>
+          <section className="glass-card"><OriginStoryTimeline journey={product.item?.journey || []} /></section>
+          <section className="glass-card"><RelatedProductsSection category={product.product?.category} /></section>
+          <section className="glass-card"><SimilarProductsSection productId={product._id} /></section>
+        </div>
+        <div className="right-sidebar">
+          <section className="glass-card"><ProductInfoCard product={product} /></section>
+          <section className="glass-card"><DigitalBirthCertificateCard product={product} /></section>
+          <section className="glass-card"><FactoryInfoCard factory={product.factory} /></section>
+          <section className="glass-card"><SellerInfoCard seller={product.seller} /></section>
+          <section className="glass-card"><VerificationHistoryTimeline history={product.item?.journey || []} /></section>
+        </div>
       </div>
     </div>
   );
