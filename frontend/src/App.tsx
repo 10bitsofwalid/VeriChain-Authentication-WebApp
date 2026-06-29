@@ -10,6 +10,8 @@ import { ShoppingProvider } from './context/ShoppingContext';
 
 // Lazy-loaded page components
 const ProductDetailsPage = lazy(() => import('./pages/ProductDetailsPage'));
+const FactoryProfile = lazy(() => import('./pages/FactoryProfile'));
+const SellerProfile = lazy(() => import('./pages/SellerProfile'));
 const Wishlist = lazy(() => import('./pages/Wishlist'));
 const Compare = lazy(() => import('./pages/Compare'));
 
@@ -57,6 +59,8 @@ function AppRoutes() {
       <Route path="/signup" element={user ? <Navigate to="/dashboard" replace /> : <Signup />} />
       <Route path="/verify" element={<VerifyItem />} />
       <Route path="/product/:id" element={<ProductDetailsPage />} />
+      <Route path="/factory/:id" element={<FactoryProfile />} />
+      <Route path="/seller/:id" element={<SellerProfile />} />
       <Route path="/accept-invite" element={<AcceptInvite />} />
         <Route path="/wishlist" element={<Wishlist />} />
 
