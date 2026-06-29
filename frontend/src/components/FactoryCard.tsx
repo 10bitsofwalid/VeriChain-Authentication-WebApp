@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle } from 'lucide-react';
+import { CheckCircle, Heart } from 'lucide-react';
 
 interface Factory {
   _id: string;
@@ -16,14 +16,23 @@ interface FactoryCardProps {
   factory: Factory;
   selected: boolean;
   onSelect: () => void;
+  isSaved?: boolean;
+  onToggleSave?: (e: React.MouseEvent) => void;
 }
 
-const FactoryCard: React.FC<FactoryCardProps> = ({ factory, selected, onSelect }) => {
+const FactoryCard: React.FC<FactoryCardProps> = ({
+  factory,
+  selected,
+  onSelect,
+  isSaved = false,
+  onToggleSave,
+}) => {
   return (
     <div
       className={`factory-card glass-card ${selected ? 'selected' : ''}`}
       onClick={onSelect}
       style={{
+        position: 'relative',
         cursor: 'pointer',
         padding: 'var(--space-lg)',
         display: 'flex',
@@ -33,6 +42,34 @@ const FactoryCard: React.FC<FactoryCardProps> = ({ factory, selected, onSelect }
         transition: 'transform 0.2s ease',
       }}
     >
+      {onToggleSave && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleSave(e);
+          }}
+          style={{
+            position: 'absolute',
+            top: '12px',
+            right: '12px',
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '6px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: isSaved ? '#ef4444' : 'var(--text-secondary)',
+            transition: 'transform 0.2s ease, color 0.2s ease',
+            zIndex: 2,
+          }}
+          className="favorite-button"
+          title={isSaved ? 'Remove Supplier' : 'Save Supplier'}
+        >
+          <Heart size={18} fill={isSaved ? '#ef4444' : 'none'} />
+        </button>
+      )}
+
       {factory.logoUrl ? (
         <img
           src={factory.logoUrl}
