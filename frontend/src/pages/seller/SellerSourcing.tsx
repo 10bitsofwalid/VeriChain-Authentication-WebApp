@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import client from '../../api/client';
 import FactoryCard from '../../components/FactoryCard';
+import ComparisonGrid from '../../components/ComparisonGrid';
+import RequestHistoryTable from '../../components/RequestHistoryTable';
+import ActivityTimeline from '../../components/ActivityTimeline';
 import SellerProductCard from '../../components/SellerProductCard';
 import { useToast } from '../../components/ToastProvider';
 import { 
@@ -70,6 +73,9 @@ const SellerSourcing: React.FC = () => {
   const [savedFactoryIds, setSavedFactoryIds] = useState<string[]>([]);
   const [reservedProductIds, setReservedProductIds] = useState<string[]>([]);
   const [allocationRequests, setAllocationRequests] = useState<AllocationRequest[]>([]);
+  const [isComparing, setIsComparing] = useState(false);
+  const [comparingFactoryIds, setComparingFactoryIds] = useState<string[]>([]);
+  const [activityLog, setActivityLog] = useState<any[]>([]);
 
   // Filter States
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -89,6 +95,9 @@ const SellerSourcing: React.FC = () => {
 
     const requests = localStorage.getItem('verichain_allocation_requests');
     if (requests) setAllocationRequests(JSON.parse(requests));
+
+    const activity = localStorage.getItem('verichain_activity_log');
+    if (activity) setActivityLog(JSON.parse(activity));
   }, []);
 
   // Fetch verified factories on mount (with robust mock fallback)
@@ -307,39 +316,6 @@ const SellerSourcing: React.FC = () => {
     fetchProducts();
   }, [selectedFactoryId]);
 
-  // Simulation effect for allocation requests
-  useEffect(() => {
-    const pendingRequests = allocationRequests.filter((r) => r.status === 'Pending');
-    if (pendingRequests.length === 0) return;
-
-    const timers = pendingRequests.map((req) => {
-      return setTimeout(() => {
-        const approved = Math.random() > 0.3; // 70% chance of approval
-        const newStatus = approved ? 'Approved' : 'Rejected';
-
-        setAllocationRequests((prev) => {
-          const updated = prev.map((r) => (r.id === req.id ? { ...r, status: newStatus as any } : r));
-          localStorage.setItem('verichain_allocation_requests', JSON.stringify(updated));
-          return updated;
-        });
-
-        if (approved) {
-          addToast(`Allocation request for ${req.productName} (Qty: ${req.requestedQty}) was Approved!`, 'success');
-        } else {
-          addToast(`Allocation request for ${req.productName} (Qty: ${req.requestedQty}) was Rejected.`, 'error');
-        }
-      }, 5000);
-    });
-
-    return () => {
-      timers.forEach(clearTimeout);
-    };
-  }, [allocationRequests, addToast]);
-
-  const handleFactorySelect = (factoryId: string) => {
-    setSelectedFactoryId(factoryId);
-  };
-
   // Save/Favorite Supplier handler
   const toggleSaveFactory = (factoryId: string) => {
     let updated: string[];
@@ -465,20 +441,47 @@ const SellerSourcing: React.FC = () => {
             onChange={(e) => setShowFavoritesOnly(e.target.checked)}
             style={{ accentColor: '#ef4444', width: '16px', height: '16px' }}
           />
-          <Heart size={16} fill={showFavoritesOnly ? '#ef4444' : 'none'} color={showFavoritesOnly ? '#ef4444' : 'currentColor'} />
-          Show Favorites Only
-        </label>
+        <div style={{ display: 'flex', gap: 'var(--space-sm)', alignItems: 'center' }}>
+          <button
+            className={`btn btn-sm ${isComparing ? 'btn-secondary' : 'btn-primary'}`}
+            onClick={() => {
+              setIsComparing(!isComparing);
+              if (isComparing) setComparingFactoryIds([]);
+            }}
+          >
+            {isComparing ? 'Exit Comparison' : 'Compare Suppliers'}
+          </button>
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              cursor: 'pointer',
+              fontSize: '0.9rem',
+              color: 'var(--text-secondary)',
+            }}
+          >
+            <input
+              type="checkbox"
+              checked={showFavoritesOnly}
+              onChange={(e) => setShowFavoritesOnly(e.target.checked)}
+              style={{ accentColor: '#ef4444', width: '16px', height: '16px' }}
+            />
+            <Heart size={16} fill={showFavoritesOnly ? '#ef4444' : 'none'} color={showFavoritesOnly ? '#ef4444' : 'currentColor'} />
+            Show Favorites Only
+          </label>
+        </div>
       </div>
 
       {/* Factory List */}
-      <div 
-        className="factory-list" 
-        style={{ 
-          display: 'flex', 
-          gap: 'var(--space-md)', 
-          overflowX: 'auto', 
+      <div
+        className="factory-list"
+        style={{
+          display: 'flex',
+          gap: 'var(--space-md)',
+          overflowX: 'auto',
           paddingBottom: 'var(--space-sm)',
-          marginBottom: 'var(--space-xl)' 
+          marginBottom: 'var(--space-xl)',
         }}
       >
         {filteredFactories.map((factory) => (
@@ -489,22 +492,35 @@ const SellerSourcing: React.FC = () => {
             onSelect={() => handleFactorySelect(factory._id)}
             isSaved={savedFactoryIds.includes(factory._id)}
             onToggleSave={() => toggleSaveFactory(factory._id)}
+            isComparing={isComparing}
+            onToggleCompare={(e: any) => {
+              const checked = e.target.checked;
+              setComparingFactoryIds((prev) => {
+                const updated = checked ? [...prev, factory._id] : prev.filter((id) => id !== factory._id);
+                return updated.slice(0, 4); // limit to 4
+              });
+            }}
           />
         ))}
         {filteredFactories.length === 0 && (
-          <div 
-            className="glass-card" 
-            style={{ 
-              padding: 'var(--space-xl)', 
-              textAlign: 'center', 
-              width: '100%', 
-              color: 'var(--text-secondary)' 
+          <div
+            className="glass-card"
+            style={{
+              padding: 'var(--space-xl)',
+              textAlign: 'center',
+              width: '100%',
+              color: 'var(--text-secondary)',
             }}
           >
             {showFavoritesOnly ? 'No saved factories found.' : 'No verified factories available.'}
           </div>
         )}
       </div>
+
+      {/* Comparison Grid */}
+      {isComparing && comparingFactoryIds.length > 0 && (
+        <ComparisonGrid factories={factories.filter((f) => comparingFactoryIds.includes(f._id))} />
+      )}
 
       {/* Supplier Profile Panel */}
       {selectedFactory && (

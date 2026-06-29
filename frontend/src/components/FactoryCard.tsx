@@ -18,6 +18,8 @@ interface FactoryCardProps {
   onSelect: () => void;
   isSaved?: boolean;
   onToggleSave?: (e: React.MouseEvent) => void;
+  isComparing?: boolean;
+  onToggleCompare?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const FactoryCard: React.FC<FactoryCardProps> = ({
@@ -26,6 +28,8 @@ const FactoryCard: React.FC<FactoryCardProps> = ({
   onSelect,
   isSaved = false,
   onToggleSave,
+  isComparing = false,
+  onToggleCompare,
 }) => {
   return (
     <div
@@ -42,6 +46,43 @@ const FactoryCard: React.FC<FactoryCardProps> = ({
         transition: 'transform 0.2s ease',
       }}
     >
+      {onToggleCompare && (
+        <label
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            position: 'absolute',
+            top: '12px',
+            left: '12px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: '0.75rem',
+            color: 'var(--text-secondary)',
+            zIndex: 2,
+            background: 'rgba(10, 14, 26, 0.6)',
+            padding: '2px 6px',
+            borderRadius: '4px',
+            border: '1px solid var(--border-default)',
+          }}
+          title="Add to comparison"
+        >
+          <input
+            type="checkbox"
+            checked={isComparing}
+            onChange={onToggleCompare}
+            style={{
+              width: '13px',
+              height: '13px',
+              accentColor: 'var(--accent-cyan)',
+              margin: 0,
+              cursor: 'pointer',
+            }}
+          />
+          Compare
+        </label>
+      )}
+
       {onToggleSave && (
         <button
           onClick={(e) => {
