@@ -1,63 +1,37 @@
-import { Laptop, Gem, Shirt, Sparkles, Pill } from 'lucide-react';
+import { Gem, Laptop, Pill, Shirt, Sparkles, Watch } from 'lucide-react';
 
 const categories = [
-  { name: 'Electronics', icon: Laptop, count: '1,240 verified', color: '#0058bc' },
-  { name: 'Luxury Goods', icon: Gem, count: '850 verified', color: '#8b5cf6' },
-  { name: 'Apparel', icon: Shirt, count: '3,110 verified', color: '#ec4899' },
-  { name: 'Cosmetics', icon: Sparkles, count: '940 verified', color: '#10b981' },
-  { name: 'Pharmaceuticals', icon: Pill, count: '4,520 verified', color: '#ef4444' },
+  { name: 'Electronics', icon: Laptop, count: '1,240 verified', tone: 'blue' },
+  { name: 'Luxury Goods', icon: Gem, count: '850 verified', tone: 'violet' },
+  { name: 'Apparel', icon: Shirt, count: '3,110 verified', tone: 'rose' },
+  { name: 'Cosmetics', icon: Sparkles, count: '940 verified', tone: 'emerald' },
+  { name: 'Pharmaceuticals', icon: Pill, count: '4,520 verified', tone: 'amber' },
+  { name: 'Wearables', icon: Watch, count: '720 verified', tone: 'sky' },
 ];
 
 export default function CategoriesSection() {
   return (
-    <section style={{ marginBottom: 'var(--space-2xl)' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-md)' }}>
-        <h2 style={{ fontSize: '20px', fontWeight: 700, color: 'var(--text-primary)' }}>Verify by Industry</h2>
-        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Decentralized category registry</span>
+    <section className="marketplace-section">
+      <div className="marketplace-section-header">
+        <div>
+          <span className="marketplace-eyebrow">Verified categories</span>
+          <h2>Explore authenticated industries</h2>
+        </div>
+        <p>Every category includes manufacturer provenance, product certificates, and seller trust signals.</p>
       </div>
 
-      <div 
-        style={{ 
-          display: 'grid', 
-          gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
-          gap: 'var(--space-md)' 
-        }}
-      >
-        {categories.map((cat) => {
-          const IconComponent = cat.icon;
-          return (
-            <div 
-              key={cat.name} 
-              className="glass-card" 
-              style={{ 
-                display: 'flex', 
-                flexDirection: 'column', 
-                alignItems: 'center', 
-                textAlign: 'center',
-                padding: 'var(--space-lg)',
-                cursor: 'pointer',
-                gap: 'var(--space-sm)'
-              }}
-            >
-              <div 
-                style={{ 
-                  width: '50px', 
-                  height: '50px', 
-                  borderRadius: '50%', 
-                  background: `${cat.color}15`, 
-                  color: cat.color,
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center' 
-                }}
-              >
-                <IconComponent size={24} />
-              </div>
-              <h3 style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text-primary)' }}>{cat.name}</h3>
-              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{cat.count}</span>
-            </div>
-          );
-        })}
+      <div className="category-grid">
+        {categories.map((cat) => (
+          <button key={cat.name} className={`category-card category-card-${cat.tone}`} type="button">
+            <span className="category-icon">
+              <cat.icon size={24} aria-hidden="true" />
+            </span>
+            <span>
+              <strong>{cat.name}</strong>
+              <small>{cat.count}</small>
+            </span>
+          </button>
+        ))}
       </div>
     </section>
   );

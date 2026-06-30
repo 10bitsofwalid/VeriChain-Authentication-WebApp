@@ -1,40 +1,22 @@
-import { Shield } from 'lucide-react';
+import { ShieldCheck } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer 
-      style={{ 
-        marginTop: 'var(--space-3xl)', 
-        paddingTop: 'var(--space-2xl)', 
-        paddingBottom: 'var(--space-xl)',
-        borderTop: '1px solid var(--border-default)', 
-        color: 'var(--text-secondary)'
-      }}
-    >
-      <div 
-        style={{ 
-          display: 'flex', 
-          flexWrap: 'wrap', 
-          justifyContent: 'space-between', 
-          alignItems: 'center', 
-          gap: 'var(--space-md)',
-          marginBottom: 'var(--space-lg)'
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)' }}>
-          <Shield size={22} color="var(--accent-cyan)" />
-          <span style={{ fontWeight: 700, fontSize: '18px', color: 'var(--text-primary)' }}>VeriChain</span>
+    <footer className="marketplace-footer">
+      <div>
+        <div className="marketplace-footer-brand">
+          <span><ShieldCheck size={22} /></span>
+          <strong>VeriChain</strong>
         </div>
-        <div style={{ display: 'flex', gap: 'var(--space-md)', fontSize: '14px' }}>
-          <a href="#" style={{ color: 'var(--text-muted)' }}>Terms of Service</a>
-          <a href="#" style={{ color: 'var(--text-muted)' }}>Privacy Policy</a>
-          <a href="#" style={{ color: 'var(--text-muted)' }}>Documentation</a>
-          <a href="#" style={{ color: 'var(--text-muted)' }}>Contact</a>
-        </div>
+        <p>Secure product authentication, supply-chain provenance, and trusted marketplace ownership.</p>
       </div>
-      <div style={{ textAlign: 'center', fontSize: '13px', color: 'var(--text-muted)' }}>
-        &copy; {new Date().getFullYear()} VeriChain. All rights reserved. Secure, cryptographic product provenance.
-      </div>
+      <nav aria-label="Footer navigation">
+        <a href="/trust-center">Trust Center</a>
+        <a href="/verify">Verify Product</a>
+        <a href="/compare">Compare</a>
+        <a href="/complaints">Reports</a>
+      </nav>
+      <small>© {new Date().getFullYear()} VeriChain. Cryptographic product provenance for modern commerce.</small>
     </footer>
   );
 }
