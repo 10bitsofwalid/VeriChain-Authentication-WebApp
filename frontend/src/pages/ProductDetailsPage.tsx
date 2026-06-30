@@ -58,8 +58,8 @@ export default function ProductDetailsPage() {
   return (
     <div className="product-details-page">
       <StickyInfoPanel product={product} />
-      <div className="main-content">
-        <div className="left-column">
+      <div className="product-details-layout">
+        <div className="product-details-left">
           <section className="glass-card"><HeroSection product={product} /></section>
           <section className="glass-card"><ImageGallery images={product.product?.imageGallery || []} /></section>
           <section className="glass-card"><ProductSpecsPanel specs={product.product?.specifications || {}} /></section>
@@ -69,7 +69,7 @@ export default function ProductDetailsPage() {
           <section className="glass-card"><RelatedProductsSection category={product.product?.category} /></section>
           <section className="glass-card"><SimilarProductsSection productId={product._id} /></section>
         </div>
-        <div className="right-sidebar">
+        <div className="product-details-sidebar">
           <section className="glass-card"><ProductInfoCard product={product} /></section>
           <section className="glass-card"><DigitalBirthCertificateCard product={product} /></section>
           <section className="glass-card"><FactoryInfoCard factory={product.factory} /></section>
