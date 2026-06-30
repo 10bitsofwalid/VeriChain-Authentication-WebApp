@@ -1,5 +1,4 @@
 import React from 'react';
-import { CheckCircle, ShieldCheck, MapPin, Heart } from 'lucide-react';
 
 interface Factory {
   _id: string;

@@ -1,26 +1,44 @@
-/* CartIcon.css */
 .cart-icon-button {
-  position: relative;
-  background: none;
-  border: none;
+  align-items: center;
+  aspect-ratio: 1;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-full);
+  color: var(--text-secondary);
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
-  transition: background-color 0.2s ease-in-out;
+  display: inline-flex;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0;
+  position: relative;
+  transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  width: 42px;
 }
 
 .cart-icon-button:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background: rgba(91, 95, 239, 0.08);
+  color: var(--accent-primary);
+  transform: translateY(-1px);
+}
+
+.cart-icon-button:focus-visible {
+  box-shadow: var(--vc-focus-ring);
+  outline: none;
 }
 
 .cart-badge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  background: #e53935; /* red accent */
+  align-items: center;
+  background: var(--color-danger);
+  border: 2px solid white;
+  border-radius: var(--radius-full);
   color: white;
-  border-radius: 50%;
-  padding: 2px 6px;
-  font-size: 0.75rem;
-  font-weight: bold;
+  display: inline-flex;
+  font-size: 0.7rem;
+  font-weight: 900;
+  justify-content: center;
+  min-width: 20px;
+  padding: 0 0.3rem;
+  position: absolute;
+  right: -2px;
+  top: -2px;
 }

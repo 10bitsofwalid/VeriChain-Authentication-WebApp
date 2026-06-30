@@ -1,51 +1,34 @@
-/* ============================================================
-   VeriChain Enterprise Token System
-   Swiss verification system foundation
-   ============================================================ */
-
 :root {
   color-scheme: light;
 
-  /* Core palette */
-  --vc-color-black: #0a0a0a;
-  --vc-color-white: #ffffff;
-  --vc-color-paper: #f7f7f4;
+  --vc-color-bg: #f5f7fb;
   --vc-color-surface: #ffffff;
-  --vc-color-surface-muted: #eeeeea;
-  --vc-color-surface-raised: #fafaf7;
-  --vc-color-border: #0a0a0a;
-  --vc-color-border-muted: #c9c9c4;
-  --vc-color-accent: #ff3000;
-
-  /* Semantic palette */
-  --vc-color-text-primary: #0a0a0a;
-  --vc-color-text-secondary: #3f3f3a;
-  --vc-color-text-muted: #74746d;
+  --vc-color-surface-soft: rgba(255, 255, 255, 0.72);
+  --vc-color-surface-muted: #eef2ff;
+  --vc-color-primary: #5b5fef;
+  --vc-color-secondary: #7c5cff;
+  --vc-color-accent: #4da8ff;
+  --vc-color-success: #22c55e;
+  --vc-color-warning: #f59e0b;
+  --vc-color-danger: #ef4444;
+  --vc-color-text-primary: #101828;
+  --vc-color-text-secondary: #475467;
+  --vc-color-text-muted: #7b8498;
   --vc-color-text-inverse: #ffffff;
-  --vc-color-success: #007a3d;
-  --vc-color-success-bg: #e2f2e9;
-  --vc-color-warning: #9a5b00;
-  --vc-color-warning-bg: #fff0cf;
-  --vc-color-danger: #b00020;
-  --vc-color-danger-bg: #ffe1e6;
-  --vc-color-info: #004b8d;
-  --vc-color-info-bg: #ddeaff;
+  --vc-color-border: rgba(255, 255, 255, 0.55);
+  --vc-color-border-muted: rgba(91, 95, 239, 0.1);
 
-  /* Typography */
-  --vc-font-sans: Inter, Helvetica Neue, Arial, system-ui, -apple-system, sans-serif;
-  --vc-font-mono: IBM Plex Mono, SFMono-Regular, Consolas, Liberation Mono, monospace;
-  --vc-letter-spacing-ui: 0;
-  --vc-letter-spacing-label: 0.04em;
-  --vc-line-height-tight: 1.1;
-  --vc-line-height-base: 1.5;
-  --vc-font-size-xs: 0.75rem;
-  --vc-font-size-sm: 0.875rem;
-  --vc-font-size-md: 1rem;
-  --vc-font-size-lg: 1.25rem;
-  --vc-font-size-xl: 1.75rem;
-  --vc-font-size-2xl: 2.5rem;
+  --vc-gradient-primary: linear-gradient(135deg, #5b5fef 0%, #7c5cff 58%, #4da8ff 100%);
+  --vc-gradient-soft: linear-gradient(135deg, rgba(91, 95, 239, 0.12), rgba(77, 168, 255, 0.08));
+  --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(124, 92, 255, 0.16), transparent 30%),
+    radial-gradient(circle at 86% 8%, rgba(77, 168, 255, 0.2), transparent 28%),
+    linear-gradient(135deg, #f9fbff 0%, #eef3ff 100%);
 
-  /* Spacing scale */
+  --vc-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --vc-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
+  --vc-line-height-tight: 1.08;
+  --vc-line-height-base: 1.55;
+
   --vc-space-1: 0.25rem;
   --vc-space-2: 0.5rem;
   --vc-space-3: 0.75rem;
@@ -58,71 +41,73 @@
   --vc-space-16: 4rem;
   --vc-space-20: 5rem;
 
-  /* Layout */
-  --vc-layout-sidebar: 280px;
-  --vc-layout-header: 72px;
+  --vc-radius-sm: 12px;
+  --vc-radius-md: 16px;
+  --vc-radius-lg: 20px;
+  --vc-radius-xl: 28px;
+  --vc-radius-full: 999px;
+
+  --vc-shadow-sm: 0 10px 30px rgba(80, 90, 140, 0.08);
+  --vc-shadow-md: 0 16px 40px rgba(80, 90, 140, 0.1);
+  --vc-shadow-lg: 0 20px 50px rgba(80, 90, 140, 0.12);
+  --vc-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  --vc-focus-ring: 0 0 0 4px rgba(91, 95, 239, 0.16);
+
+  --vc-transition-fast: 150ms ease;
+  --vc-transition-base: 220ms ease;
+  --vc-transition-slow: 300ms ease;
+  --vc-layout-sidebar: 292px;
+  --vc-layout-header: 76px;
   --vc-layout-max: 1440px;
-  --vc-grid-unit: 8px;
 
-  /* Shape, border, motion */
-  --vc-radius-none: 0;
-  --vc-border-width: 2px;
-  --vc-border-width-thin: 1px;
-  --vc-shadow-none: none;
-  --vc-focus-ring: 0 0 0 3px rgba(255, 48, 0, 0.24);
-  --vc-transition-fast: 120ms ease;
-  --vc-transition-base: 180ms ease;
-  --vc-transition-slow: 280ms ease;
-
-  /* Compatibility aliases for the existing application */
-  --bg-primary: var(--vc-color-paper);
-  --bg-secondary: var(--vc-color-surface-muted);
-  --bg-tertiary: #e3e3de;
+  --bg-primary: var(--vc-color-bg);
+  --bg-secondary: rgba(255, 255, 255, 0.64);
+  --bg-tertiary: #eef2ff;
   --bg-card: var(--vc-color-surface);
-  --bg-card-hover: var(--vc-color-surface-raised);
-  --bg-glass: var(--vc-color-surface);
-  --bg-input: var(--vc-color-surface);
-  --bg-skeleton: #deded8;
+  --bg-card-hover: var(--vc-color-surface);
+  --bg-glass: rgba(255, 255, 255, 0.76);
+  --bg-input: rgba(255, 255, 255, 0.92);
+  --bg-skeleton: #e8edfb;
 
   --text-primary: var(--vc-color-text-primary);
   --text-secondary: var(--vc-color-text-secondary);
   --text-muted: var(--vc-color-text-muted);
   --text-inverse: var(--vc-color-text-inverse);
 
-  --accent: var(--vc-color-accent);
-  --accent-bg: rgba(255, 48, 0, 0.08);
-  --accent-border: var(--vc-color-accent);
-  --accent-primary: var(--vc-color-accent);
+  --accent: var(--vc-color-primary);
+  --accent-bg: rgba(91, 95, 239, 0.1);
+  --accent-border: rgba(91, 95, 239, 0.2);
+  --accent-primary: var(--vc-color-primary);
   --accent-cyan: var(--vc-color-accent);
-  --accent-purple: var(--vc-color-black);
-  --accent-gradient: var(--vc-color-accent);
-  --accent-gradient-hover: var(--vc-color-black);
+  --accent-purple: var(--vc-color-secondary);
+  --accent-gradient: var(--vc-gradient-primary);
+  --accent-gradient-hover: linear-gradient(135deg, #4d52e8 0%, #6f4ff4 52%, #399bf7 100%);
   --accent-success: var(--vc-color-success);
   --accent-warning: var(--vc-color-warning);
   --accent-danger: var(--vc-color-danger);
 
   --color-success: var(--vc-color-success);
-  --color-success-bg: var(--vc-color-success-bg);
-  --color-success-text: #005d2f;
+  --color-success-bg: rgba(34, 197, 94, 0.12);
+  --color-success-text: #15803d;
   --color-warning: var(--vc-color-warning);
-  --color-warning-bg: var(--vc-color-warning-bg);
+  --color-warning-bg: rgba(245, 158, 11, 0.14);
   --color-danger: var(--vc-color-danger);
-  --color-danger-bg: var(--vc-color-danger-bg);
-  --color-danger-text: #8d0018;
-  --color-info: var(--vc-color-info);
-  --color-info-bg: var(--vc-color-info-bg);
+  --color-danger-bg: rgba(239, 68, 68, 0.12);
+  --color-danger-text: #dc2626;
+  --color-info: var(--vc-color-primary);
+  --color-info-bg: rgba(91, 95, 239, 0.12);
 
   --border: var(--vc-color-border);
   --border-default: var(--vc-color-border);
   --border-subtle: var(--vc-color-border-muted);
-  --border-accent: var(--vc-color-accent);
+  --border-accent: var(--accent-border);
 
-  --shadow: var(--vc-shadow-none);
-  --shadow-sm: var(--vc-shadow-none);
-  --shadow-md: var(--vc-shadow-none);
-  --shadow-lg: var(--vc-shadow-none);
-  --shadow-glow: var(--vc-shadow-none);
-  --shadow-glow-accent: var(--vc-shadow-none);
+  --shadow: var(--vc-shadow-sm);
+  --shadow-sm: var(--vc-shadow-sm);
+  --shadow-md: var(--vc-shadow-md);
+  --shadow-lg: var(--vc-shadow-lg);
+  --shadow-glow: 0 24px 60px rgba(91, 95, 239, 0.14);
+  --shadow-glow-accent: 0 20px 48px rgba(77, 168, 255, 0.18);
 
   --space-xs: var(--vc-space-2);
   --space-sm: var(--vc-space-3);
@@ -132,11 +117,11 @@
   --space-2xl: var(--vc-space-16);
   --space-3xl: var(--vc-space-20);
 
-  --radius-sm: var(--vc-radius-none);
-  --radius-md: var(--vc-radius-none);
-  --radius-lg: var(--vc-radius-none);
-  --radius-xl: var(--vc-radius-none);
-  --radius-full: var(--vc-radius-none);
+  --radius-sm: var(--vc-radius-sm);
+  --radius-md: var(--vc-radius-md);
+  --radius-lg: var(--vc-radius-lg);
+  --radius-xl: var(--vc-radius-xl);
+  --radius-full: var(--vc-radius-full);
 
   --font-sans: var(--vc-font-sans);
   --font-mono: var(--vc-font-mono);

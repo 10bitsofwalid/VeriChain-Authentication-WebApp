@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import client from '../../api/client';
 import FactoryCard from '../../components/FactoryCard';
 import ComparisonGrid from '../../components/ComparisonGrid';
-import RequestHistoryTable from '../../components/RequestHistoryTable';
-import ActivityTimeline from '../../components/ActivityTimeline';
 import SellerProductCard from '../../components/SellerProductCard';
 import { useToast } from '../../components/ToastProvider';
 import { 
@@ -75,7 +73,6 @@ const SellerSourcing: React.FC = () => {
   const [allocationRequests, setAllocationRequests] = useState<AllocationRequest[]>([]);
   const [isComparing, setIsComparing] = useState(false);
   const [comparingFactoryIds, setComparingFactoryIds] = useState<string[]>([]);
-  const [activityLog, setActivityLog] = useState<any[]>([]);
 
   // Filter States
   const [showFavoritesOnly, setShowFavoritesOnly] = useState(false);
@@ -96,8 +93,6 @@ const SellerSourcing: React.FC = () => {
     const requests = localStorage.getItem('verichain_allocation_requests');
     if (requests) setAllocationRequests(JSON.parse(requests));
 
-    const activity = localStorage.getItem('verichain_activity_log');
-    if (activity) setActivityLog(JSON.parse(activity));
   }, []);
 
   // Fetch verified factories on mount (with robust mock fallback)
@@ -317,6 +312,10 @@ const SellerSourcing: React.FC = () => {
   }, [selectedFactoryId]);
 
   // Save/Favorite Supplier handler
+  const handleFactorySelect = (factoryId: string) => {
+    setSelectedFactoryId(factoryId);
+  };
+
   const toggleSaveFactory = (factoryId: string) => {
     let updated: string[];
     if (savedFactoryIds.includes(factoryId)) {
@@ -441,6 +440,8 @@ const SellerSourcing: React.FC = () => {
             onChange={(e) => setShowFavoritesOnly(e.target.checked)}
             style={{ accentColor: '#ef4444', width: '16px', height: '16px' }}
           />
+          Favorites only
+        </label>
         <div style={{ display: 'flex', gap: 'var(--space-sm)', alignItems: 'center' }}>
           <button
             className={`btn btn-sm ${isComparing ? 'btn-secondary' : 'btn-primary'}`}
