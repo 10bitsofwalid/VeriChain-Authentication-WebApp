@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../../api/client';
 import { Package, Shield, AlertTriangle, Search } from 'lucide-react';
+import DashboardMetricCard from '../../components/DashboardMetricCard';
+import AnalyticsSection from '../../components/AnalyticsSection';
 
 interface Item {
   _id: string;
@@ -80,88 +82,64 @@ export default function BuyerDashboard() {
         </Link>
       </div>
 
-      <div className="grid-stats" style={{ marginBottom: 'var(--space-xl)' }}>
-        {stats.map(s => (
-          <div key={s.label} className="stat-card">
-            <div className="stat-icon" style={{ background: s.bg }}>
-              <s.icon size={20} color={s.color} />
-            </div>
-            <div className="stat-value">{s.value}</div>
-            <div className="stat-label">{s.label}</div>
-          </div>
-        ))}
-      </div>
+<AnalyticsSection title="Overview">
+  {stats.map(s => (
+    <DashboardMetricCard
+      key={s.label}
+      icon={<s.icon size={20} color={s.color} />}
+      label={s.label}
+      value={s.value}
+    />
+  ))}
+</AnalyticsSection>
 
-      {/* My Items */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-md)' }}>
-        <Package size={18} color="var(--accent-cyan)" />
-        <h2 style={{ fontSize: '18px', fontWeight: 600 }}>My Products</h2>
-      </div>
+<AnalyticsSection title="My Products" empty={items.length === 0}>
+  <table className="data-table">
+    <thead>
+      <tr>
+        <th>Serial Number</th>
+        <th>Product</th>
+        <th>Category</th>
+        <th>Verification</th>
+        <th>Purchased</th>
+      </tr>
+    </thead>
+    <tbody>
+      {items.map(item => (
+        <tr key={item._id}>
+          <td style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--accent-cyan)' }}>{item.serialNumber}</td>
+          <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{item.product?.name || 'Unknown'}</td>
+          <td>{item.product?.category || '—'}</td>
+          <td><span className={`badge ${statusBadge(item.product?.verifiedStatus)}`}>{item.product?.verifiedStatus || 'unknown'}</span></td>
+          <td>{new Date(item.createdAt).toLocaleDateString()}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AnalyticsSection>
 
-      {items.length === 0 ? (
-        <div className="empty-state glass-card" style={{ marginBottom: 'var(--space-xl)' }}>
-          <Package size={48} />
-          <h3>No Products Yet</h3>
-          <p>Products you purchase will appear here with their verification status.</p>
-        </div>
-      ) : (
-        <div className="table-container" style={{ marginBottom: 'var(--space-xl)' }}>
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Serial Number</th>
-                <th>Product</th>
-                <th>Category</th>
-                <th>Verification</th>
-                <th>Purchased</th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map(item => (
-                <tr key={item._id}>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--accent-cyan)' }}>{item.serialNumber}</td>
-                  <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{item.product?.name || 'Unknown'}</td>
-                  <td>{item.product?.category || '—'}</td>
-                  <td><span className={`badge ${statusBadge(item.product?.verifiedStatus)}`}>{item.product?.verifiedStatus || 'unknown'}</span></td>
-                  <td>{new Date(item.createdAt).toLocaleDateString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Complaints */}
-      {complaints.length > 0 && (
-        <>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-sm)', marginBottom: 'var(--space-md)' }}>
-            <AlertTriangle size={18} color="var(--color-warning)" />
-            <h2 style={{ fontSize: '18px', fontWeight: 600 }}>My Complaints</h2>
-          </div>
-          <div className="table-container">
-            <table className="data-table">
-              <thead>
-                <tr>
-                  <th>Item</th>
-                  <th>Reason</th>
-                  <th>Status</th>
-                  <th>Filed</th>
-                </tr>
-              </thead>
-              <tbody>
-                {complaints.map(c => (
-                  <tr key={c._id}>
-                    <td style={{ fontFamily: 'var(--font-mono)', fontSize: '13px' }}>{c.productInstance?.serialNumber || '—'}</td>
-                    <td style={{ color: 'var(--text-primary)' }}>{c.reason}</td>
-                    <td><span className={`badge ${c.status === 'resolved' ? 'badge-success' : c.status === 'dismissed' ? 'badge-danger' : 'badge-warning'}`}>{c.status.replace('_', ' ')}</span></td>
-                    <td>{new Date(c.createdAt).toLocaleDateString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </>
-      )}
+<AnalyticsSection title="My Complaints" empty={complaints.length === 0}>
+  <table className="data-table">
+    <thead>
+      <tr>
+        <th>Item</th>
+        <th>Reason</th>
+        <th>Status</th>
+        <th>Filed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {complaints.map(c => (
+        <tr key={c._id}>
+          <td style={{ fontFamily: 'var(--font-mono)', fontSize: '13px' }}>{c.productInstance?.serialNumber || '—'}</td>
+          <td style={{ color: 'var(--text-primary)' }}>{c.reason}</td>
+          <td><span className={`badge ${c.status === 'resolved' ? 'badge-success' : c.status === 'dismissed' ? 'badge-danger' : 'badge-warning'}`}>{c.status.replace('_', ' ')}</span></td>
+          <td>{new Date(c.createdAt).toLocaleDateString()}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</AnalyticsSection>
     </div>
   );
 }
