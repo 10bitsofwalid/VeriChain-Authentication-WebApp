@@ -29,7 +29,7 @@ const UserSchema = new Schema<IUser>(
       required: true,
     },
     verified: { type: Boolean, default: false },
-    trustScore: { type: Number, default: 100, min: 0, max: 100 },
+    helpfulVotesReceived: { type: Number, default: 0 },
     logoUrl: { type: String },
     certificateUrl: { type: String },
     factoryDetails: {
