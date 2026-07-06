@@ -7,6 +7,7 @@ export interface IUser extends Document {
   role: 'buyer' | 'seller' | 'factory' | 'moderator' | 'admin';
   verified: boolean;
   trustScore: number;
+  helpfulVotesReceived?: number;
   logoUrl?: string;
   certificateUrl?: string;
   factoryDetails?: {
