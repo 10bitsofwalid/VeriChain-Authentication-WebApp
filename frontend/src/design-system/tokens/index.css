@@ -1,73 +1,146 @@
 :root {
   color-scheme: light;
 
-  --vc-color-bg: #f5f7fb;
+  /* Primary brand (rose-red) */
+  --vc-color-primary: #e11d48;
+  --vc-color-primary-rgb: 225, 29, 72;
+  --vc-color-secondary: #475467;
+  --vc-color-accent: #0f172a;
+
+  /* Base palette - Light mode */
+  --vc-color-bg: #f8fafc;
   --vc-color-surface: #ffffff;
   --vc-color-surface-soft: rgba(255, 255, 255, 0.72);
-  --vc-color-surface-muted: #eef2ff;
-  --vc-color-primary: #5b5fef;
-  --vc-color-secondary: #7c5cff;
-  --vc-color-accent: #4da8ff;
-  --vc-color-success: #22c55e;
-  --vc-color-warning: #f59e0b;
-  --vc-color-danger: #ef4444;
-  --vc-color-text-primary: #101828;
+  --vc-color-surface-muted: #f1f5f9;
+
+  /* Text - Light mode */
+  --vc-color-text-primary: #0f172a;
   --vc-color-text-secondary: #475467;
-  --vc-color-text-muted: #7b8498;
+  --vc-color-text-muted: #64748b;
   --vc-color-text-inverse: #ffffff;
-  --vc-color-border: rgba(255, 255, 255, 0.55);
-  --vc-color-border-muted: rgba(91, 95, 239, 0.1);
 
-  --vc-gradient-primary: linear-gradient(135deg, #5b5fef 0%, #7c5cff 58%, #4da8ff 100%);
-  --vc-gradient-soft: linear-gradient(135deg, rgba(91, 95, 239, 0.12), rgba(77, 168, 255, 0.08));
-  --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(124, 92, 255, 0.16), transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(77, 168, 255, 0.2), transparent 28%),
-    linear-gradient(135deg, #f9fbff 0%, #eef3ff 100%);
+  /* Semantic colors */
+  --vc-color-success: #16a34a;
+  --vc-color-success-bg: rgba(22, 163, 74, 0.08);
+  --vc-color-success-text: #15803d;
 
-  --vc-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --vc-font-mono: "SFMono-Regular", Consolas, "Liberation Mono", monospace;
-  --vc-line-height-tight: 1.08;
-  --vc-line-height-base: 1.55;
+  --vc-color-warning: #ea580c;
+  --vc-color-warning-bg: rgba(234, 88, 12, 0.08);
+  --vc-color-warning-text: #c2410c;
 
-  --vc-space-1: 0.25rem;
-  --vc-space-2: 0.5rem;
-  --vc-space-3: 0.75rem;
-  --vc-space-4: 1rem;
-  --vc-space-5: 1.25rem;
-  --vc-space-6: 1.5rem;
-  --vc-space-8: 2rem;
-  --vc-space-10: 2.5rem;
-  --vc-space-12: 3rem;
-  --vc-space-16: 4rem;
-  --vc-space-20: 5rem;
+  --vc-color-danger: #dc2626;
+  --vc-color-danger-bg: rgba(220, 38, 38, 0.08);
+  --vc-color-danger-text: #b91c1c;
 
-  --vc-radius-sm: 12px;
-  --vc-radius-md: 16px;
-  --vc-radius-lg: 20px;
-  --vc-radius-xl: 28px;
-  --vc-radius-full: 999px;
+  --vc-color-info: #2563eb;
+  --vc-color-info-bg: rgba(37, 99, 235, 0.08);
+  --vc-color-info-text: #1d4ed8;
 
-  --vc-shadow-sm: 0 10px 30px rgba(80, 90, 140, 0.08);
-  --vc-shadow-md: 0 16px 40px rgba(80, 90, 140, 0.1);
-  --vc-shadow-lg: 0 20px 50px rgba(80, 90, 140, 0.12);
+  /* Surface layered system */
+  --vc-surface-bg: var(--vc-color-bg);
+  --vc-surface-card: var(--vc-color-surface);
+  --vc-surface-elevated: #ffffff;
+  --vc-surface-floating: #ffffff;
+  --vc-surface-modal: #ffffff;
+  --vc-surface-popover: #ffffff;
+  --vc-surface-tooltip: #0f172a;
+
+  /* Spacing system */
+  --vc-space-1: 0.25rem;  /* 4px */
+  --vc-space-2: 0.5rem;   /* 8px */
+  --vc-space-3: 0.75rem;  /* 12px */
+  --vc-space-4: 1rem;     /* 16px */
+  --vc-space-5: 1.25rem;  /* 20px */
+  --vc-space-6: 1.5rem;   /* 24px */
+  --vc-space-8: 2rem;     /* 32px */
+  --vc-space-10: 2.5rem;  /* 40px */
+  --vc-space-12: 3rem;    /* 48px */
+  --vc-space-16: 4rem;    /* 64px */
+  --vc-space-20: 5rem;    /* 80px */
+
+  /* Radius system */
+  --vc-radius-sm: 6px;
+  --vc-radius-md: 10px;
+  --vc-radius-lg: 16px;
+  --vc-radius-xl: 24px;
+  --vc-radius-full: 9999px;
+
+  /* Shadows (soft edges) */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.03);
+  --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
+  --shadow-md: 0 6px 16px rgba(15, 23, 42, 0.05), 0 2px 4px rgba(15, 23, 42, 0.02);
+  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.06), 0 4px 10px rgba(15, 23, 42, 0.03);
+  --shadow-xl: 0 24px 48px rgba(15, 23, 42, 0.08), 0 6px 18px rgba(15, 23, 42, 0.04);
+  --shadow-glow: 0 20px 40px rgba(225, 29, 72, 0.05);
+  --shadow-glow-accent: 0 20px 48px rgba(225, 29, 72, 0.08);
+
+  --vc-shadow-sm: var(--shadow-sm);
+  --vc-shadow-md: var(--shadow-md);
+  --vc-shadow-lg: var(--shadow-lg);
   --vc-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
-  --vc-focus-ring: 0 0 0 4px rgba(91, 95, 239, 0.16);
 
-  --vc-transition-fast: 150ms ease;
-  --vc-transition-base: 220ms ease;
-  --vc-transition-slow: 300ms ease;
-  --vc-layout-sidebar: 292px;
-  --vc-layout-header: 76px;
-  --vc-layout-max: 1440px;
+  /* Border system */
+  --border-subtle: rgba(226, 232, 240, 0.4);
+  --border-default: rgba(226, 232, 240, 0.8);
+  --border-strong: rgba(203, 213, 225, 1);
 
-  --bg-primary: var(--vc-color-bg);
-  --bg-secondary: rgba(255, 255, 255, 0.64);
-  --bg-tertiary: #eef2ff;
-  --bg-card: var(--vc-color-surface);
-  --bg-card-hover: var(--vc-color-surface);
-  --bg-glass: rgba(255, 255, 255, 0.76);
-  --bg-input: rgba(255, 255, 255, 0.92);
-  --bg-skeleton: #e8edfb;
+  --vc-color-border: var(--border-default);
+  --vc-color-border-muted: var(--border-subtle);
+
+  /* Motion / Transitions */
+  --vc-transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
+  --vc-transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
+  --vc-transition-slow: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  --easing-standard: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Layout dimensions */
+  --vc-layout-sidebar: 280px;
+  --vc-layout-header: 70px;
+  --vc-layout-max: 1400px;
+
+  /* Typography */
+  --vc-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --vc-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --vc-line-height-tight: 1.1;
+  --vc-line-height-base: 1.5;
+
+  /* Focus ring */
+  --vc-focus-ring: 0 0 0 2px var(--vc-surface-card), 0 0 0 4px var(--vc-color-primary);
+
+  /* Gradients */
+  --vc-gradient-primary: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  --vc-gradient-soft: linear-gradient(135deg, rgba(225, 29, 72, 0.08), rgba(225, 29, 72, 0.02));
+  --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(225, 29, 72, 0.03), transparent 30%),
+    radial-gradient(circle at 86% 8%, rgba(225, 29, 72, 0.04), transparent 28%),
+    linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+
+  /* Dashboard Analytics Color Mapping */
+  --color-revenue: #2563eb;
+  --color-trust: #16a34a;
+  --color-risk: #ea580c;
+  --color-counterfeit: #dc2626;
+  --color-pending: #ca8a04;
+  --color-neutral: #64748b;
+
+  /* Status Colors */
+  --color-verified: var(--color-trust);
+  --color-processing: var(--color-revenue);
+  --color-recalled: var(--color-risk);
+  --color-blocked: var(--color-counterfeit);
+  --color-expired: var(--color-neutral);
+  --color-outofstock: var(--color-neutral);
+  --color-lowstock: var(--color-risk);
+  --color-highdemand: #8b5cf6;
+
+  /* Aliases (maintain compatibility) */
+  --bg-primary: var(--vc-surface-bg);
+  --bg-secondary: var(--vc-color-surface-muted);
+  --bg-tertiary: var(--vc-surface-elevated);
+  --bg-card: var(--vc-surface-card);
+  --bg-card-hover: var(--vc-surface-elevated);
+  --bg-glass: rgba(255, 255, 255, 0.72);
+  --bg-input: var(--vc-color-surface-muted);
+  --bg-skeleton: #e2e8f0;
 
   --text-primary: var(--vc-color-text-primary);
   --text-secondary: var(--vc-color-text-secondary);
@@ -75,47 +148,45 @@
   --text-inverse: var(--vc-color-text-inverse);
 
   --accent: var(--vc-color-primary);
-  --accent-bg: rgba(91, 95, 239, 0.1);
-  --accent-border: rgba(91, 95, 239, 0.2);
+  --accent-bg: rgba(225, 29, 72, 0.08);
+  --accent-border: rgba(225, 29, 72, 0.16);
   --accent-primary: var(--vc-color-primary);
-  --accent-cyan: var(--vc-color-accent);
-  --accent-purple: var(--vc-color-secondary);
+  --accent-cyan: var(--vc-color-primary);
+  --accent-purple: #be123c;
   --accent-gradient: var(--vc-gradient-primary);
-  --accent-gradient-hover: linear-gradient(135deg, #4d52e8 0%, #6f4ff4 52%, #399bf7 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
   --accent-success: var(--vc-color-success);
   --accent-warning: var(--vc-color-warning);
   --accent-danger: var(--vc-color-danger);
 
   --color-success: var(--vc-color-success);
-  --color-success-bg: rgba(34, 197, 94, 0.12);
-  --color-success-text: #15803d;
+  --color-success-bg: var(--vc-color-success-bg);
+  --color-success-text: var(--vc-color-success-text);
   --color-warning: var(--vc-color-warning);
-  --color-warning-bg: rgba(245, 158, 11, 0.14);
+  --color-warning-bg: var(--vc-color-warning-bg);
   --color-danger: var(--vc-color-danger);
-  --color-danger-bg: rgba(239, 68, 68, 0.12);
-  --color-danger-text: #dc2626;
-  --color-info: var(--vc-color-primary);
-  --color-info-bg: rgba(91, 95, 239, 0.12);
+  --color-danger-bg: var(--vc-color-danger-bg);
+  --color-danger-text: var(--vc-color-danger-text);
+  --color-info: var(--vc-color-info);
+  --color-info-bg: var(--vc-color-info-bg);
 
   --border: var(--vc-color-border);
   --border-default: var(--vc-color-border);
   --border-subtle: var(--vc-color-border-muted);
   --border-accent: var(--accent-border);
 
-  --shadow: var(--vc-shadow-sm);
-  --shadow-sm: var(--vc-shadow-sm);
-  --shadow-md: var(--vc-shadow-md);
-  --shadow-lg: var(--vc-shadow-lg);
-  --shadow-glow: 0 24px 60px rgba(91, 95, 239, 0.14);
-  --shadow-glow-accent: 0 20px 48px rgba(77, 168, 255, 0.18);
+  --shadow: var(--shadow-sm);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
 
   --space-xs: var(--vc-space-2);
   --space-sm: var(--vc-space-3);
-  --space-md: var(--vc-space-5);
-  --space-lg: var(--vc-space-8);
-  --space-xl: var(--vc-space-12);
-  --space-2xl: var(--vc-space-16);
-  --space-3xl: var(--vc-space-20);
+  --space-md: var(--vc-space-4);
+  --space-lg: var(--vc-space-6);
+  --space-xl: var(--vc-space-8);
+  --space-2xl: var(--vc-space-12);
+  --space-3xl: var(--vc-space-16);
 
   --radius-sm: var(--vc-radius-sm);
   --radius-md: var(--vc-radius-md);
@@ -130,4 +201,158 @@
   --transition-slow: var(--vc-transition-slow);
   --sidebar-width: var(--vc-layout-sidebar);
   --header-height: var(--vc-layout-header);
+}
+
+/* --- Dark Theme media query --- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+
+    /* Base palette - Graphite-Zinc */
+    --vc-color-bg: #090d16;
+    --vc-color-surface: #131722;
+    --vc-color-surface-soft: rgba(19, 23, 34, 0.72);
+    --vc-color-surface-muted: #1d2230;
+
+    /* Text */
+    --vc-color-text-primary: #f8fafc;
+    --vc-color-text-secondary: #94a3b8;
+    --vc-color-text-muted: #64748b;
+    --vc-color-text-inverse: #090d16;
+
+    /* Primary brand (red) */
+    --vc-color-primary: #e11d48;
+    --vc-color-secondary: #94a3b8;
+    --vc-color-accent: #f8fafc;
+
+    /* Semantic colors */
+    --vc-color-success: #10b981;
+    --vc-color-success-bg: rgba(16, 185, 129, 0.12);
+    --vc-color-success-text: #34d399;
+
+    --vc-color-warning: #f59e0b;
+    --vc-color-warning-bg: rgba(245, 158, 11, 0.12);
+    --vc-color-warning-text: #fbbf24;
+
+    --vc-color-danger: #ef4444;
+    --vc-color-danger-bg: rgba(239, 68, 68, 0.12);
+    --vc-color-danger-text: #f87171;
+
+    --vc-color-info: #3b82f6;
+    --vc-color-info-bg: rgba(59, 130, 246, 0.12);
+    --vc-color-info-text: #60a5fa;
+
+    /* Surface layered system */
+    --vc-surface-bg: var(--vc-color-bg);
+    --vc-surface-card: var(--vc-color-surface);
+    --vc-surface-elevated: #1c212f;
+    --vc-surface-floating: #252a3a;
+    --vc-surface-modal: #2b3042;
+    --vc-surface-popover: #32374d;
+    --vc-surface-tooltip: #3d435c;
+
+    /* Shadows */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.5);
+
+    --vc-shadow-sm: var(--shadow-sm);
+    --vc-shadow-md: var(--shadow-md);
+    --vc-shadow-lg: var(--shadow-lg);
+    --vc-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+    /* Borders */
+    --border-subtle: rgba(255, 255, 255, 0.04);
+    --border-default: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.16);
+
+    /* Gradients */
+    --vc-gradient-primary: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+    --vc-gradient-soft: linear-gradient(135deg, rgba(225, 29, 72, 0.15), rgba(225, 29, 72, 0.05));
+    --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(225, 29, 72, 0.06), transparent 30%),
+      radial-gradient(circle at 86% 8%, rgba(225, 29, 72, 0.08), transparent 28%),
+      linear-gradient(135deg, #090d16 0%, #0d121c 100%);
+
+    /* Aliases */
+    --bg-glass: rgba(19, 23, 34, 0.72);
+    --bg-skeleton: #1e293b;
+  }
+}
+
+/* --- Dark Theme manual class overrides --- */
+.dark, [data-theme="dark"] {
+  color-scheme: dark;
+
+  /* Base palette - Graphite-Zinc */
+  --vc-color-bg: #090d16;
+  --vc-color-surface: #131722;
+  --vc-color-surface-soft: rgba(19, 23, 34, 0.72);
+  --vc-color-surface-muted: #1d2230;
+
+  /* Text */
+  --vc-color-text-primary: #f8fafc;
+  --vc-color-text-secondary: #94a3b8;
+  --vc-color-text-muted: #64748b;
+  --vc-color-text-inverse: #090d16;
+
+  /* Primary brand (red) */
+  --vc-color-primary: #e11d48;
+  --vc-color-secondary: #94a3b8;
+  --vc-color-accent: #f8fafc;
+
+  /* Semantic colors */
+  --vc-color-success: #10b981;
+  --vc-color-success-bg: rgba(16, 185, 129, 0.12);
+  --vc-color-success-text: #34d399;
+
+  --vc-color-warning: #f59e0b;
+  --vc-color-warning-bg: rgba(245, 158, 11, 0.12);
+  --vc-color-warning-text: #fbbf24;
+
+  --vc-color-danger: #ef4444;
+  --vc-color-danger-bg: rgba(239, 68, 68, 0.12);
+  --vc-color-danger-text: #f87171;
+
+  --vc-color-info: #3b82f6;
+  --vc-color-info-bg: rgba(59, 130, 246, 0.12);
+  --vc-color-info-text: #60a5fa;
+
+  /* Surface layered system */
+  --vc-surface-bg: var(--vc-color-bg);
+  --vc-surface-card: var(--vc-color-surface);
+  --vc-surface-elevated: #1c212f;
+  --vc-surface-floating: #252a3a;
+  --vc-surface-modal: #2b3042;
+  --vc-surface-popover: #32374d;
+  --vc-surface-tooltip: #3d435c;
+
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
+  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.5);
+
+  --vc-shadow-sm: var(--shadow-sm);
+  --vc-shadow-md: var(--shadow-md);
+  --vc-shadow-lg: var(--shadow-lg);
+  --vc-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+
+  /* Borders */
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.16);
+
+  /* Gradients */
+  --vc-gradient-primary: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
+  --vc-gradient-soft: linear-gradient(135deg, rgba(225, 29, 72, 0.15), rgba(225, 29, 72, 0.05));
+  --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(225, 29, 72, 0.06), transparent 30%),
+    radial-gradient(circle at 86% 8%, rgba(225, 29, 72, 0.08), transparent 28%),
+    linear-gradient(135deg, #090d16 0%, #0d121c 100%);
+
+  /* Aliases */
+  --bg-glass: rgba(19, 23, 34, 0.72);
+  --bg-skeleton: #1e293b;
 }

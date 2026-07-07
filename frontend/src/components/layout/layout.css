@@ -549,3 +549,44 @@
     flex-direction: column;
   }
 }
+
+/* Sidebar section labels and notification badge */
+.vc-sidebar-nav .vc-nav-item:first-child::before {
+  content: "Workspace";
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-xs);
+}
+
+.vc-sidebar-nav .vc-nav-item:nth-last-child(3)::before {
+  content: "Account";
+  display: block;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-top: var(--space-sm);
+  margin-bottom: var(--space-xs);
+}
+
+/* Divider before Account section */
+.vc-sidebar-nav .vc-nav-item:nth-last-child(4) {
+  border-bottom: 1px solid var(--border-default);
+  margin-bottom: var(--space-sm);
+}
+
+/* Notification badge on Notifications item (assumed third from last) */
+.vc-sidebar-nav .vc-nav-item:nth-last-child(3) {
+  position: relative;
+}
+.vc-sidebar-nav .vc-nav-item:nth-last-child(3)::after {
+  content: "5"; /* Example count */
+  position: absolute;
+  top: 4px;
+  right: 12px;
+  background: var(--color-danger);
+  color: white;
+  border-radius: 9999px;
+  font-size: 0.65rem;
+  padding: 2px 5px;
+  line-height: 1;
+}
