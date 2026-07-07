@@ -1,7 +1,8 @@
 import { ShieldCheck, ShoppingBag } from 'lucide-react';
+import type { ItemDetailResponse } from '../types';
 
 interface StickyInfoPanelProps {
-  product: any;
+  product: ItemDetailResponse;
 }
 
 export default function StickyInfoPanel({ product }: StickyInfoPanelProps) {

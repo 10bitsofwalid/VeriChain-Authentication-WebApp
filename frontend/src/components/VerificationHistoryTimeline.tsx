@@ -1,11 +1,11 @@
 import { ShieldCheck } from 'lucide-react';
 
 interface VerificationStep {
-  location: string;
+  location?: string;
   action: string;
   actor: any;
   timestamp: string;
-  txHash: string;
+  txHash?: string;
 }
 
 interface VerificationHistoryTimelineProps {
@@ -59,7 +59,7 @@ export default function VerificationHistoryTimeline({ history }: VerificationHis
                   <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{formattedDate}</span>
                 </div>
                 <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '2px 0 0 0' }}>
-                  Locality audit checkpoint passed at <strong>{event.location}</strong>. Witnessed by {actorName}.
+                  Locality audit checkpoint passed at <strong>{event.location || 'Checkpoint'}</strong>. Witnessed by {actorName}.
                 </p>
               </div>
             </div>

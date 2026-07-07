@@ -16,11 +16,12 @@ import RelatedProductsSection from '../components/RelatedProductsSection';
 import SimilarProductsSection from '../components/SimilarProductsSection';
 import RecentlyVerifiedProducts from '../components/RecentlyVerifiedProducts';
 import StickyInfoPanel from '../components/StickyInfoPanel';
+import type { JourneyStep, ItemDetailResponse } from '../types';
 import './ProductDetailsPage.css';
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
-  const [product, setProduct] = useState<any>(null);
+  const [product, setProduct] = useState<ItemDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -45,7 +46,7 @@ export default function ProductDetailsPage() {
   // Build milestones for ownership timeline
   const journey = product.item?.journey || [];
   const findTimestamp = (actionKeyword: string) => {
-    const step = journey.find((s: any) => s.action && s.action.toLowerCase().includes(actionKeyword));
+    const step = journey.find((s: JourneyStep) => s.action && s.action.toLowerCase().includes(actionKeyword));
     return step?.timestamp ? new Date(step.timestamp).toLocaleDateString() : undefined;
   };
   const milestones = [

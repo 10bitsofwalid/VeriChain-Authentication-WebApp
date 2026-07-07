@@ -18,6 +18,7 @@ import {
   ClipboardList,
   AlertTriangle,
   FileText,
+  Bot,
 } from 'lucide-react';
 import type { User } from '../../context/AuthContext';
 import StatusChip from '../ui/StatusChip';
@@ -60,18 +61,21 @@ export default function Sidebar({ open, onClose, user, onLogout }: SidebarProps)
         </div>
 
         <nav className="vc-sidebar-nav">
-          {navItems.map((item) => (
-            <NavLink
-              key={`${item.to}-${item.label}`}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) => `vc-nav-item ${isActive ? 'vc-nav-active' : ''}`}
-              onClick={onClose}
-            >
-              <item.icon size={18} aria-hidden="true" />
-              <span>{item.label}</span>
-            </NavLink>
-          ))}
+          <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
+            {navItems.map((item) => (
+              <li key={`${item.to}-${item.label}`}>
+                <NavLink
+                  to={item.to}
+                  end={item.end}
+                  className={({ isActive }) => `vc-nav-item ${isActive ? 'vc-nav-active' : ''}`}
+                  onClick={onClose}
+                >
+                  <item.icon size={18} aria-hidden="true" />
+                  <span>{item.label}</span>
+                </NavLink>
+              </li>
+            ))}
+          </ul>
         </nav>
 
         <div className="vc-sidebar-trust">
@@ -106,6 +110,8 @@ function getNavItems(role: string): NavItem[] {
     { to: '/verify', label: 'Verify Product', icon: Search },
     { to: '/dashboard/marketplace', label: 'Categories', icon: Tags },
     { to: '/trust-center', label: 'Trust Center', icon: Shield },
+    { to: '/dashboard/ai', label: 'AI Center', icon: Bot },
+    { to: '/dashboard/community', label: 'Community', icon: Users },
     { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
   ];
 

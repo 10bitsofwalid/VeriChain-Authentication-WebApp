@@ -34,6 +34,8 @@ const BuyerDashboard = lazy(() => import('./pages/buyer/BuyerDashboard'));
 const AdminDashboard = lazy(() => import('./pages/admin/AdminDashboard'));
 const RegisterProduct = lazy(() => import('./pages/factory/RegisterProduct'));
 // const QRVerification = lazy(() => import('./pages/QRVerification'));
+const AIHome = lazy(() => import('./pages/ai/AIHome'));
+const CommunityHome = lazy(() => import('./pages/community/CommunityHome'));
 
 
 function AppRoutes() {
@@ -163,6 +165,8 @@ function AppRoutes() {
             </ProtectedRoute>
           }
         />
+        <Route path="/dashboard/ai" element={<AIHome />} />
+        <Route path="/dashboard/community" element={<CommunityHome />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
       </Route>
         <Route path="/seller/sourcing" element={<ProtectedRoute roles={['seller']}><SellerSourcing /></ProtectedRoute>} />

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Factory, PackageSearch, Search, ShieldCheck, Store, X } from 'lucide-react';
 import ActionButton from '../ui/ActionButton';
@@ -17,14 +18,63 @@ const resultGroups = [
 ];
 
 export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
+  const panelRef = useRef<HTMLDivElement | null>(null);
+  const previousActiveElement = useRef<HTMLElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    previousActiveElement.current = document.activeElement as HTMLElement;
+
+    // Focus input
+    const input = panelRef.current?.querySelector('input');
+    if (input) {
+      setTimeout(() => input.focus(), 50);
+    }
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+      if (e.key === 'Tab') {
+        if (!panelRef.current) return;
+        const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
+          'input, button, a, [href], [tabindex]:not([-1])'
+        );
+        if (focusableElements.length === 0) return;
+        const first = focusableElements[0];
+        const last = focusableElements[focusableElements.length - 1];
+
+        if (e.shiftKey) {
+          if (document.activeElement === first) {
+            last.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === last) {
+            first.focus();
+            e.preventDefault();
+          }
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      if (previousActiveElement.current) {
+        previousActiveElement.current.focus();
+      }
+    };
+  }, [open, onClose]);
+
   if (!open) return null;
 
   return (
     <div className="vc-search-overlay" role="dialog" aria-modal="true" aria-label="Global search">
-      <div className="vc-search-panel">
+      <div className="vc-search-panel" ref={panelRef}>
         <div className="vc-search-input-row">
           <Search size={20} aria-hidden="true" />
-          <input autoFocus placeholder="Search products, factories, sellers, categories..." />
+          <input placeholder="Search products, factories, sellers, categories..." aria-label="Search keywords" />
           <ActionButton variant="ghost" size="icon" onClick={onClose} aria-label="Close search">
             <X size={18} />
           </ActionButton>
@@ -54,3 +104,4 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
     </div>
   );
 }
+

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
+import LazyImage from '../components/LazyImage';
 import {
   ShoppingBag,
   Search,
@@ -196,7 +197,7 @@ export default function Marketplace() {
                 border: '1px solid var(--border-subtle)',
                 marginBottom: 'var(--space-md)'
               }}>
-                <img
+                <LazyImage
                   src={item.product?.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=600&q=80'}
                   alt={item.product?.name}
                   style={{ width: '100%', height: '100%', objectFit: 'cover' }}
