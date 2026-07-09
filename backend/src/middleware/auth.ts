@@ -10,7 +10,10 @@ export interface AuthRequest extends Request {
   };
 }
 
-const JWT_SECRET = process.env.JWT_SECRET || 'verichain-super-secret-key';
+if (!process.env.JWT_SECRET) {
+  throw new Error('FATAL ERROR: JWT_SECRET environment variable is missing.');
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
 export const protect = async (req: AuthRequest, res: Response, next: NextFunction) => {
   let token = '';

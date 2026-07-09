@@ -4,12 +4,51 @@ import { Product } from '../models/Product';
 import { AuditLog } from '../models/AuditLog';
 import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
+import { lookupLimiter } from '../middleware/rateLimiter';
+import { z } from 'zod';
+import { validateRequest } from '../middleware/validate';
 
 const router = Router();
 
+const transferItemSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid item ID',
+    }),
+  }),
+  body: z.object({
+    toUserId: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Please provide a valid recipient user ID',
+    }),
+    location: z.string().optional(),
+  }),
+});
+
+const updateItemStatusSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid item ID',
+    }),
+  }),
+  body: z.object({
+    status: z.string().refine((val) => ['manufactured', 'in_transit', 'listed', 'sold', 'recalled'].includes(val), {
+      message: "Status must be one of: manufactured, in_transit, listed, sold, recalled",
+    }),
+    location: z.string().optional(),
+  }),
+});
+
+const buyItemSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid item ID',
+    }),
+  }),
+});
+
 // @route   GET /api/items/verify/:serialNumber
 // @desc    Public endpoint — verify item authenticity by serial number
-router.get('/verify/:serialNumber', async (req: Request, res: Response, next) => {
+router.get('/verify/:serialNumber', lookupLimiter, async (req: Request, res: Response, next) => {
   try {
     const item = await ItemInstance.findOne({ serialNumber: req.params.serialNumber })
       .populate('product', 'name description category sku imageUrl certificateUrl verifiedStatus')
@@ -67,7 +106,7 @@ router.get('/my', protect, async (req: AuthRequest, res: Response, next) => {
 
 // @route   POST /api/items/:id/transfer
 // @desc    Transfer item ownership (e.g. factory → seller, seller → buyer)
-router.post('/:id/transfer', protect, ensureVerified, async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/transfer', protect, ensureVerified, validateRequest(transferItemSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid item ID' });
@@ -122,7 +161,7 @@ router.post('/:id/transfer', protect, ensureVerified, async (req: AuthRequest, r
 
 // @route   PATCH /api/items/:id/status
 // @desc    Update item status (factory/seller/admin)
-router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), ensureVerified, validateRequest(updateItemStatusSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid item ID' });
@@ -137,6 +176,17 @@ router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), en
     const item = await ItemInstance.findById(req.params.id);
     if (!item) {
       return res.status(404).json({ success: false, message: 'Item not found' });
+    }
+
+    const product = await Product.findById(item.product);
+    const isOwner = item.currentOwner.toString() === req.user!.id;
+    const isResponsibleFactory = product && product.factory.toString() === req.user!.id;
+
+    if (!isOwner && !isResponsibleFactory) {
+      return res.status(403).json({
+        success: false,
+        message: 'Access denied. You are not the owner or the factory responsible for this item.',
+      });
     }
 
     const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -210,7 +260,7 @@ router.get('/marketplace', protect, async (req: AuthRequest, res: Response, next
 
 // @route   POST /api/items/:id/buy
 // @desc    Purchase a listed item from the marketplace (buyer only)
-router.post('/:id/buy', protect, authorize('buyer'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/buy', protect, authorize('buyer'), ensureVerified, validateRequest(buyItemSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid item ID' });

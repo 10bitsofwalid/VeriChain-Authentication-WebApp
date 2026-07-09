@@ -8,6 +8,38 @@ import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
 import crypto from 'crypto';
 import { Invitation } from '../models/Invitation';
+import { z } from 'zod';
+import { validateRequest } from '../middleware/validate';
+
+const verifyUserSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), { message: 'Invalid user ID' }),
+  }),
+  body: z.object({
+    verified: z.boolean({ error: 'Please provide a boolean `verified` field' }),
+  }),
+});
+
+const verifyProductSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), { message: 'Invalid product ID' }),
+  }),
+  body: z.object({
+    verifiedStatus: z.string().refine((val) => ['verified', 'rejected'].includes(val), {
+      message: 'verifiedStatus must be "verified" or "rejected"',
+    }),
+  }),
+});
+
+const createInvitationSchema = z.object({
+  body: z.object({
+    email: z.string().email('Please provide a valid email address'),
+    name: z.string().min(1, 'Name is required'),
+    role: z.string().refine((val) => ['moderator', 'admin'].includes(val), {
+      message: 'Role must be admin or moderator',
+    }),
+  }),
+});
 
 const router = Router();
 
@@ -46,7 +78,7 @@ router.get('/users', async (req: AuthRequest, res: Response, next) => {
 
 // @route   PATCH /api/admin/users/:id/verify
 // @desc    Verify or reject a seller/factory account
-router.patch('/users/:id/verify', async (req: AuthRequest, res: Response, next) => {
+router.patch('/users/:id/verify', validateRequest(verifyUserSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid user ID' });
@@ -138,7 +170,7 @@ router.get('/products', async (req: AuthRequest, res: Response, next) => {
 
 // @route   PATCH /api/admin/products/:id/verify
 // @desc    Verify or reject a product template
-router.patch('/products/:id/verify', async (req: AuthRequest, res: Response, next) => {
+router.patch('/products/:id/verify', validateRequest(verifyProductSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid product ID' });
@@ -223,7 +255,7 @@ router.get('/dashboard', async (_req: AuthRequest, res: Response, next) => {
 
 // @route   POST /api/admin/invitations
 // @desc    Create and send an invitation
-router.post('/invitations', async (req: AuthRequest, res: Response, next) => {
+router.post('/invitations', validateRequest(createInvitationSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     const { email, name, role } = req.body;
 

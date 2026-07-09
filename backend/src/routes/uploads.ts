@@ -4,8 +4,10 @@ import path from 'path';
 import fs from 'fs';
 import { v2 as cloudinary } from 'cloudinary';
 import { protect, AuthRequest } from '../middleware/auth';
+import { uploadLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
+router.use(uploadLimiter);
 
 // Ensure local upload directory exists
 const UPLOAD_DIR = path.join(__dirname, '../../public/uploads');

@@ -5,12 +5,37 @@ import { ItemInstance } from '../models/ItemInstance';
 import { Product } from '../models/Product';
 import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
+import { z } from 'zod';
+import { validateRequest } from '../middleware/validate';
 
 const router = Router();
 
+const createComplaintSchema = z.object({
+  body: z.object({
+    productInstanceId: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Please provide a valid productInstanceId',
+    }),
+    reason: z.string().min(1, 'Reason is required'),
+    description: z.string().min(1, 'Description is required'),
+    evidenceUrl: z.string().optional(),
+  }),
+});
+
+const updateComplaintSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid complaint ID',
+    }),
+  }),
+  body: z.object({
+    status: z.enum(['pending', 'under_review', 'resolved', 'dismissed']).optional(),
+    moderatorNotes: z.string().optional(),
+  }),
+});
+
 // @route   POST /api/complaints
 // @desc    File a complaint (buyer only)
-router.post('/', protect, authorize('buyer'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+router.post('/', protect, authorize('buyer'), ensureVerified, validateRequest(createComplaintSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     const { productInstanceId, reason, description, evidenceUrl } = req.body;
 
@@ -124,7 +149,7 @@ router.get('/', protect, async (req: AuthRequest, res: Response, next) => {
 
 // @route   PATCH /api/complaints/:id
 // @desc    Update complaint status and moderator notes (moderator/admin)
-router.patch('/:id', protect, authorize('moderator', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+router.patch('/:id', protect, authorize('moderator', 'admin'), ensureVerified, validateRequest(updateComplaintSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid complaint ID' });

@@ -100,9 +100,10 @@ const SellerSourcing: React.FC = () => {
     const fetchFactories = async () => {
       try {
         const res = await client.get('/users', { params: { role: 'factory', verified: true } });
-        if (res.data && res.data.users && res.data.users.length > 0) {
-          setFactories(res.data.users);
-          setSelectedFactoryId(res.data.users[0]._id);
+        const factoryList = Array.isArray(res.data) ? res.data : res.data?.users;
+        if (factoryList && factoryList.length > 0) {
+          setFactories(factoryList);
+          setSelectedFactoryId(factoryList[0]._id);
           setLoadingFactories(false);
           return;
         }

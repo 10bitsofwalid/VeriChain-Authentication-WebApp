@@ -4,18 +4,55 @@ import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 import { Invitation } from '../models/Invitation';
 import { protect, AuthRequest } from '../middleware/auth';
+import { z } from 'zod';
+import { validateRequest } from '../middleware/validate';
+import { authLimiter } from '../middleware/rateLimiter';
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'verichain-super-secret-key';
+router.use(authLimiter);
+if (!process.env.JWT_SECRET) {
+  throw new Error('FATAL ERROR: JWT_SECRET environment variable is missing.');
+}
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // Helper to sign JWT
 const signToken = (id: string, role: string, verified: boolean) => {
   return jwt.sign({ id, role, verified }, JWT_SECRET, { expiresIn: '30d' });
 };
 
+const signupSchema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Name is required'),
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+    role: z.string().refine((val) => ['buyer', 'seller', 'factory'].includes(val), {
+      message: "Role must be 'buyer', 'seller', or 'factory'",
+    }),
+    factoryLocation: z.string().optional(),
+    factoryCapacity: z.string().optional(),
+    factoryCertificateNo: z.string().optional(),
+    logoUrl: z.string().optional(),
+    certificateUrl: z.string().optional(),
+  }),
+});
+
+const loginSchema = z.object({
+  body: z.object({
+    email: z.string().email('Invalid email address'),
+    password: z.string().min(1, 'Password is required'),
+  }),
+});
+
+const acceptInviteSchema = z.object({
+  body: z.object({
+    token: z.string().min(1, 'Token is required'),
+    password: z.string().min(6, 'Password must be at least 6 characters'),
+  }),
+});
+
 // @route   POST /api/auth/signup
 // @desc    Register a new buyer, seller, or factory
-router.post('/signup', async (req, res, next) => {
+router.post('/signup', validateRequest(signupSchema), async (req, res, next) => {
   try {
     const { name, email, password, role, factoryLocation, factoryCapacity, factoryCertificateNo, logoUrl, certificateUrl } = req.body;
 
@@ -76,7 +113,7 @@ router.post('/signup', async (req, res, next) => {
 
 // @route   POST /api/auth/login
 // @desc    Authenticate user and get token
-router.post('/login', async (req, res, next) => {
+router.post('/login', validateRequest(loginSchema), async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -179,7 +216,7 @@ router.post('/invite', protect, async (req: AuthRequest, res: Response, next) =>
 
 // @route   POST /api/auth/accept-invite
 // @desc    Accept invitation and activate account
-router.post('/accept-invite', async (req, res, next) => {
+router.post('/accept-invite', validateRequest(acceptInviteSchema), async (req, res, next) => {
   try {
     const { token, password } = req.body;
 

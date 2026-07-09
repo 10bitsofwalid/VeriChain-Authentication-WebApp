@@ -246,6 +246,21 @@ describe('VeriChain Backend Integration Tests', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.itemsCount).toBe(3);
     });
+
+    it('should fail to generate batch if duplicate serials are detected (pre-insert check)', async () => {
+      const res = await request(app)
+        .post(`/api/products/${testProduct._id}/batch`)
+        .set('Authorization', `Bearer ${factoryToken}`)
+        .send({
+          count: 3,
+          prefix: 'TST',
+          startingSerial: 200001,
+        });
+
+      expect(res.status).toBe(400);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain('Duplicate serial number(s) detected');
+    });
   });
 
   describe('4. Marketplace Listing & Transfer Tests', () => {
@@ -266,6 +281,57 @@ describe('VeriChain Backend Integration Tests', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.item.status).toBe('listed');
+    });
+
+    it('should reject status update from an unauthorized factory (non-owner/non-responsible)', async () => {
+      // Register a second factory
+      const signupRes = await request(app)
+        .post('/api/auth/signup')
+        .send({
+          name: 'Test Factory 2',
+          email: 'test-factory2@verichain.io',
+          password: 'password123',
+          role: 'factory',
+          factoryLocation: 'Seoul, South Korea',
+          factoryCapacity: '10000 units/mo',
+          factoryCertificateNo: 'ISO-9001-KOR-TEST2',
+        });
+      expect(signupRes.status).toBe(201);
+      const factory2Id = signupRes.body.user.id;
+      const factory2Token = signupRes.body.token;
+
+      // Admin verifies the second factory
+      const verifyRes = await request(app)
+        .patch(`/api/admin/users/${factory2Id}/verify`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ verified: true });
+      expect(verifyRes.status).toBe(200);
+
+      // Try to update status of testItem using factory2Token
+      const updateRes = await request(app)
+        .patch(`/api/items/${testItem._id}/status`)
+        .set('Authorization', `Bearer ${factory2Token}`)
+        .send({
+          status: 'in_transit',
+          location: 'Intermediary Hub',
+        });
+
+      expect(updateRes.status).toBe(403);
+      expect(updateRes.body.success).toBe(false);
+      expect(updateRes.body.message).toContain('Access denied');
+    });
+
+    it('should reject status update from an admin who is not the owner/responsible', async () => {
+      const res = await request(app)
+        .patch(`/api/items/${testItem._id}/status`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          status: 'recalled',
+        });
+
+      expect(res.status).toBe(403);
+      expect(res.body.success).toBe(false);
+      expect(res.body.message).toContain('Access denied');
     });
 
     it('should allow a buyer to purchase the listed item', async () => {
@@ -307,6 +373,62 @@ describe('VeriChain Backend Integration Tests', () => {
 
       expect(res.status).toBe(200);
       expect(res.body.complaints.length).toBeGreaterThan(0);
+    });
+  });
+
+  describe('6. Rate Limiting Tests', () => {
+    it('should rate limit auth requests after 20 attempts', async () => {
+      // Make 20 auth requests (should return normal validation/auth errors, not 429)
+      for (let i = 0; i < 20; i++) {
+        await request(app)
+          .post('/api/auth/login')
+          .send({ email: 'rate-limit-test@verichain.io', password: 'wrong' });
+      }
+
+      // The 21st request should be rate-limited and return 429
+      const limitRes = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'rate-limit-test@verichain.io', password: 'wrong' });
+
+      expect(limitRes.status).toBe(429);
+      expect(limitRes.body.success).toBe(false);
+      expect(limitRes.body.message).toContain('Too many login or signup attempts');
+    });
+  });
+
+  describe('7. Security Headers & CORS Tests', () => {
+    it('should set secure HTTP headers (Helmet)', async () => {
+      const res = await request(app).get('/api/health');
+      expect(res.headers['x-content-type-options']).toBe('nosniff');
+      expect(res.headers['x-frame-options']).toBeDefined();
+    });
+
+    it('should restrict CORS in production if origin not allowed', async () => {
+      const originalEnv = process.env.NODE_ENV;
+      const originalOrigins = process.env.ALLOWED_ORIGINS;
+      
+      try {
+        process.env.NODE_ENV = 'production';
+        process.env.ALLOWED_ORIGINS = 'https://verichain.io,https://app.verichain.io';
+        
+        // Allowed origin
+        const resAllowed = await request(app)
+          .get('/api/health')
+          .set('Origin', 'https://verichain.io');
+        
+        expect(resAllowed.headers['access-control-allow-origin']).toBe('https://verichain.io');
+
+        // Disallowed origin should return CORS error (handled by custom callback throwing error)
+        const resDisallowed = await request(app)
+          .get('/api/health')
+          .set('Origin', 'https://malicious-site.com');
+
+        expect(resDisallowed.status).toBe(500);
+        expect(resDisallowed.body.message).toContain('Not allowed by CORS');
+      } finally {
+        process.env.NODE_ENV = originalEnv;
+        process.env.ALLOWED_ORIGINS = originalOrigins;
+      }
     });
   });
 });

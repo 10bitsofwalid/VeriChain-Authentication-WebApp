@@ -5,12 +5,51 @@ import { User } from '../models/User';
 import { AuditLog } from '../models/AuditLog';
 import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
+import { batchLimiter } from '../middleware/rateLimiter';
+import { z } from 'zod';
+import { validateRequest } from '../middleware/validate';
 
 const router = Router();
 
+const registerProductSchema = z.object({
+  body: z.object({
+    name: z.string().min(1, 'Name is required'),
+    description: z.string().min(1, 'Description is required'),
+    category: z.string().min(1, 'Category is required'),
+    sku: z.string().min(1, 'SKU is required'),
+    imageUrl: z.string().min(1, 'Image URL is required'),
+    certificateUrl: z.string().optional(),
+    specs: z.record(z.string(), z.string()).optional(),
+  }),
+});
+
+const batchSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid product template ID',
+    }),
+  }),
+  body: z.object({
+    count: z.union([z.number(), z.string()]).transform((val) => Number(val)).optional(),
+    prefix: z.string().optional(),
+    startingSerial: z.union([z.number(), z.string()]).transform((val) => Number(val)).optional(),
+  }),
+});
+
+const recallSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid product ID',
+    }),
+  }),
+  body: z.object({
+    reason: z.string().min(1, 'Please provide a reason for the recall'),
+  }),
+});
+
 // @route   POST /api/products/register
 // @desc    Register a new product template (Factory only)
-router.post('/register', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+router.post('/register', protect, authorize('factory'), ensureVerified, validateRequest(registerProductSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     const { name, description, category, sku, imageUrl, certificateUrl, specs } = req.body;
 
@@ -63,7 +102,7 @@ router.get('/factory', protect, authorize('factory'), ensureVerified, async (req
 
 // @route   POST /api/products/:id/batch
 // @desc    Generate a serialized batch of items (Factory only)
-router.post('/:id/batch', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/batch', protect, authorize('factory'), ensureVerified, batchLimiter, validateRequest(batchSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid product template ID' });
@@ -78,14 +117,26 @@ router.post('/:id/batch', protect, authorize('factory'), ensureVerified, async (
       return res.status(404).json({ success: false, message: 'Product template not found' });
     }
 
+    // Pre-insert duplicate serial check
+    const serialNumbers: string[] = [];
+    for (let i = 0; i < countNum; i++) {
+      serialNumbers.push(`${productPrefix}-${product.sku}-${startSerialNum + i}`);
+    }
+
+    const duplicates = await ItemInstance.find({ serialNumber: { $in: serialNumbers } });
+    if (duplicates.length > 0) {
+      const duplicateSerials = duplicates.map(item => item.serialNumber);
+      return res.status(400).json({
+        success: false,
+        message: `Duplicate serial number(s) detected. Generation aborted. Duplicates: ${duplicateSerials.join(', ')}`,
+      });
+    }
+
     const createdItems = [];
     const factory = await User.findById(req.user?.id);
     const location = factory?.factoryDetails?.location || 'Unknown Manufacturing Facility';
 
-    for (let i = 0; i < countNum; i++) {
-      const serialNumber = `${productPrefix}-${product.sku}-${startSerialNum + i}`;
-
-      // Simulate a blockchain transaction hash for the QR certificate
+    for (const serialNumber of serialNumbers) {
       const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
 
       const item = await ItemInstance.create({
@@ -128,7 +179,7 @@ router.post('/:id/batch', protect, authorize('factory'), ensureVerified, async (
 
 // @route   POST /api/products/:id/recall
 // @desc    Recall all items of a product catalog (Factory or Admin)
-router.post('/:id/recall', protect, authorize('factory', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+router.post('/:id/recall', protect, authorize('factory', 'admin'), ensureVerified, validateRequest(recallSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid product ID' });

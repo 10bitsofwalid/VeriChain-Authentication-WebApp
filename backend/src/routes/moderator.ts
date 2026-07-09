@@ -6,6 +6,35 @@ import { Complaint } from '../models/Complaint';
 import { AuditLog } from '../models/AuditLog';
 import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
+import { z } from 'zod';
+import { validateRequest } from '../middleware/validate';
+
+const modVerifyProductSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), { message: 'Invalid product ID' }),
+  }),
+  body: z.object({
+    verifiedStatus: z.string().refine((val) => ['verified', 'rejected'].includes(val), {
+      message: 'verifiedStatus must be "verified" or "rejected"',
+    }),
+  }),
+});
+
+const modItemRiskSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), { message: 'Invalid item ID' }),
+  }),
+  body: z.object({
+    counterfeitRisk: z.string().refine((val) => ['low', 'medium', 'high'].includes(val), {
+      message: 'Invalid counterfeitRisk value. Must be low, medium, or high',
+    }).optional(),
+    status: z.string().refine((val) => ['manufactured', 'in_transit', 'listed', 'sold', 'recalled'].includes(val), {
+      message: 'Invalid item status value',
+    }).optional(),
+  }).refine((data) => data.counterfeitRisk !== undefined || data.status !== undefined, {
+    message: 'At least one of counterfeitRisk or status must be provided',
+  }),
+});
 
 const router = Router();
 
@@ -68,7 +97,7 @@ router.get('/products', async (req: AuthRequest, res: Response, next) => {
 
 // @route   PATCH /api/moderator/products/:id/verify
 // @desc    Verify or reject a product template
-router.patch('/products/:id/verify', async (req: AuthRequest, res: Response, next) => {
+router.patch('/products/:id/verify', validateRequest(modVerifyProductSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid product ID' });
@@ -134,7 +163,7 @@ router.get('/fake-listings', async (req: AuthRequest, res: Response, next) => {
 
 // @route   PATCH /api/moderator/items/:id/risk
 // @desc    Modify counterfeit risk or status of an item
-router.patch('/items/:id/risk', async (req: AuthRequest, res: Response, next) => {
+router.patch('/items/:id/risk', validateRequest(modItemRiskSchema), async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
       return res.status(400).json({ success: false, message: 'Invalid item ID' });

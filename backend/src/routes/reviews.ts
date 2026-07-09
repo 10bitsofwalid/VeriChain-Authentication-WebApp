@@ -1,9 +1,38 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Review } from '../models/Review';
 import { ItemInstance } from '../models/ItemInstance';
 import { Product } from '../models/Product';
 import { User } from '../models/User';
+import { Types } from 'mongoose';
+import { z } from 'zod';
+import { validateRequest } from '../middleware/validate';
+
+const createReviewSchema = z.object({
+  params: z.object({
+    productId: z.string().refine((val) => Types.ObjectId.isValid(val), { message: 'Invalid product ID' }),
+  }),
+  body: z.object({
+    itemInstanceId: z.string().refine((val) => Types.ObjectId.isValid(val), { message: 'Invalid item instance ID' }),
+    rating: z.number({ error: 'Rating must be a number' }).int().min(1).max(5),
+    title: z.string().min(1, 'Title is required').max(200),
+    text: z.string().min(1, 'Review text is required').max(5000),
+    images: z.array(z.string().url()).optional(),
+  }),
+});
+
+const updateReviewSchema = z.object({
+  params: z.object({
+    productId: z.string().refine((val) => Types.ObjectId.isValid(val), { message: 'Invalid product ID' }),
+    reviewId: z.string().refine((val) => Types.ObjectId.isValid(val), { message: 'Invalid review ID' }),
+  }),
+  body: z.object({
+    rating: z.number().int().min(1).max(5).optional(),
+    title: z.string().min(1).max(200).optional(),
+    text: z.string().min(1).max(5000).optional(),
+    images: z.array(z.string().url()).optional(),
+  }),
+});
 
 const router = Router();
 
@@ -40,7 +69,7 @@ router.get('/:productId/reviews', async (req: Request, res: Response) => {
 });
 
 // POST a new review (verified buyer only)
-router.post('/:productId/reviews', protect, ensureVerified, async (req: AuthRequest, res: Response) => {
+router.post('/:productId/reviews', protect, ensureVerified, validateRequest(createReviewSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { productId } = req.params;
   const { itemInstanceId, rating, title, text, images } = req.body;
 
@@ -73,7 +102,7 @@ router.post('/:productId/reviews', protect, ensureVerified, async (req: AuthRequ
   res.status(201).json({ success: true, review });
 });
 
-router.patch('/:productId/reviews/:reviewId', protect, async (req: AuthRequest, res: Response) => {
+router.patch('/:productId/reviews/:reviewId', protect, validateRequest(updateReviewSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { productId, reviewId } = req.params;
   const { rating, title, text, images } = req.body;
 
@@ -92,14 +121,14 @@ router.patch('/:productId/reviews/:reviewId', protect, async (req: AuthRequest, 
   res.json({ success: true, review });
 });
 
-router.delete('/:productId/reviews/:reviewId', protect, async (req: AuthRequest, res: Response) => {
+router.delete('/:productId/reviews/:reviewId', protect, async (req: AuthRequest, res: Response, next: NextFunction) => {
   const { productId, reviewId } = req.params;
   const review = await Review.findOne({ _id: reviewId, product: productId });
   if (!review) return res.status(404).json({ success: false, message: 'Review not found' });
   if (review.user.toString() !== req.user!.id) {
     return res.status(403).json({ success: false, message: 'Not authorized to delete this review' });
   }
-  await review.remove();
+  await review.deleteOne();
   res.json({ success: true, message: 'Review deleted' });
 });
 
