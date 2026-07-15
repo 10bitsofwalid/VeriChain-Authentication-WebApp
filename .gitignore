@@ -1,3 +1,6 @@
 node_modules/
 dist/
 .env
+CHANGELOG_AI.md
+AGENT_RULES.md
+package-lock.json

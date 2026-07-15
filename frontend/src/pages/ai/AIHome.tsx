@@ -61,7 +61,7 @@ export default function AIHome() {
         });
         setRiskLoading(false);
       }, 1000);
-    } catch (e) {
+    } catch {
       setRiskLoading(false);
     }
   };
@@ -79,7 +79,7 @@ export default function AIHome() {
         });
         setSimLoading(false);
       }, 1000);
-    } catch (e) {
+    } catch {
       setSimLoading(false);
     }
   };

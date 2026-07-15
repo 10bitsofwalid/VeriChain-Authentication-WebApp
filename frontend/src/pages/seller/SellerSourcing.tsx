@@ -183,7 +183,7 @@ const SellerSourcing: React.FC = () => {
       }
 
       // Fallback mock products
-      let mockProducts: Product[] = [];
+      let mockProducts: Product[];
       if (selectedFactoryId === 'factory_1') {
         mockProducts = [
           {
