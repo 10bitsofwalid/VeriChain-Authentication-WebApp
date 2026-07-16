@@ -1,3 +1,6 @@
+// src/components/AnalyticsCard.tsx
+// @deprecated — For new features, use components/ui/MetricCard instead.
+// This component is kept for backward compatibility with existing callers.
 import React from 'react';
 
 interface AnalyticsCardProps {

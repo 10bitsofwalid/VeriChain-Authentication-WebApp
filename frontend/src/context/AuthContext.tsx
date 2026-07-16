@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import client from '../api/client';
+import { STORAGE_KEYS } from '../utils/constants';
 
 export interface User {
   id: string;
@@ -43,16 +44,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Restore session on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('verichain_token');
-    const storedUser = localStorage.getItem('verichain_user');
+    const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+    const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
 
     if (storedToken && storedUser) {
       try {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
       } catch {
-        localStorage.removeItem('verichain_token');
-        localStorage.removeItem('verichain_user');
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
       }
     }
     setLoading(false);
@@ -64,8 +65,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await client.post('/auth/login', { email, password });
       const { token: newToken, user: userData } = res.data;
 
-      localStorage.setItem('verichain_token', newToken);
-      localStorage.setItem('verichain_user', JSON.stringify(userData));
+      localStorage.setItem(STORAGE_KEYS.TOKEN, newToken);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
       setToken(newToken);
       setUser(userData);
     } catch (err: any) {
@@ -81,8 +82,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await client.post('/auth/signup', data);
       const { token: newToken, user: userData } = res.data;
 
-      localStorage.setItem('verichain_token', newToken);
-      localStorage.setItem('verichain_user', JSON.stringify(userData));
+      localStorage.setItem(STORAGE_KEYS.TOKEN, newToken);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
       setToken(newToken);
       setUser(userData);
     } catch (err: any) {
@@ -98,8 +99,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const res = await client.post('/auth/accept-invite', { token: inviteToken, password });
       const { token: newToken, user: userData } = res.data;
 
-      localStorage.setItem('verichain_token', newToken);
-      localStorage.setItem('verichain_user', JSON.stringify(userData));
+      localStorage.setItem(STORAGE_KEYS.TOKEN, newToken);
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
       setToken(newToken);
       setUser(userData);
     } catch (err: any) {
@@ -110,8 +111,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('verichain_token');
-    localStorage.removeItem('verichain_user');
+    localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    localStorage.removeItem(STORAGE_KEYS.USER);
     setToken(null);
     setUser(null);
   };

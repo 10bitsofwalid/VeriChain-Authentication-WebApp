@@ -4,6 +4,8 @@ import FactoryCard from '../../components/FactoryCard';
 import ComparisonGrid from '../../components/ComparisonGrid';
 import SellerProductCard from '../../components/SellerProductCard';
 import { useToast } from '../../components/ToastProvider';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { STORAGE_KEYS } from '../../utils/constants';
 import { 
   Building, 
   ShieldCheck, 
@@ -67,10 +69,10 @@ const SellerSourcing: React.FC = () => {
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [error, setError] = useState<string>('');
 
-  // Sourcing Interactions States (Persisted in localStorage)
-  const [savedFactoryIds, setSavedFactoryIds] = useState<string[]>([]);
-  const [reservedProductIds, setReservedProductIds] = useState<string[]>([]);
-  const [allocationRequests, setAllocationRequests] = useState<AllocationRequest[]>([]);
+  // Sourcing Interactions States (Persisted in localStorage via useLocalStorage)
+  const [savedFactoryIds, setSavedFactoryIds] = useLocalStorage<string[]>(STORAGE_KEYS.SAVED_FACTORIES, []);
+  const [reservedProductIds, setReservedProductIds] = useLocalStorage<string[]>(STORAGE_KEYS.RESERVED_BATCHES, []);
+  const [allocationRequests, setAllocationRequests] = useLocalStorage<AllocationRequest[]>(STORAGE_KEYS.ALLOCATION_REQUESTS, []);
   const [isComparing, setIsComparing] = useState(false);
   const [comparingFactoryIds, setComparingFactoryIds] = useState<string[]>([]);
 
@@ -82,18 +84,7 @@ const SellerSourcing: React.FC = () => {
   const [requestProduct, setRequestProduct] = useState<Product | null>(null);
   const [requestQty, setRequestQty] = useState<number>(50);
 
-  // Load localStorage data on mount
-  useEffect(() => {
-    const saved = localStorage.getItem('verichain_saved_factories');
-    if (saved) setSavedFactoryIds(JSON.parse(saved));
 
-    const reserved = localStorage.getItem('verichain_reserved_batches');
-    if (reserved) setReservedProductIds(JSON.parse(reserved));
-
-    const requests = localStorage.getItem('verichain_allocation_requests');
-    if (requests) setAllocationRequests(JSON.parse(requests));
-
-  }, []);
 
   // Fetch verified factories on mount (with robust mock fallback)
   useEffect(() => {
@@ -327,7 +318,6 @@ const SellerSourcing: React.FC = () => {
       addToast('Supplier saved to favorites!', 'success');
     }
     setSavedFactoryIds(updated);
-    localStorage.setItem('verichain_saved_factories', JSON.stringify(updated));
   };
 
   // Reserve/Unreserve Product Batch handler
@@ -344,7 +334,6 @@ const SellerSourcing: React.FC = () => {
       addToast(`Inventory batch reserved for ${prodName}!`, 'success');
     }
     setReservedProductIds(updated);
-    localStorage.setItem('verichain_reserved_batches', JSON.stringify(updated));
   };
 
   // Allocation Request Handlers
@@ -376,9 +365,7 @@ const SellerSourcing: React.FC = () => {
       createdAt: new Date().toISOString(),
     };
 
-    const updated = [newRequest, ...allocationRequests];
-    setAllocationRequests(updated);
-    localStorage.setItem('verichain_allocation_requests', JSON.stringify(updated));
+    setAllocationRequests((prev) => [newRequest, ...prev]);
     
     addToast(`Allocation request submitted for ${requestQty} units of ${requestProduct.name}.`, 'success');
     handleCloseRequestModal();

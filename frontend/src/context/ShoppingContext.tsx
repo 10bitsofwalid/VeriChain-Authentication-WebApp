@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer } from 'react';
 import type { ReactNode } from 'react';
 import { persistState, retrieveState } from '../utils/storage';
+import { STORAGE_KEYS } from '../utils/constants';
 
 // Types for cart items – assuming product has at least id, name, price, image
 export interface Product {
@@ -29,9 +30,9 @@ export type ShoppingAction =
   | { type: 'REMOVE_FROM_COMPARE'; payload: string };
 
 const initialState: ShoppingState = {
-  cart: retrieveState('shopping_cart') || [],
-  wishlist: retrieveState('shopping_wishlist') || [],
-  compare: retrieveState('shopping_compare') || [],
+  cart: retrieveState(STORAGE_KEYS.CART) || [],
+  wishlist: retrieveState(STORAGE_KEYS.WISHLIST) || [],
+  compare: retrieveState(STORAGE_KEYS.COMPARE) || [],
 };
 
 function shoppingReducer(state: ShoppingState, action: ShoppingAction): ShoppingState {
@@ -48,12 +49,12 @@ function shoppingReducer(state: ShoppingState, action: ShoppingAction): Shopping
         const itemWithQty = { ...action.payload, quantity: 1 };
         newCart = [...state.cart, itemWithQty];
       }
-      persistState('shopping_cart', newCart);
+      persistState(STORAGE_KEYS.CART, newCart);
       return { ...state, cart: newCart };
     }
     case 'REMOVE_FROM_CART': {
       const newCart = state.cart.filter((p) => p.id !== action.payload);
-      persistState('shopping_cart', newCart);
+      persistState(STORAGE_KEYS.CART, newCart);
       return { ...state, cart: newCart };
     }
     case 'UPDATE_QUANTITY': {
@@ -61,41 +62,41 @@ function shoppingReducer(state: ShoppingState, action: ShoppingAction): Shopping
       if (quantity <= 0) {
         // Remove if quantity zero or negative
         const newCart = state.cart.filter((p) => p.id !== id);
-        persistState('shopping_cart', newCart);
+        persistState(STORAGE_KEYS.CART, newCart);
         return { ...state, cart: newCart };
       }
       const newCart = state.cart.map((p) =>
         p.id === id ? { ...p, quantity } : p,
       );
-      persistState('shopping_cart', newCart);
+      persistState(STORAGE_KEYS.CART, newCart);
       return { ...state, cart: newCart };
     }
     case 'CLEAR_CART': {
-      persistState('shopping_cart', []);
+      persistState(STORAGE_KEYS.CART, []);
       return { ...state, cart: [] };
     }
     case 'ADD_TO_WISHLIST': {
       const exists = state.wishlist.some((p) => p.id === action.payload.id);
       if (exists) return state;
       const newWish = [...state.wishlist, action.payload];
-      persistState('shopping_wishlist', newWish);
+      persistState(STORAGE_KEYS.WISHLIST, newWish);
       return { ...state, wishlist: newWish };
     }
     case 'REMOVE_FROM_WISHLIST': {
       const newWish = state.wishlist.filter((p) => p.id !== action.payload);
-      persistState('shopping_wishlist', newWish);
+      persistState(STORAGE_KEYS.WISHLIST, newWish);
       return { ...state, wishlist: newWish };
     }
     case 'ADD_TO_COMPARE': {
       const exists = state.compare.some((p) => p.id === action.payload.id);
       if (exists) return state;
       const newComp = [...state.compare, action.payload];
-      persistState('shopping_compare', newComp);
+      persistState(STORAGE_KEYS.COMPARE, newComp);
       return { ...state, compare: newComp };
     }
     case 'REMOVE_FROM_COMPARE': {
       const newComp = state.compare.filter((p) => p.id !== action.payload);
-      persistState('shopping_compare', newComp);
+      persistState(STORAGE_KEYS.COMPARE, newComp);
       return { ...state, compare: newComp };
     }
     default:
