@@ -1,24 +1,16 @@
 import { Router, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { User } from '../models/User';
 import { Invitation } from '../models/Invitation';
 import { protect, AuthRequest } from '../middleware/auth';
 import { z } from 'zod';
-import { validateRequest } from '../middleware/validate';
+import { validateRequest } from '../utils/validation';
 import { authLimiter } from '../middleware/rateLimiter';
+import { signToken } from '../utils/jwt';
+import { sendError } from '../utils/errorResponse';
 
 const router = Router();
 router.use(authLimiter);
-if (!process.env.JWT_SECRET) {
-  throw new Error('FATAL ERROR: JWT_SECRET environment variable is missing.');
-}
-const JWT_SECRET = process.env.JWT_SECRET;
-
-// Helper to sign JWT
-const signToken = (id: string, role: string, verified: boolean) => {
-  return jwt.sign({ id, role, verified }, JWT_SECRET, { expiresIn: '30d' });
-};
 
 const signupSchema = z.object({
   body: z.object({
@@ -56,20 +48,9 @@ router.post('/signup', validateRequest(signupSchema), async (req, res, next) => 
   try {
     const { name, email, password, role, factoryLocation, factoryCapacity, factoryCertificateNo, logoUrl, certificateUrl } = req.body;
 
-    if (!name || !email || !password || !role) {
-      return res.status(400).json({ success: false, message: 'Please provide all required fields' });
-    }
-
-    if (['moderator', 'admin'].includes(role)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Moderator and Admin accounts cannot self-register. They must be invited.',
-      });
-    }
-
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ success: false, message: 'User already exists with this email' });
+      return sendError(res, 400, 'User already exists with this email');
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -117,18 +98,14 @@ router.post('/login', validateRequest(loginSchema), async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide email and password' });
-    }
-
     const user = await User.findOne({ email });
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return sendError(res, 401, 'Invalid credentials');
     }
 
     const isMatch = await bcrypt.compare(password, user.passwordHash);
     if (!isMatch) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return sendError(res, 401, 'Invalid credentials');
     }
 
     const token = signToken(user._id.toString(), user.role, user.verified);
@@ -156,7 +133,7 @@ router.get('/me', protect, async (req: AuthRequest, res: Response, next) => {
   try {
     const user = await User.findById(req.user?.id).select('-passwordHash');
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return sendError(res, 404, 'User not found');
     }
 
     res.json({ success: true, user });
@@ -170,21 +147,21 @@ router.get('/me', protect, async (req: AuthRequest, res: Response, next) => {
 router.post('/invite', protect, async (req: AuthRequest, res: Response, next) => {
   try {
     if (req.user?.role !== 'admin') {
-      return res.status(403).json({ success: false, message: 'Only administrators can issue invites' });
+      return sendError(res, 403, 'Only administrators can issue invites');
     }
 
     const { email, name, role, password } = req.body;
     if (!email || !name || !role || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide name, email, password and role' });
+      return sendError(res, 400, 'Please provide name, email, password and role');
     }
 
     if (!['moderator', 'admin'].includes(role)) {
-      return res.status(400).json({ success: false, message: 'Can only invite moderators or admins' });
+      return sendError(res, 400, 'Can only invite moderators or admins');
     }
 
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ success: false, message: 'User already exists' });
+      return sendError(res, 400, 'User already exists');
     }
 
     const salt = await bcrypt.genSalt(10);
@@ -220,27 +197,19 @@ router.post('/accept-invite', validateRequest(acceptInviteSchema), async (req, r
   try {
     const { token, password } = req.body;
 
-    if (!token || !password) {
-      return res.status(400).json({ success: false, message: 'Please provide token and password' });
-    }
-
-    if (password.length < 6) {
-      return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
-    }
-
     const invitation = await Invitation.findOne({ token });
     if (!invitation) {
-      return res.status(404).json({ success: false, message: 'Invalid invitation token' });
+      return sendError(res, 404, 'Invalid invitation token');
     }
 
     if (invitation.status !== 'pending') {
-      return res.status(400).json({ success: false, message: `This invitation has already been ${invitation.status}` });
+      return sendError(res, 400, `This invitation has already been ${invitation.status}`);
     }
 
     if (invitation.expiresAt < new Date()) {
       invitation.status = 'expired';
       await invitation.save();
-      return res.status(400).json({ success: false, message: 'This invitation has expired' });
+      return sendError(res, 400, 'This invitation has expired');
     }
 
     // Check if user already exists
@@ -248,7 +217,7 @@ router.post('/accept-invite', validateRequest(acceptInviteSchema), async (req, r
     if (userExists) {
       invitation.status = 'accepted';
       await invitation.save();
-      return res.status(400).json({ success: false, message: 'User already exists' });
+      return sendError(res, 400, 'User already exists');
     }
 
     // Create user account

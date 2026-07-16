@@ -5,6 +5,7 @@ import { Product } from '../models/Product';
 import { ItemInstance } from '../models/ItemInstance';
 import { Complaint } from '../models/Complaint';
 import { AuditLog } from '../models/AuditLog';
+import { sendError } from '../utils/errorResponse';
 
 const router = Router();
 
@@ -83,12 +84,12 @@ const buildFactoryTimeline = (factory: any, products: any[], totalUnits: number)
 router.get('/factory/:id', async (req: Request, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(404).json({ success: false, message: 'Factory profile not found' });
+      return sendError(res, 404, 'Factory profile not found');
     }
 
     const factory = await User.findOne({ _id: req.params.id, role: 'factory' }).select(publicUserFields).lean();
     if (!factory) {
-      return res.status(404).json({ success: false, message: 'Factory profile not found' });
+      return sendError(res, 404, 'Factory profile not found');
     }
 
     const [allProducts, verifiedProducts] = await Promise.all([
@@ -186,12 +187,12 @@ router.get('/factory/:id', async (req: Request, res: Response, next) => {
 router.get('/seller/:id', async (req: Request, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(404).json({ success: false, message: 'Seller profile not found' });
+      return sendError(res, 404, 'Seller profile not found');
     }
 
     const seller = await User.findOne({ _id: req.params.id, role: 'seller' }).select(publicUserFields).lean();
     if (!seller) {
-      return res.status(404).json({ success: false, message: 'Seller profile not found' });
+      return sendError(res, 404, 'Seller profile not found');
     }
 
     const listedItems = await ItemInstance.find({ currentOwner: seller._id, status: 'listed' })

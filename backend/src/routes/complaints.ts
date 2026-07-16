@@ -6,7 +6,8 @@ import { Product } from '../models/Product';
 import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
 import { z } from 'zod';
-import { validateRequest } from '../middleware/validate';
+import { validateRequest } from '../utils/validation';
+import { sendError } from '../utils/errorResponse';
 
 const router = Router();
 
@@ -39,25 +40,14 @@ router.post('/', protect, authorize('buyer'), ensureVerified, validateRequest(cr
   try {
     const { productInstanceId, reason, description, evidenceUrl } = req.body;
 
-    if (!productInstanceId || !Types.ObjectId.isValid(productInstanceId)) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid productInstanceId' });
-    }
-
-    if (!reason || !description) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide reason and description',
-      });
-    }
-
     const item = await ItemInstance.findById(productInstanceId);
     if (!item) {
-      return res.status(404).json({ success: false, message: 'Product item instance not found.' });
+      return sendError(res, 404, 'Product item instance not found.');
     }
 
     // Verify ownership
     if (item.currentOwner.toString() !== req.user!.id) {
-      return res.status(403).json({ success: false, message: 'You can only file complaints for items you currently own.' });
+      return sendError(res, 403, 'You can only file complaints for items you currently own.');
     }
 
     // Search journey in reverse chronological order to find the purchase or transfer step
@@ -132,7 +122,7 @@ router.get('/', protect, async (req: AuthRequest, res: Response, next) => {
     } else if (req.user?.role === 'seller') {
       filter.seller = req.user.id;
     } else if (!['moderator', 'admin'].includes(req.user?.role || '')) {
-      return res.status(403).json({ success: false, message: 'Not authorized to view complaints' });
+      return sendError(res, 403, 'Not authorized to view complaints');
     }
 
     const complaints = await Complaint.find(filter)
@@ -151,22 +141,11 @@ router.get('/', protect, async (req: AuthRequest, res: Response, next) => {
 // @desc    Update complaint status and moderator notes (moderator/admin)
 router.patch('/:id', protect, authorize('moderator', 'admin'), ensureVerified, validateRequest(updateComplaintSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid complaint ID' });
-    }
     const { status, moderatorNotes } = req.body;
-    const validStatuses = ['pending', 'under_review', 'resolved', 'dismissed'];
-
-    if (status && !validStatuses.includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: `Status must be one of: ${validStatuses.join(', ')}`,
-      });
-    }
 
     const complaint = await Complaint.findById(req.params.id);
     if (!complaint) {
-      return res.status(404).json({ success: false, message: 'Complaint not found' });
+      return sendError(res, 404, 'Complaint not found');
     }
 
     if (status) complaint.status = status;

@@ -5,6 +5,7 @@ import fs from 'fs';
 import { v2 as cloudinary } from 'cloudinary';
 import { protect, AuthRequest } from '../middleware/auth';
 import { uploadLimiter } from '../middleware/rateLimiter';
+import { sendError } from '../utils/errorResponse';
 
 const router = Router();
 router.use(uploadLimiter);
@@ -69,9 +70,9 @@ router.post(
   (req, res, next) => {
     upload.single('file')(req, res, (err) => {
       if (err instanceof multer.MulterError) {
-        return res.status(400).json({ success: false, message: `Upload error: ${err.message}` });
+        return sendError(res, 400, `Upload error: ${err.message}`);
       } else if (err) {
-        return res.status(400).json({ success: false, message: err.message });
+        return sendError(res, 400, err.message);
       }
       next();
     });
@@ -79,7 +80,7 @@ router.post(
   async (req: AuthRequest, res: Response, next) => {
     try {
       if (!req.file) {
-        return res.status(400).json({ success: false, message: 'Please provide a file to upload.' });
+        return sendError(res, 400, 'Please provide a file to upload.');
       }
 
       const localFilePath = req.file.path;

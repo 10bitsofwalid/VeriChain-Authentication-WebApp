@@ -1,5 +1,4 @@
 import { Router, Response } from 'express';
-import { User } from '../models/User';
 import { Product } from '../models/Product';
 import { ItemInstance } from '../models/ItemInstance';
 import { Complaint } from '../models/Complaint';
@@ -7,7 +6,8 @@ import { AuditLog } from '../models/AuditLog';
 import { protect, authorize, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
 import { z } from 'zod';
-import { validateRequest } from '../middleware/validate';
+import { validateRequest } from '../utils/validation';
+import { sendError } from '../utils/errorResponse';
 
 const modVerifyProductSchema = z.object({
   params: z.object({
@@ -99,21 +99,11 @@ router.get('/products', async (req: AuthRequest, res: Response, next) => {
 // @desc    Verify or reject a product template
 router.patch('/products/:id/verify', validateRequest(modVerifyProductSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid product ID' });
-    }
     const { verifiedStatus } = req.body;
-
-    if (!verifiedStatus || !['verified', 'rejected'].includes(verifiedStatus)) {
-      return res.status(400).json({
-        success: false,
-        message: 'verifiedStatus must be "verified" or "rejected"',
-      });
-    }
 
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product template not found' });
+      return sendError(res, 404, 'Product template not found');
     }
 
     product.verifiedStatus = verifiedStatus;
@@ -165,27 +155,18 @@ router.get('/fake-listings', async (req: AuthRequest, res: Response, next) => {
 // @desc    Modify counterfeit risk or status of an item
 router.patch('/items/:id/risk', validateRequest(modItemRiskSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid item ID' });
-    }
     const { counterfeitRisk, status } = req.body;
 
     const item = await ItemInstance.findById(req.params.id);
     if (!item) {
-      return res.status(404).json({ success: false, message: 'Product item instance not found' });
+      return sendError(res, 404, 'Product item instance not found');
     }
 
     if (counterfeitRisk) {
-      if (!['low', 'medium', 'high'].includes(counterfeitRisk)) {
-        return res.status(400).json({ success: false, message: 'Invalid counterfeitRisk value' });
-      }
       item.counterfeitRisk = counterfeitRisk;
     }
 
     if (status) {
-      if (!['manufactured', 'in_transit', 'listed', 'sold', 'recalled'].includes(status)) {
-        return res.status(400).json({ success: false, message: 'Invalid item status value' });
-      }
       item.status = status;
     }
 

@@ -9,7 +9,8 @@ import { Types } from 'mongoose';
 import crypto from 'crypto';
 import { Invitation } from '../models/Invitation';
 import { z } from 'zod';
-import { validateRequest } from '../middleware/validate';
+import { validateRequest } from '../utils/validation';
+import { sendError } from '../utils/errorResponse';
 
 const verifyUserSchema = z.object({
   params: z.object({
@@ -80,17 +81,11 @@ router.get('/users', async (req: AuthRequest, res: Response, next) => {
 // @desc    Verify or reject a seller/factory account
 router.patch('/users/:id/verify', validateRequest(verifyUserSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid user ID' });
-    }
     const { verified } = req.body;
-    if (typeof verified !== 'boolean') {
-      return res.status(400).json({ success: false, message: 'Please provide a boolean `verified` field' });
-    }
 
     const user = await User.findById(req.params.id).select('-passwordHash');
     if (!user) {
-      return res.status(404).json({ success: false, message: 'User not found' });
+      return sendError(res, 404, 'User not found');
     }
 
     user.verified = verified;
@@ -172,21 +167,11 @@ router.get('/products', async (req: AuthRequest, res: Response, next) => {
 // @desc    Verify or reject a product template
 router.patch('/products/:id/verify', validateRequest(verifyProductSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid product ID' });
-    }
     const { verifiedStatus } = req.body;
-
-    if (!verifiedStatus || !['verified', 'rejected'].includes(verifiedStatus)) {
-      return res.status(400).json({
-        success: false,
-        message: 'verifiedStatus must be "verified" or "rejected"',
-      });
-    }
 
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return sendError(res, 404, 'Product not found');
     }
 
     product.verifiedStatus = verifiedStatus;
@@ -259,24 +244,16 @@ router.post('/invitations', validateRequest(createInvitationSchema), async (req:
   try {
     const { email, name, role } = req.body;
 
-    if (!email || !name || !role) {
-      return res.status(400).json({ success: false, message: 'Please provide email, name, and role' });
-    }
-
-    if (!['moderator', 'admin'].includes(role)) {
-      return res.status(400).json({ success: false, message: 'Role must be admin or moderator' });
-    }
-
     // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
-      return res.status(400).json({ success: false, message: 'User already exists with this email' });
+      return sendError(res, 400, 'User already exists with this email');
     }
 
     // Check if invitation already exists
     const existingInvite = await Invitation.findOne({ email });
     if (existingInvite && existingInvite.status === 'pending' && existingInvite.expiresAt > new Date()) {
-      return res.status(400).json({ success: false, message: 'A pending invitation already exists for this email' });
+      return sendError(res, 400, 'A pending invitation already exists for this email');
     }
 
     // Generate token
@@ -331,16 +308,16 @@ router.get('/invitations', async (req: AuthRequest, res: Response, next) => {
 router.delete('/invitations/:id', async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid invitation ID' });
+      return sendError(res, 400, 'Invalid invitation ID');
     }
 
     const invitation = await Invitation.findById(req.params.id);
     if (!invitation) {
-      return res.status(404).json({ success: false, message: 'Invitation not found' });
+      return sendError(res, 404, 'Invitation not found');
     }
 
     if (invitation.status !== 'pending') {
-      return res.status(400).json({ success: false, message: 'Can only revoke pending invitations' });
+      return sendError(res, 400, 'Can only revoke pending invitations');
     }
 
     invitation.status = 'expired'; // Revoke it

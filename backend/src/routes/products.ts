@@ -7,7 +7,8 @@ import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/a
 import { Types } from 'mongoose';
 import { batchLimiter } from '../middleware/rateLimiter';
 import { z } from 'zod';
-import { validateRequest } from '../middleware/validate';
+import { validateRequest } from '../utils/validation';
+import { sendError } from '../utils/errorResponse';
 
 const router = Router();
 
@@ -53,13 +54,9 @@ router.post('/register', protect, authorize('factory'), ensureVerified, validate
   try {
     const { name, description, category, sku, imageUrl, certificateUrl, specs } = req.body;
 
-    if (!name || !description || !category || !sku || !imageUrl) {
-      return res.status(400).json({ success: false, message: 'Please provide all required fields' });
-    }
-
     const skuExists = await Product.findOne({ sku });
     if (skuExists) {
-      return res.status(400).json({ success: false, message: 'SKU must be unique' });
+      return sendError(res, 400, 'SKU must be unique');
     }
 
     const product = await Product.create({
@@ -104,9 +101,6 @@ router.get('/factory', protect, authorize('factory'), ensureVerified, async (req
 // @desc    Generate a serialized batch of items (Factory only)
 router.post('/:id/batch', protect, authorize('factory'), ensureVerified, batchLimiter, validateRequest(batchSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid product template ID' });
-    }
     const { count, prefix, startingSerial } = req.body;
     const countNum = parseInt(count) || 10;
     const startSerialNum = parseInt(startingSerial) || 100001;
@@ -114,7 +108,7 @@ router.post('/:id/batch', protect, authorize('factory'), ensureVerified, batchLi
 
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product template not found' });
+      return sendError(res, 404, 'Product template not found');
     }
 
     // Pre-insert duplicate serial check
@@ -126,10 +120,11 @@ router.post('/:id/batch', protect, authorize('factory'), ensureVerified, batchLi
     const duplicates = await ItemInstance.find({ serialNumber: { $in: serialNumbers } });
     if (duplicates.length > 0) {
       const duplicateSerials = duplicates.map(item => item.serialNumber);
-      return res.status(400).json({
-        success: false,
-        message: `Duplicate serial number(s) detected. Generation aborted. Duplicates: ${duplicateSerials.join(', ')}`,
-      });
+      return sendError(
+        res,
+        400,
+        `Duplicate serial number(s) detected. Generation aborted. Duplicates: ${duplicateSerials.join(', ')}`
+      );
     }
 
     const createdItems = [];
@@ -181,23 +176,17 @@ router.post('/:id/batch', protect, authorize('factory'), ensureVerified, batchLi
 // @desc    Recall all items of a product catalog (Factory or Admin)
 router.post('/:id/recall', protect, authorize('factory', 'admin'), ensureVerified, validateRequest(recallSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid product ID' });
-    }
     const product = await Product.findById(req.params.id);
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return sendError(res, 404, 'Product not found');
     }
 
     // If factory, verify ownership
     if (req.user?.role === 'factory' && product.factory.toString() !== req.user.id) {
-      return res.status(403).json({ success: false, message: 'Unauthorized: Product belongs to another manufacturer' });
+      return sendError(res, 403, 'Unauthorized: Product belongs to another manufacturer');
     }
 
     const { reason } = req.body;
-    if (!reason) {
-      return res.status(400).json({ success: false, message: 'Please provide a reason for the recall' });
-    }
 
     // Update all items of this product
     const items = await ItemInstance.find({ product: product._id });

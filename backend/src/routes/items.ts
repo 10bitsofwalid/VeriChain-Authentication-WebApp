@@ -6,7 +6,8 @@ import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/a
 import { Types } from 'mongoose';
 import { lookupLimiter } from '../middleware/rateLimiter';
 import { z } from 'zod';
-import { validateRequest } from '../middleware/validate';
+import { validateRequest } from '../utils/validation';
+import { sendError } from '../utils/errorResponse';
 
 const router = Router();
 
@@ -56,10 +57,7 @@ router.get('/verify/:serialNumber', lookupLimiter, async (req: Request, res: Res
       .populate('journey.actor', 'name role');
 
     if (!item) {
-      return res.status(404).json({
-        success: false,
-        message: 'No item found with this serial number. It may be counterfeit or unregistered.',
-      });
+      return sendError(res, 404, 'No item found with this serial number. It may be counterfeit or unregistered.');
     }
 
     const product = item.product as any;
@@ -108,27 +106,20 @@ router.get('/my', protect, async (req: AuthRequest, res: Response, next) => {
 // @desc    Transfer item ownership (e.g. factory → seller, seller → buyer)
 router.post('/:id/transfer', protect, ensureVerified, validateRequest(transferItemSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid item ID' });
-    }
     const { toUserId, location } = req.body;
-
-    if (!toUserId || !Types.ObjectId.isValid(toUserId)) {
-      return res.status(400).json({ success: false, message: 'Please provide a valid recipient user ID' });
-    }
 
     const item = await ItemInstance.findById(req.params.id);
     if (!item) {
-      return res.status(404).json({ success: false, message: 'Item not found' });
+      return sendError(res, 404, 'Item not found');
     }
 
     // Only current owner can transfer
     if (item.currentOwner.toString() !== req.user?.id) {
-      return res.status(403).json({ success: false, message: 'Only the current owner can transfer this item' });
+      return sendError(res, 403, 'Only the current owner can transfer this item');
     }
 
     if (item.status === 'recalled') {
-      return res.status(400).json({ success: false, message: 'Cannot transfer a recalled item' });
+      return sendError(res, 400, 'Cannot transfer a recalled item');
     }
 
     const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -163,19 +154,11 @@ router.post('/:id/transfer', protect, ensureVerified, validateRequest(transferIt
 // @desc    Update item status (factory/seller/admin)
 router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), ensureVerified, validateRequest(updateItemStatusSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid item ID' });
-    }
     const { status, location } = req.body;
-    const validStatuses = ['manufactured', 'in_transit', 'listed', 'sold', 'recalled'];
-
-    if (!status || !validStatuses.includes(status)) {
-      return res.status(400).json({ success: false, message: `Status must be one of: ${validStatuses.join(', ')}` });
-    }
 
     const item = await ItemInstance.findById(req.params.id);
     if (!item) {
-      return res.status(404).json({ success: false, message: 'Item not found' });
+      return sendError(res, 404, 'Item not found');
     }
 
     const product = await Product.findById(item.product);
@@ -183,10 +166,7 @@ router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), en
     const isResponsibleFactory = product && product.factory.toString() === req.user!.id;
 
     if (!isOwner && !isResponsibleFactory) {
-      return res.status(403).json({
-        success: false,
-        message: 'Access denied. You are not the owner or the factory responsible for this item.',
-      });
+      return sendError(res, 403, 'Access denied. You are not the owner or the factory responsible for this item.');
     }
 
     const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -221,16 +201,16 @@ router.patch('/:id/status', protect, authorize('factory', 'seller', 'admin'), en
 router.get('/product/:productId', protect, authorize('factory', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.productId)) {
-      return res.status(400).json({ success: false, message: 'Invalid product ID' });
+      return sendError(res, 400, 'Invalid product ID');
     }
     const product = await Product.findById(req.params.productId);
     if (!product) {
-      return res.status(404).json({ success: false, message: 'Product not found' });
+      return sendError(res, 404, 'Product not found');
     }
 
     // If factory, verify ownership
     if (req.user?.role === 'factory' && product.factory.toString() !== req.user.id) {
-      return res.status(403).json({ success: false, message: 'Not authorized to view these items' });
+      return sendError(res, 403, 'Not authorized to view these items');
     }
 
     const items = await ItemInstance.find({ product: req.params.productId })
@@ -262,20 +242,17 @@ router.get('/marketplace', protect, async (req: AuthRequest, res: Response, next
 // @desc    Purchase a listed item from the marketplace (buyer only)
 router.post('/:id/buy', protect, authorize('buyer'), ensureVerified, validateRequest(buyItemSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid item ID' });
-    }
     const item = await ItemInstance.findById(req.params.id);
     if (!item) {
-      return res.status(404).json({ success: false, message: 'Item not found' });
+      return sendError(res, 404, 'Item not found');
     }
 
     if (item.status !== 'listed') {
-      return res.status(400).json({ success: false, message: 'This item is not listed for sale' });
+      return sendError(res, 400, 'This item is not listed for sale');
     }
 
     if (item.currentOwner.toString() === req.user?.id) {
-      return res.status(400).json({ success: false, message: 'You already own this item' });
+      return sendError(res, 400, 'You already own this item');
     }
 
     const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
@@ -313,7 +290,7 @@ router.post('/:id/buy', protect, authorize('buyer'), ensureVerified, validateReq
 router.get('/:id', async (req: Request, res: Response, next) => {
   try {
     if (!Types.ObjectId.isValid(req.params.id)) {
-      return res.status(400).json({ success: false, message: 'Invalid item ID' });
+      return sendError(res, 400, 'Invalid item ID');
     }
     const item = await ItemInstance.findById(req.params.id)
       .populate({
@@ -323,7 +300,7 @@ router.get('/:id', async (req: Request, res: Response, next) => {
       .populate('currentOwner', 'name email role trustScore logoUrl verified');
 
     if (!item) {
-      return res.status(404).json({ success: false, message: 'Item not found' });
+      return sendError(res, 404, 'Item not found');
     }
 
     const productInfo = item.product as any;

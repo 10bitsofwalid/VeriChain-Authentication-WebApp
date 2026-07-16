@@ -1,12 +1,11 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
+import { protect, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Review } from '../models/Review';
 import { ItemInstance } from '../models/ItemInstance';
-import { Product } from '../models/Product';
-import { User } from '../models/User';
 import { Types } from 'mongoose';
 import { z } from 'zod';
-import { validateRequest } from '../middleware/validate';
+import { validateRequest } from '../utils/validation';
+import { sendError } from '../utils/errorResponse';
 
 const createReviewSchema = z.object({
   params: z.object({
@@ -70,66 +69,79 @@ router.get('/:productId/reviews', async (req: Request, res: Response) => {
 
 // POST a new review (verified buyer only)
 router.post('/:productId/reviews', protect, ensureVerified, validateRequest(createReviewSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const { productId } = req.params;
-  const { itemInstanceId, rating, title, text, images } = req.body;
+  try {
+    const { productId } = req.params;
+    const { itemInstanceId, rating, title, text, images } = req.body;
 
-  if (!itemInstanceId || !rating || !title || !text) {
-    return res.status(400).json({ success: false, message: 'Missing required fields' });
+    const canReview = await verifyPurchase(req.user!.id, itemInstanceId);
+    if (!canReview) {
+      return sendError(res, 403, 'You can only review verified purchases');
+    }
+
+    // Prevent duplicate review for same itemInstance
+    const existing = await Review.findOne({ itemInstance: itemInstanceId, user: req.user!.id });
+    if (existing) {
+      return sendError(res, 400, 'You have already reviewed this purchase');
+    }
+
+    const review = await Review.create({
+      product: productId,
+      user: req.user!.id,
+      itemInstance: itemInstanceId,
+      rating,
+      title,
+      text,
+      images: images || [],
+      verified: true,
+    });
+
+    res.status(201).json({ success: true, review });
+  } catch (error) {
+    next(error);
   }
-
-  const canReview = await verifyPurchase(req.user!.id, itemInstanceId);
-  if (!canReview) {
-    return res.status(403).json({ success: false, message: 'You can only review verified purchases' });
-  }
-
-  // Prevent duplicate review for same itemInstance
-  const existing = await Review.findOne({ itemInstance: itemInstanceId, user: req.user!.id });
-  if (existing) {
-    return res.status(400).json({ success: false, message: 'You have already reviewed this purchase' });
-  }
-
-  const review = await Review.create({
-    product: productId,
-    user: req.user!.id,
-    itemInstance: itemInstanceId,
-    rating,
-    title,
-    text,
-    images: images || [],
-    verified: true,
-  });
-
-  res.status(201).json({ success: true, review });
 });
 
 router.patch('/:productId/reviews/:reviewId', protect, validateRequest(updateReviewSchema), async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const { productId, reviewId } = req.params;
-  const { rating, title, text, images } = req.body;
+  try {
+    const { productId, reviewId } = req.params;
+    const { rating, title, text, images } = req.body;
 
-  const review = await Review.findOne({ _id: reviewId, product: productId });
-  if (!review) return res.status(404).json({ success: false, message: 'Review not found' });
-  if (review.user.toString() !== req.user!.id) {
-    return res.status(403).json({ success: false, message: 'Not authorized to edit this review' });
+    const review = await Review.findOne({ _id: reviewId, product: productId });
+    if (!review) return sendError(res, 404, 'Review not found');
+    if (review.user.toString() !== req.user!.id) {
+      return sendError(res, 403, 'Not authorized to edit this review');
+    }
+
+    if (rating) review.rating = rating;
+    if (title) review.title = title;
+    if (text) review.text = text;
+    if (images) review.images = images;
+
+    await review.save();
+    res.json({ success: true, review });
+  } catch (error) {
+    next(error);
   }
-
-  if (rating) review.rating = rating;
-  if (title) review.title = title;
-  if (text) review.text = text;
-  if (images) review.images = images;
-
-  await review.save();
-  res.json({ success: true, review });
 });
 
 router.delete('/:productId/reviews/:reviewId', protect, async (req: AuthRequest, res: Response, next: NextFunction) => {
-  const { productId, reviewId } = req.params;
-  const review = await Review.findOne({ _id: reviewId, product: productId });
-  if (!review) return res.status(404).json({ success: false, message: 'Review not found' });
-  if (review.user.toString() !== req.user!.id) {
-    return res.status(403).json({ success: false, message: 'Not authorized to delete this review' });
+  try {
+    const { productId, reviewId } = req.params;
+
+    if (!Types.ObjectId.isValid(productId) || !Types.ObjectId.isValid(reviewId)) {
+      return sendError(res, 400, 'Invalid parameters');
+    }
+
+    const review = await Review.findOne({ _id: reviewId, product: productId });
+    if (!review) return sendError(res, 404, 'Review not found');
+    if (review.user.toString() !== req.user!.id) {
+      return sendError(res, 403, 'Not authorized to delete this review');
+    }
+    await review.deleteOne();
+    res.json({ success: true, message: 'Review deleted' });
+  } catch (error) {
+    next(error);
   }
-  await review.deleteOne();
-  res.json({ success: true, message: 'Review deleted' });
 });
 
 export default router;
