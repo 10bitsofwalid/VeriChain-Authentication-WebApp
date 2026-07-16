@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import PageLoader from '../../components/ui/PageLoader';
+import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
 import FactoryCard from '../../components/FactoryCard';
 import ComparisonGrid from '../../components/ComparisonGrid';
@@ -382,11 +384,7 @@ const SellerSourcing: React.FC = () => {
   const selectedFactory = factories.find((f) => f._id === selectedFactoryId);
 
   if (loadingFactories) {
-    return (
-      <div className="loading-container" style={{ minHeight: '60vh' }}>
-        <div className="spinner" />
-      </div>
-    );
+    return <PageLoader minHeight="60vh" />;
   }
 
   return (
@@ -397,9 +395,12 @@ const SellerSourcing: React.FC = () => {
       </div>
 
       {error && (
-        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
-          {error}
-        </div>
+        <AlertBanner
+          type="error"
+          message={error}
+          onDismiss={() => setError('')}
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {/* Factories Section Header & Filter */}
@@ -676,9 +677,7 @@ const SellerSourcing: React.FC = () => {
           </h2>
           
           {loadingProducts ? (
-            <div className="loading-container" style={{ minHeight: '30vh' }}>
-              <div className="spinner" />
-            </div>
+            <PageLoader minHeight="30vh" />
           ) : (
             <div 
               className="grid-cards" 

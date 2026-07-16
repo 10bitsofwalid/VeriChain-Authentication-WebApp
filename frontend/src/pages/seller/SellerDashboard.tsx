@@ -1,4 +1,9 @@
 import { useEffect, useState } from 'react';
+import PageLoader from '../../components/ui/PageLoader';
+import AlertBanner from '../../components/ui/AlertBanner';
+import Modal from '../../components/ui/Modal';
+import MetricCard from '../../components/ui/MetricCard';
+import { itemStatusBadge } from '../../utils/badges';
 import client from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import {
@@ -149,7 +154,7 @@ export default function SellerDashboard() {
   };
 
   if (loading) {
-    return <div className="loading-container"><div className="spinner" /></div>;
+    return <PageLoader />;
   }
 
   const statusCounts = items.reduce((acc, item) => {
@@ -164,16 +169,7 @@ export default function SellerDashboard() {
     { label: 'Sold Units', value: statusCounts['sold'] || 0, icon: ShoppingBag, color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
   ];
 
-  const statusBadge = (status: string) => {
-    switch (status) {
-      case 'manufactured': return 'badge-info';
-      case 'in_transit': return 'badge-warning';
-      case 'listed': return 'badge-neutral';
-      case 'sold': return 'badge-success';
-      case 'recalled': return 'badge-danger';
-      default: return 'badge-neutral';
-    }
-  };
+
 
   return (
     <div className="animate-fade-in">
@@ -183,40 +179,44 @@ export default function SellerDashboard() {
       </div>
 
       {user && !user.verified && (
-        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
-          <AlertTriangle size={18} />
-          <span>
-            <strong>Account Verification Pending:</strong> Your seller account is pending administrator approval.
-            You cannot list items on the marketplace or transfer ownership until verified.
-          </span>
-        </div>
+        <AlertBanner
+          type="error"
+          message={
+            <span>
+              <strong>Account Verification Pending:</strong> Your seller account is pending administrator approval.
+              You cannot list items on the marketplace or transfer ownership until verified.
+            </span>
+          }
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {success && (
-        <div className="alert alert-success" style={{ marginBottom: 'var(--space-lg)' }}>
-          <CheckCircle size={18} />
-          <span>{success}</span>
-          <button onClick={() => setSuccess('')} className="alert-close">&times;</button>
-        </div>
+        <AlertBanner
+          type="success"
+          message={success}
+          onDismiss={() => setSuccess('')}
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {error && (
-        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
-          <AlertTriangle size={18} />
-          <span>{error}</span>
-          <button onClick={() => setError('')} className="alert-close">&times;</button>
-        </div>
+        <AlertBanner
+          type="error"
+          message={error}
+          onDismiss={() => setError('')}
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
-      <div className="grid-stats" style={{ marginBottom: 'var(--space-xl)' }}>
+      <div className="grid-stats" style={{ marginBottom: 'var(--space-xl)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-lg)' }}>
         {stats.map(s => (
-          <div key={s.label} className="stat-card">
-            <div className="stat-icon" style={{ background: s.bg }}>
-              <s.icon size={20} color={s.color} />
-            </div>
-            <div className="stat-value">{s.value}</div>
-            <div className="stat-label">{s.label}</div>
-          </div>
+          <MetricCard
+            key={s.label}
+            label={s.label}
+            value={s.value}
+            icon={<s.icon size={20} color={s.color} />}
+          />
         ))}
       </div>
 
@@ -245,7 +245,7 @@ export default function SellerDashboard() {
                   <td style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--accent-cyan)' }}>{item.serialNumber}</td>
                   <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{item.product?.name || 'Unknown'}</td>
                   <td>{item.product?.category || '—'}</td>
-                  <td><span className={`badge ${statusBadge(item.status)}`}>{item.status.replace('_', ' ')}</span></td>
+                  <td><span className={`badge ${itemStatusBadge(item.status)}`}>{item.status.replace('_', ' ')}</span></td>
                   <td>{new Date(item.createdAt).toLocaleDateString()}</td>
                   <td style={{ textAlign: 'right' }}>
                     {item.status !== 'recalled' && item.status !== 'sold' && (
@@ -289,113 +289,105 @@ export default function SellerDashboard() {
         </div>
       )}
 
-      {/* Transfer Ownership Modal */}
-      {showTransferModal && selectedItem && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Transfer Item Ownership</h3>
-              <button className="modal-close" onClick={() => { setShowTransferModal(false); setSelectedItem(null); }}>&times;</button>
+      <Modal
+        open={showTransferModal && !!selectedItem}
+        onClose={() => { setShowTransferModal(false); setSelectedItem(null); }}
+        title="Transfer Item Ownership"
+      >
+        {selectedItem && (
+          <form onSubmit={handleTransfer} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(10, 14, 26, 0.4)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)' }}>
+              Item: <strong>{selectedItem.product?.name}</strong><br />
+              Serial: <code style={{ color: 'var(--accent-cyan)' }}>{selectedItem.serialNumber}</code>
             </div>
-            
-            <form onSubmit={handleTransfer} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(10, 14, 26, 0.4)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)' }}>
-                Item: <strong>{selectedItem.product?.name}</strong><br />
-                Serial: <code style={{ color: 'var(--accent-cyan)' }}>{selectedItem.serialNumber}</code>
-              </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="recipient-id">Recipient User ID</label>
-                <input
-                  id="recipient-id"
-                  type="text"
-                  className="form-input"
-                  placeholder="Enter recipient's system ID"
-                  value={transferToUserId}
-                  onChange={e => setTransferToUserId(e.target.value)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="transfer-loc">Transfer Location / Point</label>
-                <input
-                  id="transfer-loc"
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Retail Outlet, Central Hub"
-                  value={transferLocation}
-                  onChange={e => setTransferLocation(e.target.value)}
-                />
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => { setShowTransferModal(false); setSelectedItem(null); }} disabled={submitting}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting || !transferToUserId}>
-                  {submitting ? <Loader size={14} className="spin" /> : 'Confirm Transfer'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Status Update Modal */}
-      {showStatusModal && selectedItem && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Update Item Status</h3>
-              <button className="modal-close" onClick={() => { setShowStatusModal(false); setSelectedItem(null); }}>&times;</button>
+            <div className="form-group">
+              <label className="form-label" htmlFor="recipient-id">Recipient User ID</label>
+              <input
+                id="recipient-id"
+                type="text"
+                className="form-input"
+                placeholder="Enter recipient's system ID"
+                value={transferToUserId}
+                onChange={e => setTransferToUserId(e.target.value)}
+                required
+              />
             </div>
-            
-            <form onSubmit={handleUpdateStatus} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(10, 14, 26, 0.4)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)' }}>
-                Item: <strong>{selectedItem.product?.name}</strong><br />
-                Current Status: <span className={`badge ${statusBadge(selectedItem.status)}`}>{selectedItem.status}</span>
-              </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="select-status">New Status</label>
-                <select
-                  id="select-status"
-                  className="form-select"
-                  value={statusVal}
-                  onChange={e => setStatusVal(e.target.value)}
-                  required
-                >
-                  <option value="manufactured">Manufactured (In Facility)</option>
-                  <option value="in_transit">In Transit (Dispatch/Shipment)</option>
-                  <option value="listed">Listed (For sale in marketplace)</option>
-                </select>
-              </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="transfer-loc">Transfer Location / Point</label>
+              <input
+                id="transfer-loc"
+                type="text"
+                className="form-input"
+                placeholder="e.g. Retail Outlet, Central Hub"
+                value={transferLocation}
+                onChange={e => setTransferLocation(e.target.value)}
+              />
+            </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="status-loc">Location Description</label>
-                <input
-                  id="status-loc"
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. Route 66 Transit, Warehouse D"
-                  value={statusLocation}
-                  onChange={e => setStatusLocation(e.target.value)}
-                />
-              </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => { setShowTransferModal(false); setSelectedItem(null); }} disabled={submitting}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={submitting || !transferToUserId}>
+                {submitting ? <Loader size={14} className="spin" /> : 'Confirm Transfer'}
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
 
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => { setShowStatusModal(false); setSelectedItem(null); }} disabled={submitting}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting}>
-                  {submitting ? <Loader size={14} className="spin" /> : 'Update Status'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      <Modal
+        open={showStatusModal && !!selectedItem}
+        onClose={() => { setShowStatusModal(false); setSelectedItem(null); }}
+        title="Update Item Status"
+      >
+        {selectedItem && (
+          <form onSubmit={handleUpdateStatus} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(10, 14, 26, 0.4)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)' }}>
+              Item: <strong>{selectedItem.product?.name}</strong><br />
+              Current Status: <span className={`badge ${itemStatusBadge(selectedItem.status)}`}>{selectedItem.status}</span>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="select-status">New Status</label>
+              <select
+                id="select-status"
+                className="form-select"
+                value={statusVal}
+                onChange={e => setStatusVal(e.target.value)}
+                required
+              >
+                <option value="manufactured">Manufactured (In Facility)</option>
+                <option value="in_transit">In Transit (Dispatch/Shipment)</option>
+                <option value="listed">Listed (For sale in marketplace)</option>
+              </select>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="status-loc">Location Description</label>
+              <input
+                id="status-loc"
+                type="text"
+                className="form-input"
+                placeholder="e.g. Route 66 Transit, Warehouse D"
+                value={statusLocation}
+                onChange={e => setStatusLocation(e.target.value)}
+              />
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => { setShowStatusModal(false); setSelectedItem(null); }} disabled={submitting}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" disabled={submitting}>
+                {submitting ? <Loader size={14} className="spin" /> : 'Update Status'}
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
   );
 }

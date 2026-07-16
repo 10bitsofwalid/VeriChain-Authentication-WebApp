@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Mail, Lock, Loader } from 'lucide-react';
 import './Auth.css';
@@ -38,10 +39,12 @@ export default function Login() {
         </div>
 
         {error && (
-          <div className="alert alert-error">
-            <span>{error}</span>
-            <button onClick={clearError} className="alert-close">&times;</button>
-          </div>
+          <AlertBanner
+            type="error"
+            message={error}
+            onDismiss={clearError}
+            style={{ marginBottom: 'var(--space-md)' }}
+          />
         )}
 
         <form onSubmit={handleSubmit} className="auth-form">

@@ -1,4 +1,9 @@
 import { useEffect, useState } from 'react';
+import PageLoader from '../../components/ui/PageLoader';
+import AlertBanner from '../../components/ui/AlertBanner';
+import Modal from '../../components/ui/Modal';
+import MetricCard from '../../components/ui/MetricCard';
+import { verificationBadge } from '../../utils/badges';
 import { Link } from 'react-router-dom';
 import client from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
@@ -106,7 +111,7 @@ export default function FactoryDashboard() {
   };
 
   if (loading) {
-    return <div className="loading-container"><div className="spinner" /></div>;
+    return <PageLoader />;
   }
 
   const stats = [
@@ -117,13 +122,7 @@ export default function FactoryDashboard() {
     { label: 'Active Recalls', value: analytics?.activeRecalls || 0, icon: AlertTriangle, color: '#ef4444', bg: 'rgba(239, 68, 68, 0.12)' },
   ];
 
-  const statusBadge = (status: string) => {
-    switch (status) {
-      case 'verified': return 'badge-success';
-      case 'rejected': return 'badge-danger';
-      default: return 'badge-warning';
-    }
-  };
+
 
   return (
     <div className="animate-fade-in">
@@ -146,25 +145,27 @@ export default function FactoryDashboard() {
       </div>
 
       {user && !user.verified && (
-        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
-          <AlertTriangle size={18} />
-          <span>
-            <strong>Account Verification Pending:</strong> Your manufacturer account is pending administrator approval.
-            You cannot register new products or generate batch serials until verified.
-          </span>
-        </div>
+        <AlertBanner
+          type="error"
+          message={
+            <span>
+              <strong>Account Verification Pending:</strong> Your manufacturer account is pending administrator approval.
+              You cannot register new products or generate batch serials until verified.
+            </span>
+          }
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {/* Stats */}
-      <div className="grid-stats" style={{ marginBottom: 'var(--space-xl)' }}>
+      <div className="grid-stats" style={{ marginBottom: 'var(--space-xl)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-lg)' }}>
         {stats.map(s => (
-          <div key={s.label} className="stat-card">
-            <div className="stat-icon" style={{ background: s.bg }}>
-              <s.icon size={20} color={s.color} />
-            </div>
-            <div className="stat-value">{s.value.toLocaleString()}</div>
-            <div className="stat-label">{s.label}</div>
-          </div>
+          <MetricCard
+            key={s.label}
+            label={s.label}
+            value={s.value}
+            icon={<s.icon size={20} color={s.color} />}
+          />
         ))}
       </div>
 
@@ -202,7 +203,7 @@ export default function FactoryDashboard() {
                   <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{product.name}</td>
                   <td style={{ fontFamily: 'var(--font-mono)', fontSize: '13px' }}>{product.sku}</td>
                   <td>{product.category}</td>
-                  <td><span className={`badge ${statusBadge(product.verifiedStatus)}`}>{product.verifiedStatus}</span></td>
+                  <td><span className={`badge ${verificationBadge(product.verifiedStatus)}`}>{product.verifiedStatus}</span></td>
                   <td>{new Date(product.createdAt).toLocaleDateString()}</td>
                   <td style={{ textAlign: 'right' }}>
                     <button
@@ -221,70 +222,65 @@ export default function FactoryDashboard() {
         </div>
       )}
 
-      {/* Batch Generation Modal */}
-      {showBatchModal && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3>Generate Serialized Batch</h3>
-              <button className="modal-close" onClick={() => setShowBatchModal(false)}>&times;</button>
-            </div>
-            {modalError && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>{modalError}</div>}
-            {modalSuccess && <div className="alert alert-success" style={{ marginBottom: 'var(--space-md)' }}>{modalSuccess}</div>}
-            
-            <form onSubmit={handleGenerateBatch} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-              <div className="form-group">
-                <label className="form-label" htmlFor="batch-count">Batch Count (Units)</label>
-                <input
-                  id="batch-count"
-                  type="number"
-                  className="form-input"
-                  min="1"
-                  max="500"
-                  value={batchCount}
-                  onChange={e => setBatchCount(parseInt(e.target.value) || 1)}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="batch-prefix">Serial Prefix</label>
-                <input
-                  id="batch-prefix"
-                  type="text"
-                  className="form-input"
-                  placeholder="e.g. VC"
-                  value={batchPrefix}
-                  onChange={e => setBatchPrefix(e.target.value.toUpperCase())}
-                  required
-                />
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="starting-serial">Starting Serial Number</label>
-                <input
-                  id="starting-serial"
-                  type="number"
-                  className="form-input"
-                  min="1"
-                  value={startingSerial}
-                  onChange={e => setStartingSerial(parseInt(e.target.value) || 1)}
-                  required
-                />
-              </div>
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowBatchModal(false)} disabled={generating}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={generating}>
-                  {generating ? 'Generating...' : 'Generate Batch'}
-                </button>
-              </div>
-            </form>
+      <Modal
+        open={showBatchModal}
+        onClose={() => setShowBatchModal(false)}
+        title="Generate Serialized Batch"
+      >
+        {modalError && <AlertBanner type="error" message={modalError} style={{ marginBottom: 'var(--space-md)' }} />}
+        {modalSuccess && <AlertBanner type="success" message={modalSuccess} style={{ marginBottom: 'var(--space-md)' }} />}
+        
+        <form onSubmit={handleGenerateBatch} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="batch-count">Batch Count (Units)</label>
+            <input
+              id="batch-count"
+              type="number"
+              className="form-input"
+              min="1"
+              max="500"
+              value={batchCount}
+              onChange={e => setBatchCount(parseInt(e.target.value) || 1)}
+              required
+            />
           </div>
-        </div>
-      )}
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="batch-prefix">Serial Prefix</label>
+            <input
+              id="batch-prefix"
+              type="text"
+              className="form-input"
+              placeholder="e.g. VC"
+              value={batchPrefix}
+              onChange={e => setBatchPrefix(e.target.value.toUpperCase())}
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="starting-serial">Starting Serial Number</label>
+            <input
+              id="starting-serial"
+              type="number"
+              className="form-input"
+              min="1"
+              value={startingSerial}
+              onChange={e => setStartingSerial(parseInt(e.target.value) || 1)}
+              required
+            />
+          </div>
+
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" onClick={() => setShowBatchModal(false)} disabled={generating}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" disabled={generating}>
+              {generating ? 'Generating...' : 'Generate Batch'}
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 }

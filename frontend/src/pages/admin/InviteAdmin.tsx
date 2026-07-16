@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import PageLoader from '../../components/ui/PageLoader';
+import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
 import { Mail, User, Shield, Check, Copy, Trash2, ArrowLeft, Loader, Plus, AlertCircle, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -116,8 +118,22 @@ export default function InviteAdmin() {
         </button>
       </div>
 
-      {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}><AlertCircle size={18} /><span>{error}</span></div>}
-      {success && <div className="alert alert-success" style={{ marginBottom: 'var(--space-md)' }}><Check size={18} /><span>{success}</span></div>}
+      {error && (
+        <AlertBanner
+          type="error"
+          message={error}
+          onDismiss={() => setError('')}
+          style={{ marginBottom: 'var(--space-md)' }}
+        />
+      )}
+      {success && (
+        <AlertBanner
+          type="success"
+          message={success}
+          onDismiss={() => setSuccess('')}
+          style={{ marginBottom: 'var(--space-md)' }}
+        />
+      )}
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 'var(--space-xl)', alignItems: 'start' }}>
         {/* Send Invitation Form */}
@@ -186,7 +202,7 @@ export default function InviteAdmin() {
         <div>
           <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: 'var(--space-md)' }}>Invitation Logs</h2>
           {loading ? (
-            <div className="loading-container" style={{ minHeight: '200px' }}><div className="spinner" /></div>
+            <PageLoader minHeight="200px" />
           ) : invitations.length === 0 ? (
             <div className="empty-state glass-card" style={{ padding: 'var(--space-xl)' }}>
               <Mail size={32} />

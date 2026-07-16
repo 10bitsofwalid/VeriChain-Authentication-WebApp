@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import PageLoader from '../../components/ui/PageLoader';
+import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
 import {
   FileText,
@@ -80,11 +82,7 @@ export default function AuditLogs() {
   };
 
   if (loading && logs.length === 0) {
-    return (
-      <div className="loading-container" style={{ minHeight: '60vh' }}>
-        <div className="spinner" />
-      </div>
-    );
+    return <PageLoader minHeight="60vh" />;
   }
 
   return (
@@ -95,10 +93,12 @@ export default function AuditLogs() {
       </div>
 
       {error && (
-        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
-          <ShieldAlert size={18} />
-          <span>{error}</span>
-        </div>
+        <AlertBanner
+          type="error"
+          message={error}
+          onDismiss={() => setError('')}
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {logs.length === 0 ? (

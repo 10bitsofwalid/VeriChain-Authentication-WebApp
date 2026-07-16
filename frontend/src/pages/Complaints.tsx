@@ -1,4 +1,8 @@
 import { useEffect, useState } from 'react';
+import PageLoader from '../components/ui/PageLoader';
+import AlertBanner from '../components/ui/AlertBanner';
+import Modal from '../components/ui/Modal';
+import { complaintStatusBadge } from '../utils/badges';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import FileUpload from '../components/FileUpload';
@@ -153,22 +157,10 @@ export default function Complaints() {
     }
   };
 
-  const statusBadge = (status: string) => {
-    switch (status) {
-      case 'resolved': return 'badge-success';
-      case 'dismissed': return 'badge-danger';
-      case 'under_review': return 'badge-warning';
-      case 'pending': return 'badge-info';
-      default: return 'badge-neutral';
-    }
-  };
+
 
   if (loading) {
-    return (
-      <div className="loading-container" style={{ minHeight: '60vh' }}>
-        <div className="spinner" />
-      </div>
-    );
+    return <PageLoader minHeight="60vh" />;
   }
 
   const isModOrAdmin = ['admin', 'moderator'].includes(user?.role || '');
@@ -192,19 +184,21 @@ export default function Complaints() {
       </div>
 
       {success && (
-        <div className="alert alert-success" style={{ marginBottom: 'var(--space-lg)' }}>
-          <CheckCircle size={18} />
-          <span>{success}</span>
-          <button onClick={() => setSuccess('')} className="alert-close">&times;</button>
-        </div>
+        <AlertBanner
+          type="success"
+          message={success}
+          onDismiss={() => setSuccess('')}
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {error && (
-        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
-          <AlertTriangle size={18} />
-          <span>{error}</span>
-          <button onClick={() => setError('')} className="alert-close">&times;</button>
-        </div>
+        <AlertBanner
+          type="error"
+          message={error}
+          onDismiss={() => setError('')}
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {complaints.length === 0 ? (
@@ -256,7 +250,7 @@ export default function Complaints() {
                   </td>
                   <td>{new Date(c.createdAt).toLocaleDateString()}</td>
                   <td>
-                    <span className={`badge ${statusBadge(c.status)}`}>
+                    <span className={`badge ${complaintStatusBadge(c.status)}`}>
                       {c.status.replace('_', ' ')}
                     </span>
                   </td>
@@ -275,94 +269,90 @@ export default function Complaints() {
       )}
 
       {/* File Complaint Modal (Buyer Only) */}
-      {showFileModal && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '500px' }}>
-            <div className="modal-header">
-              <h3>File Authenticity Complaint</h3>
-              <button className="modal-close" onClick={() => setShowFileModal(false)}>&times;</button>
-            </div>
-            
-            <form onSubmit={handleFileComplaint} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
-              <div className="form-group">
-                <label className="form-label" htmlFor="select-item">Select Owned Item</label>
-                <select
-                  id="select-item"
-                  className="form-select"
-                  value={selectedItemInstanceId}
-                  onChange={e => setSelectedItemInstanceId(e.target.value)}
-                  required
-                >
-                  <option value="">-- Select Product Instance --</option>
-                  {myItems.map(item => (
-                    <option key={item._id} value={item._id}>
-                      {item.product?.name || 'Product'} (Serial: {item.serialNumber})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="complaint-reason">Complaint Reason</label>
-                <select
-                  id="complaint-reason"
-                  className="form-select"
-                  value={reason}
-                  onChange={e => setReason(e.target.value)}
-                  required
-                >
-                  <option value="">-- Select Reason --</option>
-                  <option value="Counterfeit Suspicion">Counterfeit Suspicion</option>
-                  <option value="Defective QR Code">Defective QR Code / Verification Link</option>
-                  <option value="Unregistered Seller Listing">Unregistered Seller / Wrong Details</option>
-                  <option value="Product Spec Discrepancy">Product Spec Discrepancy</option>
-                  <option value="Other">Other</option>
-                </select>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="complaint-desc">Details & Description</label>
-                <textarea
-                  id="complaint-desc"
-                  className="form-textarea"
-                  placeholder="Provide details about why you suspect counterfeit or have an issue with this seller listing..."
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
-                  required
-                />
-              </div>
-
-              <FileUpload
-                label="Evidence File (optional)"
-                accept=".jpg,.jpeg,.png,.webp,.pdf"
-                maxSizeMB={5}
-                value={evidenceUrl}
-                onChange={(url) => setEvidenceUrl(url)}
-                type="any"
-              />
-
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={() => setShowFileModal(false)} disabled={submitting}>
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={submitting || !selectedItemInstanceId || !reason || !description}>
-                  {submitting ? <Loader size={14} className="spin" /> : 'File Complaint'}
-                </button>
-              </div>
-            </form>
+      <Modal
+        open={showFileModal}
+        onClose={() => setShowFileModal(false)}
+        title="File Authenticity Complaint"
+        maxWidth="500px"
+      >
+        <form onSubmit={handleFileComplaint} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <div className="form-group">
+            <label className="form-label" htmlFor="select-item">Select Owned Item</label>
+            <select
+              id="select-item"
+              className="form-select"
+              value={selectedItemInstanceId}
+              onChange={e => setSelectedItemInstanceId(e.target.value)}
+              required
+            >
+              <option value="">-- Select Product Instance --</option>
+              {myItems.map(item => (
+                <option key={item._id} value={item._id}>
+                  {item.product?.name || 'Product'} (Serial: {item.serialNumber})
+                </option>
+              ))}
+            </select>
           </div>
-        </div>
-      )}
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="complaint-reason">Complaint Reason</label>
+            <select
+              id="complaint-reason"
+              className="form-select"
+              value={reason}
+              onChange={e => setReason(e.target.value)}
+              required
+            >
+              <option value="">-- Select Reason --</option>
+              <option value="Counterfeit Suspicion">Counterfeit Suspicion</option>
+              <option value="Defective QR Code">Defective QR Code / Verification Link</option>
+              <option value="Unregistered Seller Listing">Unregistered Seller / Wrong Details</option>
+              <option value="Product Spec Discrepancy">Product Spec Discrepancy</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="complaint-desc">Details & Description</label>
+            <textarea
+              id="complaint-desc"
+              className="form-textarea"
+              placeholder="Provide details about why you suspect counterfeit or have an issue with this seller listing..."
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              required
+            />
+          </div>
+
+          <FileUpload
+            label="Evidence File (optional)"
+            accept=".jpg,.jpeg,.png,.webp,.pdf"
+            maxSizeMB={5}
+            value={evidenceUrl}
+            onChange={(url) => setEvidenceUrl(url)}
+            type="any"
+          />
+
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" onClick={() => setShowFileModal(false)} disabled={submitting}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" disabled={submitting || !selectedItemInstanceId || !reason || !description}>
+              {submitting ? <Loader size={14} className="spin" /> : 'File Complaint'}
+            </button>
+          </div>
+        </form>
+      </Modal>
 
       {/* Review Complaint Modal (Moderator/Admin Only) */}
-      {showReviewModal && selectedComplaint && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '550px' }}>
-            <div className="modal-header">
-              <h3>Review Dispute</h3>
-              <button className="modal-close" onClick={() => { setShowReviewModal(false); setSelectedComplaint(null); }}>&times;</button>
-            </div>
-
+      <Modal
+        open={showReviewModal && !!selectedComplaint}
+        onClose={() => { setShowReviewModal(false); setSelectedComplaint(null); }}
+        title="Review Dispute"
+        maxWidth="550px"
+      >
+        {selectedComplaint && (
+          <>
             <div style={{
               display: 'flex',
               flexDirection: 'column',
@@ -449,9 +439,9 @@ export default function Complaints() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
+          </>
+        )}
+      </Modal>
     </div>
   );
 }

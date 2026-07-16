@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import PageLoader from '../../components/ui/PageLoader';
+import { verificationBadge } from '../../utils/badges';
 import { Link } from 'react-router-dom';
 import client from '../../api/client';
 import { Package, Shield, AlertTriangle, Search } from 'lucide-react';
@@ -51,7 +53,7 @@ export default function BuyerDashboard() {
   }, []);
 
   if (loading) {
-    return <div className="loading-container"><div className="spinner" /></div>;
+    return <PageLoader />;
   }
 
   const stats = [
@@ -60,14 +62,7 @@ export default function BuyerDashboard() {
     { label: 'Open Complaints', value: complaints.filter(c => ['pending', 'under_review'].includes(c.status)).length, icon: AlertTriangle, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
   ];
 
-  const statusBadge = (status: string) => {
-    switch (status) {
-      case 'verified': return 'badge-success';
-      case 'pending': return 'badge-warning';
-      case 'rejected': return 'badge-danger';
-      default: return 'badge-neutral';
-    }
-  };
+
 
   return (
     <div className="animate-fade-in">
@@ -110,7 +105,7 @@ export default function BuyerDashboard() {
           <td style={{ fontFamily: 'var(--font-mono)', fontSize: '13px', color: 'var(--accent-cyan)' }}>{item.serialNumber}</td>
           <td style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{item.product?.name || 'Unknown'}</td>
           <td>{item.product?.category || '—'}</td>
-          <td><span className={`badge ${statusBadge(item.product?.verifiedStatus)}`}>{item.product?.verifiedStatus || 'unknown'}</span></td>
+          <td><span className={`badge ${verificationBadge(item.product?.verifiedStatus || 'unknown')}`}>{item.product?.verifiedStatus || 'unknown'}</span></td>
           <td>{new Date(item.createdAt).toLocaleDateString()}</td>
         </tr>
       ))}

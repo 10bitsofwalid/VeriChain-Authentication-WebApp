@@ -836,6 +836,17 @@ img {
   color: var(--color-success-text);
 }
 
+.alert-close {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 4px;
+  margin-left: auto;
+  line-height: 1;
+}
+
 /* --- Keyboard Accessibility Focus Outline --- */
 a:focus-visible,
 button:focus-visible,

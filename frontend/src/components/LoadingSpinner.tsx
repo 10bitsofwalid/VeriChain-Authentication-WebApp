@@ -1,10 +1,6 @@
 import React from 'react';
-import './LoadingSpinner.css'; // ensure CSS exists or use existing .spinner class
+import PageLoader from './ui/PageLoader';
 
-const LoadingSpinner: React.FC = () => (
-  <div className="loading-container">
-    <div className="spinner" />
-  </div>
-);
+const LoadingSpinner: React.FC = () => <PageLoader />;
 
 export default LoadingSpinner;

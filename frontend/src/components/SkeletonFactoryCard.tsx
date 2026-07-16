@@ -1,20 +1,14 @@
 import React from 'react';
+import SkeletonCard from './ui/SkeletonCard';
 
-// Simple skeleton placeholder for factory card while loading
-const SkeletonFactoryCard: React.FC = () => (
-  <div className="factory-card glass-card" style={{
-    padding: 'var(--space-lg)',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: 'var(--space-md)',
-    background: 'var(--bg-skeleton)',
-    animation: 'pulse 1.5s ease-in-out infinite',
-  }}>
-    <div style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--bg-skeleton)' }} />
-    <div style={{ width: '60%', height: 16, background: 'var(--bg-skeleton)' }} />
-    <div style={{ width: '40%', height: 12, background: 'var(--bg-skeleton)' }} />
-  </div>
-);
+const SkeletonFactoryCard: React.FC = () => {
+  const rows = [
+    { width: 80, height: 80, borderRadius: '50%' },
+    { width: '60%', height: 16 },
+    { width: '40%', height: 12 },
+  ];
+
+  return <SkeletonCard className="factory-card glass-card" alignItems="center" rows={rows} />;
+};
 
 export default SkeletonFactoryCard;

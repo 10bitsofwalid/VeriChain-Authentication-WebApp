@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Package, ArrowLeft, Loader, Plus, Trash2, AlertTriangle } from 'lucide-react';
@@ -73,17 +74,20 @@ export default function RegisterProduct() {
         <p>Create a product template that can be used to generate serialized item batches.</p>
       </div>
 
-      {error && <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>{error}</div>}
-      {success && <div className="alert alert-success" style={{ marginBottom: 'var(--space-md)' }}>{success}</div>}
+      {error && <AlertBanner type="error" message={error} onDismiss={() => setError('')} style={{ marginBottom: 'var(--space-md)' }} />}
+      {success && <AlertBanner type="success" message={success} onDismiss={() => setSuccess('')} style={{ marginBottom: 'var(--space-md)' }} />}
 
       {user && !user.verified && (
-        <div className="alert alert-error" style={{ marginBottom: 'var(--space-md)' }}>
-          <AlertTriangle size={18} />
-          <span>
-            <strong>Account Verification Pending:</strong> Your manufacturer account is pending administrator approval.
-            You cannot register new products until verified.
-          </span>
-        </div>
+        <AlertBanner
+          type="error"
+          message={
+            <span>
+              <strong>Account Verification Pending:</strong> Your manufacturer account is pending administrator approval.
+              You cannot register new products until verified.
+            </span>
+          }
+          style={{ marginBottom: 'var(--space-md)' }}
+        />
       )}
 
       <form onSubmit={handleSubmit} className="glass-card" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>

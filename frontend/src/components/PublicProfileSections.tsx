@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Calendar, CheckCircle, Package, ShieldCheck, Star, TrendingUp, Users } from 'lucide-react';
 import AnalyticsCard from './AnalyticsCard';
-import EmptyState from './EmptyState';
+import EmptyState from './ui/EmptyState';
 import LazyImage from './LazyImage';
 import { formatCurrency } from '../utils/format';
 import { verificationBadge } from '../utils/badges';
@@ -269,7 +269,7 @@ export const PublicTimeline = memo(function PublicTimeline({ events }: { events:
     <section className="public-section" aria-labelledby="timeline-heading">
       <h2 id="timeline-heading">Timeline</h2>
       {events.length === 0 ? (
-        <EmptyState message="No public timeline events are available yet." />
+        <EmptyState icon={Calendar} title="No public timeline events" message="No public timeline events are available yet." />
       ) : (
         <ol className="public-timeline">
           {events.map((event) => (
@@ -343,7 +343,7 @@ export const ReviewsList = memo(function ReviewsList({ reviews }: { reviews: Rev
   return (
     <PaginatedSection title="Reviews" total={reviews.length} page={page} onPage={setPage}>
       {reviews.length === 0 ? (
-        <EmptyState message="No public customer reviews are available yet." />
+        <EmptyState icon={Star} title="No reviews yet" message="No public customer reviews are available yet." />
       ) : (
         <div className="reviews-list">
           {visibleReviews.map((review) => (

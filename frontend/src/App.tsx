@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import { ToastProvider } from './components/ToastProvider';
 import Layout from './components/Layout';
 import LoadingSpinner from './components/LoadingSpinner';
+import PageLoader from './components/ui/PageLoader';
 import ErrorBoundary from './components/ErrorBoundary';
 import { ShoppingProvider } from './context/ShoppingContext';
 
@@ -42,11 +43,7 @@ function AppRoutes() {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="loading-container" style={{ minHeight: '100vh' }}>
-        <div className="spinner" />
-      </div>
-    );
+    return <PageLoader minHeight="100vh" />;
   }
 
   return (

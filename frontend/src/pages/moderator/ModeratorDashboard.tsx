@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import PageLoader from '../../components/ui/PageLoader';
+import MetricCard from '../../components/ui/MetricCard';
 import { useLocation } from 'react-router-dom';
 import client from '../../api/client';
 import {
@@ -214,7 +216,7 @@ export default function ModeratorDashboard({ defaultTab }: ModeratorDashboardPro
   };
 
   if (loading) {
-    return <div className="loading-container"><div className="spinner" /></div>;
+    return <PageLoader />;
   }
 
   const stats = [
@@ -231,15 +233,14 @@ export default function ModeratorDashboard({ defaultTab }: ModeratorDashboardPro
       </div>
 
       {/* Stats */}
-      <div className="grid-stats" style={{ marginBottom: 'var(--space-xl)', gridTemplateColumns: 'repeat(3, 1fr)' }}>
+      <div className="grid-stats" style={{ marginBottom: 'var(--space-xl)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: 'var(--space-lg)' }}>
         {stats.map(s => (
-          <div key={s.label} className="stat-card">
-            <div className="stat-icon" style={{ background: s.bg }}>
-              <s.icon size={20} color={s.color} />
-            </div>
-            <div className="stat-value">{s.value.toLocaleString()}</div>
-            <div className="stat-label">{s.label}</div>
-          </div>
+          <MetricCard
+            key={s.label}
+            label={s.label}
+            value={s.value}
+            icon={<s.icon size={20} color={s.color} />}
+          />
         ))}
       </div>
 

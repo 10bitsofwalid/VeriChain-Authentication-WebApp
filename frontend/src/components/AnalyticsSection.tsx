@@ -1,6 +1,7 @@
 import React from 'react';
-import LoadingSpinner from './LoadingSpinner';
-import EmptyState from './EmptyState';
+import PageLoader from './ui/PageLoader';
+import EmptyState from './ui/EmptyState';
+import { CheckCircle } from 'lucide-react';
 
 interface AnalyticsSectionProps {
   title: string;
@@ -24,11 +25,9 @@ const AnalyticsSection: React.FC<AnalyticsSectionProps> = ({
         {description && <p style={{ margin: 0, color: 'var(--text-secondary)' }}>{description}</p>}
       </header>
       {loading ? (
-        <div className="loading-container" style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-lg)' }}>
-          <LoadingSpinner />
-        </div>
+        <PageLoader style={{ display: 'flex', justifyContent: 'center', padding: 'var(--space-lg)' }} />
       ) : empty ? (
-        <EmptyState message={`No ${title.toLowerCase()} available.`} />
+        <EmptyState icon={CheckCircle} title={`No ${title.toLowerCase()} available.`} message="" />
       ) : (
         <div className="section-content" style={{ display: 'grid', gap: 'var(--space-lg)', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))' }}>
           {children}

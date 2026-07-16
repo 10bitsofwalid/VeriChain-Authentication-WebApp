@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
+import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
 import { Shield, Lock, Loader, CheckCircle, AlertTriangle } from 'lucide-react';
 import './Auth.css';
@@ -72,18 +73,21 @@ export default function AcceptInvite() {
         </div>
 
         {localError && (
-          <div className="alert alert-error">
-            <AlertTriangle size={18} />
-            <span>{localError}</span>
-          </div>
+          <AlertBanner
+            type="error"
+            message={localError}
+            onDismiss={() => setLocalError('')}
+            style={{ marginBottom: 'var(--space-md)' }}
+          />
         )}
 
         {error && (
-          <div className="alert alert-error">
-            <AlertTriangle size={18} />
-            <span>{error}</span>
-            <button onClick={clearError} className="alert-close">&times;</button>
-          </div>
+          <AlertBanner
+            type="error"
+            message={error}
+            onDismiss={clearError}
+            style={{ marginBottom: 'var(--space-md)' }}
+          />
         )}
 
         {success ? (

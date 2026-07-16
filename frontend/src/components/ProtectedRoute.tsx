@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
+import PageLoader from './ui/PageLoader';
 import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
@@ -11,11 +12,7 @@ export default function ProtectedRoute({ children, roles }: ProtectedRouteProps)
   const location = useLocation();
 
   if (loading) {
-    return (
-      <div className="loading-container" style={{ minHeight: '100vh' }}>
-        <div className="spinner" />
-      </div>
-    );
+    return <PageLoader minHeight="100vh" />;
   }
 
   if (!user) {

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import PageLoader from '../components/ui/PageLoader';
 import client from '../api/client';
 import NavBar from '../components/NavBar';
 import HeroBanner from '../components/HeroBanner';
@@ -37,11 +38,7 @@ const MarketplaceHome: React.FC = () => {
   const trustedSellers = items.slice(0, 4).map((item) => item.currentOwner?.name).filter(Boolean);
 
   if (loading) {
-    return (
-      <div className="loading-container" style={{ minHeight: '60vh' }}>
-        <div className="spinner" />
-      </div>
-    );
+    return <PageLoader minHeight="60vh" />;
   }
 
   return (

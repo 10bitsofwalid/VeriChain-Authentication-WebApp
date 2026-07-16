@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import PageLoader from '../components/ui/PageLoader';
+import AlertBanner from '../components/ui/AlertBanner';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import LazyImage from '../components/LazyImage';
@@ -109,11 +111,7 @@ export default function Marketplace() {
   };
 
   if (loading) {
-    return (
-      <div className="loading-container" style={{ minHeight: '60vh' }}>
-        <div className="spinner" />
-      </div>
-    );
+    return <PageLoader minHeight="60vh" />;
   }
 
   return (
@@ -124,19 +122,21 @@ export default function Marketplace() {
       </div>
 
       {successMessage && (
-        <div className="alert alert-success" style={{ marginBottom: 'var(--space-lg)' }}>
-          <CheckCircle size={18} />
-          <span>{successMessage}</span>
-          <button onClick={() => setSuccessMessage('')} className="alert-close">&times;</button>
-        </div>
+        <AlertBanner
+          type="success"
+          message={successMessage}
+          onDismiss={() => setSuccessMessage('')}
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {error && (
-        <div className="alert alert-error" style={{ marginBottom: 'var(--space-lg)' }}>
-          <AlertTriangle size={18} />
-          <span>{error}</span>
-          <button onClick={() => setError('')} className="alert-close">&times;</button>
-        </div>
+        <AlertBanner
+          type="error"
+          message={error}
+          onDismiss={() => setError('')}
+          style={{ marginBottom: 'var(--space-lg)' }}
+        />
       )}
 
       {/* Filters */}

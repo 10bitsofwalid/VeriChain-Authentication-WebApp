@@ -1,6 +1,8 @@
 import React from 'react';
 import { useShopping } from '../context/ShoppingContext';
 import ProductCard from '../components/ProductCard';
+import EmptyState from '../components/ui/EmptyState';
+import { CheckCircle } from 'lucide-react';
 
 const Wishlist: React.FC = () => {
   const { wishlist, dispatch } = useShopping();
