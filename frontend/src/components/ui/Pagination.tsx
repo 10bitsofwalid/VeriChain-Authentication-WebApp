@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, memo } from 'react';
 import './ui.css';
 
 interface PaginationProps {
@@ -8,18 +8,19 @@ interface PaginationProps {
   ariaLabel?: string;
 }
 
-export default function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = 'Pagination' }: PaginationProps) {
+function Pagination({ currentPage, totalPages, onPageChange, ariaLabel = 'Pagination' }: PaginationProps) {
   const pages: number[] = [];
   for (let i = 1; i <= totalPages; i++) {
     pages.push(i);
   }
 
-  const handlePrev = () => {
+  const handlePrev = useCallback(() => {
     if (currentPage > 1) onPageChange(currentPage - 1);
-  };
-  const handleNext = () => {
+  }, [currentPage, onPageChange]);
+
+  const handleNext = useCallback(() => {
     if (currentPage < totalPages) onPageChange(currentPage + 1);
-  };
+  }, [currentPage, totalPages, onPageChange]);
 
   return (
     <nav aria-label={ariaLabel} className="flex items-center justify-center gap-2 mt-4">
@@ -54,3 +55,5 @@ export default function Pagination({ currentPage, totalPages, onPageChange, aria
     </nav>
   );
 }
+
+export default memo(Pagination);

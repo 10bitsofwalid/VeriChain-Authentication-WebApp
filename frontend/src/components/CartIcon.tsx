@@ -1,17 +1,17 @@
-import { useState } from 'react';
+import { useState, useCallback, memo } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import CartModal from './CartModal';
 import { useShopping } from '../context/ShoppingContext';
 import './CartIcon.css';
 
-export default function CartIcon() {
+function CartIcon() {
   const { cart } = useShopping();
   const [open, setOpen] = useState(false);
 
   // Calculate total quantity of items in cart
   const totalItems = cart.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
 
-  const toggle = () => setOpen(!open);
+  const toggle = useCallback(() => setOpen(!open), [open]);
 
   return (
     <>
@@ -25,3 +25,5 @@ export default function CartIcon() {
     </>
   );
 }
+
+export default memo(CartIcon);

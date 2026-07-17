@@ -1,4 +1,4 @@
-import { memo, useMemo } from 'react';
+import { memo, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { BadgeCheck, ExternalLink, Heart, Scale, ShoppingBag, Tag, User } from 'lucide-react';
 import LazyImage from './LazyImage';
@@ -31,6 +31,7 @@ export const ProductCard = ({ item }: ProductCardProps) => {
       price: Number(item.product?.price || 20 + (hash % 480)).toFixed(2),
     };
   }, [item]);
+
   const inWishlist = wishlist.some((p) => p.id === productId);
   const inCompare = compare.some((p) => p.id === productId);
   const riskTone = toneFromBadge(riskBadge(item.counterfeitRisk));
@@ -42,6 +43,26 @@ export const ProductCard = ({ item }: ProductCardProps) => {
     price: Number(placeholder.price),
     imageUrl: item.product?.imageUrl,
   };
+
+  // Memoized action handlers
+  const handleAddToCart = useCallback(() => {
+    dispatch({ type: 'ADD_TO_CART', payload: shoppingPayload });
+  }, [dispatch, shoppingPayload]);
+
+  const handleToggleWishlist = useCallback(() => {
+    dispatch({
+      type: inWishlist ? 'REMOVE_FROM_WISHLIST' : 'ADD_TO_WISHLIST',
+      payload: inWishlist ? productId : shoppingPayload,
+    });
+  }, [dispatch, inWishlist, productId, shoppingPayload]);
+
+  const handleToggleCompare = useCallback(() => {
+    if (inCompare) {
+      dispatch({ type: 'REMOVE_FROM_COMPARE', payload: productId });
+    } else if (compare.length < 4) {
+      dispatch({ type: 'ADD_TO_COMPARE', payload: shoppingPayload });
+    }
+  }, [dispatch, inCompare, productId, compare.length, shoppingPayload]);
 
   return (
     <article className="product-card">
@@ -92,7 +113,7 @@ export const ProductCard = ({ item }: ProductCardProps) => {
       <div className="product-card-actions">
         <button
           className="product-card-primary"
-          onClick={() => dispatch({ type: 'ADD_TO_CART', payload: shoppingPayload })}
+          onClick={handleAddToCart}
           type="button"
         >
           <ShoppingBag size={16} />
@@ -105,12 +126,7 @@ export const ProductCard = ({ item }: ProductCardProps) => {
           className={`product-icon-button ${inWishlist ? 'product-icon-active' : ''}`}
           title="Add to Wishlist"
           type="button"
-          onClick={() => {
-            dispatch({
-              type: inWishlist ? 'REMOVE_FROM_WISHLIST' : 'ADD_TO_WISHLIST',
-              payload: inWishlist ? productId : shoppingPayload,
-            });
-          }}
+          onClick={handleToggleWishlist}
         >
           <Heart size={16} fill={inWishlist ? 'currentColor' : 'none'} />
         </button>
@@ -118,13 +134,7 @@ export const ProductCard = ({ item }: ProductCardProps) => {
           className={`product-icon-button ${inCompare ? 'product-icon-active' : ''}`}
           title="Add to Compare"
           type="button"
-          onClick={() => {
-            if (inCompare) {
-              dispatch({ type: 'REMOVE_FROM_COMPARE', payload: productId });
-            } else if (compare.length < 4) {
-              dispatch({ type: 'ADD_TO_COMPARE', payload: shoppingPayload });
-            }
-          }}
+          onClick={handleToggleCompare}
         >
           <Scale size={16} />
         </button>
