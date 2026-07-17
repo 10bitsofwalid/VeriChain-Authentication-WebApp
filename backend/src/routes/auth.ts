@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import { User } from '../models/User';
 import { Invitation } from '../models/Invitation';
 import { protect, AuthRequest } from '../middleware/auth';
-import { z } from 'zod';
+import { signupSchema, loginSchema, acceptInviteSchema } from '../validation/authSchemas';
 import { validateRequest } from '../utils/validation';
 import { authLimiter } from '../middleware/rateLimiter';
 import { signToken } from '../utils/jwt';
