@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, CheckCircle, X } from 'lucide-react';
+import { AlertCircle, CheckCircle } from 'lucide-react';
 
 interface AlertBannerProps {
   type: 'success' | 'error';

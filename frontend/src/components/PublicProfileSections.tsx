@@ -1,5 +1,5 @@
 import React, { memo, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Calendar, CheckCircle, Package, ShieldCheck, Star, TrendingUp, Users } from 'lucide-react';
+import { AlertTriangle, Calendar, CheckCircle, Package, ShieldCheck, Star, TrendingUp, Users, ShoppingBag } from 'lucide-react';
 import AnalyticsCard from './AnalyticsCard';
 import EmptyState from './ui/EmptyState';
 import LazyImage from './LazyImage';
@@ -170,7 +170,7 @@ export const CertificationsTable = memo(function CertificationsTable({ certifica
     <section className="public-section" aria-labelledby="certifications-heading">
       <h2 id="certifications-heading">Certifications</h2>
       {certifications.length === 0 ? (
-        <EmptyState message="No public certifications are available yet." />
+        <EmptyState icon={AlertTriangle} title="No certifications" message="No public certifications are available yet." />
       ) : (
         <div className="table-container">
           <table className="data-table">
@@ -215,7 +215,7 @@ export const FactoryProductsGrid = memo(function FactoryProductsGrid({ products 
   return (
     <PaginatedSection title="Verified Products" total={products.length} page={page} onPage={setPage}>
       {products.length === 0 ? (
-        <EmptyState message="No verified products are public yet." />
+        <EmptyState icon={Package} title="No products" message="No verified products are public yet." />
       ) : (
         <div className="grid-cards profile-product-grid">
           {visibleProducts.map((product) => (
@@ -243,7 +243,7 @@ export const SellerProductsGrid = memo(function SellerProductsGrid({ products }:
   return (
     <PaginatedSection title="Products Sold" total={products.length} page={page} onPage={setPage}>
       {products.length === 0 ? (
-        <EmptyState message="This seller has no public listings right now." />
+        <EmptyState icon={ShoppingBag} title="No listings" message="This seller has no public listings right now." />
       ) : (
         <div className="grid-cards profile-product-grid">
           {visibleProducts.map((product) => (

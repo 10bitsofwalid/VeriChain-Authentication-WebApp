@@ -37,12 +37,12 @@ export const ProductCard = ({ item }: ProductCardProps) => {
   const riskTone = toneFromBadge(riskBadge(item.counterfeitRisk));
   const verificationTone = toneFromBadge(verificationBadge(item.product?.verifiedStatus));
 
-  const shoppingPayload = {
+  const shoppingPayload = useMemo(() => ({
     id: productId,
     name: item.product?.name || 'Verified product',
     price: Number(placeholder.price),
     imageUrl: item.product?.imageUrl,
-  };
+  }), [productId, placeholder]);
 
   // Memoized action handlers
   const handleAddToCart = useCallback(() => {
