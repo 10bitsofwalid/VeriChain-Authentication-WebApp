@@ -1,0 +1,24 @@
+/* Card component styles */
+.vc-card {
+  background-color: var(--vc-card-bg);
+  border-radius: var(--vc-card-border-radius);
+  padding: var(--vc-space-4);
+  transition: var(--vc-transition-base);
+}
+
+.vc-card--elevated {
+  background-color: var(--vc-card-bg-elevated);
+  box-shadow: var(--vc-card-shadow-elevated);
+}
+
+.vc-card--outlined {
+  background-color: var(--vc-card-bg);
+  border: 1px solid var(--vc-border-default);
+  box-shadow: var(--vc-card-shadow-outlined);
+}
+
+.vc-card--glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--vc-card-shadow-glass);
+}

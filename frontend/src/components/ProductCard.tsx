@@ -19,50 +19,15 @@ function toneFromBadge(className: string) {
 export const ProductCard = ({ item }: ProductCardProps) => {
   const { dispatch, wishlist, compare } = useShopping();
   const productId = item.product?._id || item.product?.id || item._id;
-  const placeholder = useMemo(() => {
-    const hash = item.serialNumber
-      ? item.serialNumber.split('').reduce((acc: number, char: string) => acc + char.charCodeAt(0), 0)
-      : 0;
-    return {
-      factoryName: item.product?.manufacturer || 'Verified Factory',
-      trustScore: 70 + (hash % 30),
-      rating: (4.0 + (hash % 11) / 10).toFixed(1),
-      stock: 5 + (hash % 95),
-      price: Number(item.product?.price || 20 + (hash % 480)).toFixed(2),
-    };
-  }, [item]);
+  const placeholder = useProductPlaceholder(item);
 
   const inWishlist = wishlist.some((p) => p.id === productId);
   const inCompare = compare.some((p) => p.id === productId);
   const riskTone = toneFromBadge(riskBadge(item.counterfeitRisk));
   const verificationTone = toneFromBadge(verificationBadge(item.product?.verifiedStatus));
 
-  const shoppingPayload = useMemo(() => ({
-    id: productId,
-    name: item.product?.name || 'Verified product',
-    price: Number(placeholder.price),
-    imageUrl: item.product?.imageUrl,
-  }), [productId, placeholder]);
-
-  // Memoized action handlers
-  const handleAddToCart = useCallback(() => {
-    dispatch({ type: 'ADD_TO_CART', payload: shoppingPayload });
-  }, [dispatch, shoppingPayload]);
-
-  const handleToggleWishlist = useCallback(() => {
-    dispatch({
-      type: inWishlist ? 'REMOVE_FROM_WISHLIST' : 'ADD_TO_WISHLIST',
-      payload: inWishlist ? productId : shoppingPayload,
-    });
-  }, [dispatch, inWishlist, productId, shoppingPayload]);
-
-  const handleToggleCompare = useCallback(() => {
-    if (inCompare) {
-      dispatch({ type: 'REMOVE_FROM_COMPARE', payload: productId });
-    } else if (compare.length < 4) {
-      dispatch({ type: 'ADD_TO_COMPARE', payload: shoppingPayload });
-    }
-  }, [dispatch, inCompare, productId, compare.length, shoppingPayload]);
+  const cartItemPayload = useCartActions(productId, placeholder, dispatch, inWishlist, inCompare, compare.length);
+  const { handleAddToCart, handleToggleWishlist, handleToggleCompare } = cartItemPayload;
 
   return (
     <article className="product-card">

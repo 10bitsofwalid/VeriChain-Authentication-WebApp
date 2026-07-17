@@ -91,6 +91,47 @@
   --vc-transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
   --vc-transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
   --vc-transition-slow: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* Component Variant Tokens */
+  /* Buttons */
+  --vc-button-bg-primary: var(--vc-color-primary);
+  --vc-button-bg-primary-hover: var(--vc-color-primary-rgb);
+  --vc-button-bg-secondary: var(--vc-color-secondary);
+  --vc-button-bg-outline: transparent;
+  --vc-button-text-primary: var(--vc-color-inverse);
+  --vc-button-text-secondary: var(--vc-color-primary);
+  --vc-button-border-radius: var(--vc-radius-md);
+  --vc-button-padding-sm: var(--vc-space-2) var(--vc-space-3);
+  --vc-button-padding-md: var(--vc-space-3) var(--vc-space-4);
+  --vc-button-padding-lg: var(--vc-space-4) var(--vc-space-5);
+  /* Cards */
+  --vc-card-bg: var(--vc-color-surface);
+  --vc-card-bg-elevated: var(--vc-color-surface-soft);
+  --vc-card-border-radius: var(--vc-radius-lg);
+  --vc-card-shadow-elevated: var(--vc-shadow-md);
+  --vc-card-shadow-outlined: var(--vc-shadow-sm);
+  --vc-card-shadow-glass: var(--vc-shadow-lg);
+  /* Inputs */
+  --vc-input-bg: var(--vc-color-surface-muted);
+  --vc-input-border: var(--border-default);
+  --vc-input-border-radius: var(--vc-radius-md);
+  --vc-input-padding: var(--vc-space-3);
+  --vc-input-focus-ring: var(--vc-focus-ring);
+  /* Badges */
+  --vc-badge-bg-primary: var(--vc-color-primary);
+  --vc-badge-bg-success: var(--vc-color-success);
+  --vc-badge-bg-warning: var(--vc-color-warning);
+  --vc-badge-bg-danger: var(--vc-color-danger);
+  --vc-badge-text: var(--vc-color-inverse);
+  --vc-badge-border-radius: var(--vc-radius-full);
+  /* Icons */
+  --vc-icon-size-sm: 1rem;
+  --vc-icon-size-md: 1.5rem;
+  --vc-icon-size-lg: 2rem;
+  /* Animations */
+  --vc-animation-fade-in: opacity 0.2s var(--vc-transition-fast);
+  --vc-animation-fade-out: opacity 0.2s var(--vc-transition-fast);
+  --vc-animation-slide-up: transform 0.3s var(--vc-transition-base);
+
   --easing-standard: cubic-bezier(0.16, 1, 0.3, 1);
 
   /* Layout dimensions */
