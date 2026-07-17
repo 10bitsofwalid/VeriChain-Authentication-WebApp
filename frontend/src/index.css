@@ -943,3 +943,30 @@ textarea:focus-visible {
 }
 
 
+
+/* --------------------------------------------------- */
+/* Focus-visible outline for accessibility */
+:focus-visible {
+  outline: 3px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Hover elevation for cards */
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* Button hover and focus styles */
+.btn:hover:not(:disabled),
+.btn:focus-visible {
+  background: var(--accent-gradient-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Utility spacing classes */
+.p-2 { padding: var(--space-sm); }
+.p-4 { padding: var(--space-md); }
+.m-2 { margin: var(--space-sm); }
+.m-4 { margin: var(--space-md); }
