@@ -44,7 +44,7 @@ export default function Sidebar({ open, onClose, user, onLogout }: SidebarProps)
 
   return (
     <>
-      <aside className={`vc-sidebar ${open ? 'vc-sidebar-open' : ''}`} aria-label="Primary navigation">
+      <aside className={`vc-sidebar ${open ? 'vc-sidebar-open' : ''}`} aria-label="Primary navigation" aria-expanded={open}>
         <div className="vc-sidebar-header">
           <button className="vc-brand" onClick={() => navigate('/dashboard')} type="button">
             <span className="vc-brand-mark">

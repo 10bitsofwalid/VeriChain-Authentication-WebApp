@@ -1,3 +1,5 @@
+@import "../../design-system/tokens/navigationTokens.css";
+
 .vc-app-shell {
   background: var(--vc-gradient-hero);
   display: flex;

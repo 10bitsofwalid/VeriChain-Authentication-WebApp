@@ -37,7 +37,7 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
     <>
       <header className="vc-topbar">
         <div className="vc-topbar-left">
-          <ActionButton variant="secondary" size="icon" className="vc-menu-button" onClick={onMenuClick} aria-label="Open sidebar">
+          <ActionButton variant="secondary" size="icon" className="vc-menu-button" onClick={onMenuClick} aria-label="Open sidebar" aria-haspopup="true">
             <Menu size={18} />
           </ActionButton>
           <SearchBar onFocus={() => setSearchOpen(true)} />
