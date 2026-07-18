@@ -1,4 +1,4 @@
-@import "../../design-system/tokens/navigationTokens.css";
+/* Navigation token definitions are already included via the global import of design-system tokens (index.css). This import was removed to prevent ENOENT error. */
 
 .vc-app-shell {
   background: var(--vc-gradient-hero);
