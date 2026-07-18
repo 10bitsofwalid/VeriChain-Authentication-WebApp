@@ -1,0 +1,20 @@
+.category-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.filter-button {
+  padding: var(--space-xs) var(--space-sm);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-bg-muted);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: var(--transition-base);
+}
+
+.filter-button.active {
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
