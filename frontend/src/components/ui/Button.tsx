@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Button.module.css';
+import './ui.css';
 
 export type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost';
 export type ButtonSize = 'sm' | 'md' | 'lg';
@@ -14,12 +14,13 @@ export const Button: React.FC<ButtonProps> = ({
   variant = 'primary',
   size = 'md',
   className = '',
+  children,
   ...rest
 }) => {
-  const classNames = ${styles.button}   ;
+  const classNames = `vc-action-button vc-action-${variant} vc-action-${size} ${className}`.trim();
   return (
     <button className={classNames} {...rest}>
-      {rest.children}
+      {children}
     </button>
   );
 };
