@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Trash2, ShieldCheck, AlertTriangle, ArrowRight, ShoppingBag } from 'lucide-react';
 import './BuyerExperience.css';
+import BuyerNav from './BuyerNav';
 import { mockCartItems } from './mockData';
 import type { CartItem } from './mockData';
 
@@ -23,10 +24,13 @@ export default function CartPage() {
   const shipping = subtotal > 200 ? 0 : 14.99;
   const total = subtotal + shipping;
 
+  const totalQty = items.reduce((s, i) => s + i.quantity, 0);
+
   if (items.length === 0) {
     return (
       <div className="buyer-page">
-        <div className="bx-empty" style={{ marginTop: '80px' }}>
+        <BuyerNav cartCount={0} />
+        <div className="bx-empty" style={{ marginTop: '40px' }}>
           <div className="bx-empty-icon">
             <ShoppingCart size={36} />
           </div>
@@ -42,6 +46,7 @@ export default function CartPage() {
 
   return (
     <div className="buyer-page">
+      <BuyerNav cartCount={totalQty} />
       <div className="bx-header">
         <div className="bx-header-left">
           <h1>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, CreditCard, MapPin, ShieldCheck, ChevronRight } from 'lucide-react';
 import './BuyerExperience.css';
+import BuyerNav from './BuyerNav';
 import { mockCartItems, mockProfile } from './mockData';
 
 type Step = 'shipping' | 'payment' | 'review' | 'confirmed';
@@ -34,30 +35,33 @@ export default function CheckoutPage() {
 
   if (step === 'confirmed') {
     return (
-      <div className="buyer-page" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
-        <div style={{ textAlign: 'center', maxWidth: 480 }}>
-          <div style={{
-            width: 80, height: 80, borderRadius: 'var(--radius-full)',
-            background: 'rgba(0,88,188,0.1)', display: 'flex', alignItems: 'center',
-            justifyContent: 'center', margin: '0 auto var(--space-lg)',
-            animation: 'bx-fade-in 0.4s ease',
-          }}>
-            <Check size={36} color="var(--accent-cyan)" strokeWidth={2.5} />
-          </div>
-          <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 10 }}>Order Confirmed!</h1>
-          <p style={{ color: 'var(--text-muted)', marginBottom: 'var(--space-md)' }}>
-            Your order has been placed successfully. You'll receive a confirmation email shortly.
-          </p>
-          <div style={{
-            background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
-            padding: 'var(--space-md)', marginBottom: 'var(--space-lg)',
-            fontFamily: 'var(--font-mono)', fontSize: '0.9rem',
-          }}>
-            Order #VC-2024-00999
-          </div>
-          <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <Link to="/buyer/orders" className="bx-btn-primary">View Orders</Link>
-            <Link to="/" className="bx-btn-ghost">Continue Shopping</Link>
+      <div className="buyer-page">
+        <BuyerNav />
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '60vh' }}>
+          <div style={{ textAlign: 'center', maxWidth: 480 }}>
+            <div style={{
+              width: 80, height: 80, borderRadius: 'var(--radius-full)',
+              background: 'rgba(0,88,188,0.1)', display: 'flex', alignItems: 'center',
+              justifyContent: 'center', margin: '0 auto var(--space-lg)',
+              animation: 'bx-fade-in 0.4s ease',
+            }}>
+              <Check size={36} color="var(--accent-cyan)" strokeWidth={2.5} />
+            </div>
+            <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 10 }}>Order Confirmed!</h1>
+            <p style={{ color: 'var(--text-muted)', marginBottom: 'var(--space-md)' }}>
+              Your order has been placed successfully. You'll receive a confirmation email shortly.
+            </p>
+            <div style={{
+              background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
+              padding: 'var(--space-md)', marginBottom: 'var(--space-lg)',
+              fontFamily: 'var(--font-mono)', fontSize: '0.9rem',
+            }}>
+              Order #VC-2024-00999
+            </div>
+            <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <Link to="/buyer/orders" className="bx-btn-primary">View Orders</Link>
+              <Link to="/" className="bx-btn-ghost">Continue Shopping</Link>
+            </div>
           </div>
         </div>
       </div>
@@ -66,6 +70,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="buyer-page">
+      <BuyerNav />
       <div className="bx-header">
         <div className="bx-header-left">
           <h1>Checkout</h1>

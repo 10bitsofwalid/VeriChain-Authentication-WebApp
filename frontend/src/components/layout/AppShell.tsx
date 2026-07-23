@@ -9,6 +9,7 @@ export default function AppShell() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = () => {
     logout();
@@ -16,10 +17,12 @@ export default function AppShell() {
   };
 
   return (
-    <div className="vc-app-shell">
+    <div className={`vc-app-shell ${collapsed ? 'vc-shell-collapsed' : ''}`}>
       <Sidebar
         open={sidebarOpen}
         onClose={() => setSidebarOpen(false)}
+        collapsed={collapsed}
+        onToggleCollapse={() => setCollapsed(!collapsed)}
         user={user}
         onLogout={handleLogout}
       />

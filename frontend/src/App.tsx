@@ -38,6 +38,14 @@ const RegisterProduct = lazy(() => import('./pages/factory/RegisterProduct'));
 const AIHome = lazy(() => import('./pages/ai/AIHome'));
 const CommunityHome = lazy(() => import('./pages/community/CommunityHome'));
 
+// Buyer Experience Pages
+const CartPage = lazy(() => import('./pages/buyer/CartPage'));
+const CheckoutPage = lazy(() => import('./pages/buyer/CheckoutPage'));
+const OrdersPage = lazy(() => import('./pages/buyer/OrdersPage'));
+const WishlistPage = lazy(() => import('./pages/buyer/WishlistPage'));
+const ProfilePage = lazy(() => import('./pages/buyer/ProfilePage'));
+const PurchaseHistoryPage = lazy(() => import('./pages/buyer/PurchaseHistoryPage'));
+
 
 function AppRoutes() {
   const { user, loading } = useAuth();
@@ -164,6 +172,15 @@ function AppRoutes() {
         />
         <Route path="/dashboard/ai" element={<AIHome />} />
         <Route path="/dashboard/community" element={<CommunityHome />} />
+        
+        {/* Buyer Experience routes */}
+        <Route path="/buyer/cart" element={<CartPage />} />
+        <Route path="/buyer/checkout" element={<CheckoutPage />} />
+        <Route path="/buyer/orders" element={<OrdersPage />} />
+        <Route path="/buyer/wishlist" element={<WishlistPage />} />
+        <Route path="/buyer/profile" element={<ProfilePage />} />
+        <Route path="/buyer/purchase-history" element={<PurchaseHistoryPage />} />
+
         <Route path="/dashboard/*" element={<Dashboard />} />
       </Route>
         <Route path="/seller/sourcing" element={<ProtectedRoute roles={['seller']}><SellerSourcing /></ProtectedRoute>} />

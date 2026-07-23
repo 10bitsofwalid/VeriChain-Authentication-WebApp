@@ -44,26 +44,28 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
         </div>
 
         <div className="vc-topbar-actions">
-          <ActionButton variant="primary" size="sm" onClick={() => navigate('/verify')}>
+          <ActionButton variant="primary" size="sm" onClick={() => navigate('/verify')} className="vc-quick-verify-btn">
             <Zap size={15} />
-            Quick Verify
+            <span>Quick Verify</span>
           </ActionButton>
-          <ActionButton variant="ghost" size="icon" aria-label="Messages">
+
+          <ActionButton variant="ghost" size="icon" aria-label="Messages" className="vc-icon-btn">
             <MessageCircle size={18} />
           </ActionButton>
-          <ActionButton variant="ghost" size="icon" aria-label="Notifications">
+
+          <ActionButton variant="ghost" size="icon" aria-label="Notifications" className="vc-icon-btn">
             <Bell size={18} />
           </ActionButton>
+
           <CartIcon />
+
           <div className="vc-topbar-profile" aria-label="Current user">
             <div className="vc-avatar vc-avatar-sm">{user?.name?.charAt(0).toUpperCase() || 'V'}</div>
-            <div>
-              <strong>{user?.name || 'VeriChain'}</strong>
-              <StatusChip tone="success">
-                <ShieldCheck size={12} />
-                {user?.role || 'buyer'}
-              </StatusChip>
-            </div>
+            <span className="vc-topbar-username">{user?.name || 'VeriChain'}</span>
+            <StatusChip tone="success">
+              <ShieldCheck size={11} />
+              <span>{user?.role || 'buyer'}</span>
+            </StatusChip>
           </div>
         </div>
       </header>

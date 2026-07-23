@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Truck, CheckCircle, XCircle, Clock, RotateCcw, ChevronDown, ChevronUp, ShieldCheck, AlertTriangle } from 'lucide-react';
 import './BuyerExperience.css';
+import BuyerNav from './BuyerNav';
 import { mockOrders } from './mockData';
 import type { Order } from './mockData';
 
@@ -25,6 +26,7 @@ export default function OrdersPage() {
 
   return (
     <div className="buyer-page">
+      <BuyerNav />
       <div className="bx-header">
         <div className="bx-header-left">
           <h1>
