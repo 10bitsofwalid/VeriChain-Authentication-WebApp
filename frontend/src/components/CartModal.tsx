@@ -1,7 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
+import { Link } from 'react-router-dom';
 import { useShopping } from '../context/ShoppingContext';
+import { mockCartItems } from '../pages/buyer/mockData';
 import './CartModal.css';
-import { X } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowRight, Plus } from 'lucide-react';
 import LazyImage from './LazyImage';
 
 interface CartModalProps {
@@ -13,13 +16,15 @@ export default function CartModal({ onClose }: CartModalProps) {
   const modalRef = useRef<HTMLDivElement | null>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
+  const cartItems = Array.isArray(cart) ? cart : [];
+  const totalQty = cartItems.reduce((sum, item) => sum + (item.quantity ?? 1), 0);
+  const subtotal = cartItems.reduce((sum, item) => sum + (Number(item.price) || 0) * (item.quantity ?? 1), 0);
+
   useEffect(() => {
-    // Save focused element
     previousActiveElement.current = document.activeElement as HTMLElement;
 
-    // Focus close button initially
     const focusable = modalRef.current?.querySelectorAll<HTMLElement>(
-      'button, [href], input, select, textarea, [tabindex]:not([-1])'
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
     );
     if (focusable && focusable.length > 0) {
       focusable[0].focus();
@@ -32,7 +37,7 @@ export default function CartModal({ onClose }: CartModalProps) {
       if (e.key === 'Tab') {
         if (!modalRef.current) return;
         const focusableElements = modalRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], input, select, textarea, [tabindex]:not([-1])'
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
         if (focusableElements.length === 0) return;
         const first = focusableElements[0];
@@ -55,7 +60,6 @@ export default function CartModal({ onClose }: CartModalProps) {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
-      // Restore focus
       if (previousActiveElement.current) {
         previousActiveElement.current.focus();
       }
@@ -66,7 +70,27 @@ export default function CartModal({ onClose }: CartModalProps) {
     dispatch({ type: 'REMOVE_FROM_CART', payload: id });
   };
 
-  return (
+  const handleUpdateQty = (id: string, newQty: number) => {
+    dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity: newQty } });
+  };
+
+  const seedMockItems = () => {
+    dispatch({ type: 'CLEAR_CART' });
+    mockCartItems.forEach(item => {
+      dispatch({
+        type: 'ADD_TO_CART',
+        payload: {
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          imageUrl: item.image,
+          quantity: item.quantity,
+        },
+      });
+    });
+  };
+
+  const modalContent = (
     <div className="cart-modal-overlay" onClick={onClose}>
       <div 
         ref={modalRef}
@@ -77,37 +101,116 @@ export default function CartModal({ onClose }: CartModalProps) {
         aria-labelledby="cart-title"
       >
         <div className="cart-modal-header">
-          <h2 id="cart-title">Your Cart</h2>
-          <button className="close-btn" onClick={onClose} aria-label="Close cart">
-            <X size={20} />
+          <div className="cart-modal-title-group">
+            <ShoppingBag size={20} color="var(--accent-cyan, #00d2ff)" />
+            <h2 id="cart-title">Shopping Cart</h2>
+            {totalQty > 0 && <span className="cart-modal-count-badge">{totalQty} items</span>}
+          </div>
+          <button className="cart-modal-close-btn" onClick={onClose} aria-label="Close cart">
+            <X size={18} />
           </button>
         </div>
-        {cart.length === 0 ? (
-          <p className="empty-cart">Your cart is empty.</p>
-        ) : (
-          <ul className="cart-items-list">
-            {cart.map(item => (
-              <li key={item.id} className="cart-item">
-                {item.imageUrl && <LazyImage src={item.imageUrl} alt={item.name} className="cart-item-image" />}
-                <div className="cart-item-details">
-                  <span className="cart-item-name">{item.name}</span>
-                  <span className="cart-item-price">${item.price.toFixed(2)}</span>
-                </div>
-                <div className="quantity-controls">
-                  <button className="decrease-btn" onClick={() => dispatch({ type: 'UPDATE_QUANTITY', payload: { id: item.id, quantity: (item.quantity ?? 1) - 1 } })} aria-label="Decrease quantity">−</button>
-                  <span className="item-quantity">{item.quantity ?? 1}</span>
-                  <button className="increase-btn" onClick={() => dispatch({ type: 'UPDATE_QUANTITY', payload: { id: item.id, quantity: (item.quantity ?? 1) + 1 } })} aria-label="Increase quantity">+</button>
-                </div>
-                <button className="remove-btn" onClick={() => handleRemove(item.id)} aria-label="Remove item">×</button>
-              </li>
-            ))}
-          </ul>
-        )}
-        <div className="cart-actions">
-          <button className="clear-cart-btn" onClick={() => dispatch({ type: 'CLEAR_CART' })}>Clear Cart</button>
+
+        <div className="cart-modal-body">
+          {cartItems.length === 0 ? (
+            <div className="empty-cart-container">
+              <div className="empty-cart-icon">
+                <ShoppingBag size={32} />
+              </div>
+              <h3 className="empty-cart-title">Your cart is empty</h3>
+              <p className="empty-cart-sub">
+                Explore verified authentic items in our marketplace and add them to your cart.
+              </p>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
+                <Link to="/dashboard/marketplace" onClick={onClose} className="bx-btn-primary" style={{ padding: '9px 18px', fontSize: '0.85rem' }}>
+                  Browse Marketplace
+                </Link>
+                <button onClick={seedMockItems} className="bx-btn-ghost" style={{ padding: '9px 16px', fontSize: '0.82rem' }}>
+                  <Plus size={14} /> Add Demo Items
+                </button>
+              </div>
+            </div>
+          ) : (
+            <ul className="cart-items-list">
+              {cartItems.map(item => {
+                const priceVal = Number(item.price) || 0;
+                const qtyVal = item.quantity ?? 1;
+                const imgUrl = item.imageUrl || (item as any).image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80';
+
+                return (
+                  <li key={item.id} className="cart-item">
+                    <LazyImage src={imgUrl} alt={item.name} className="cart-item-image" />
+                    <div className="cart-item-details">
+                      <span className="cart-item-name">{item.name || 'Authentic Product'}</span>
+                      <span className="cart-item-price">${(priceVal * qtyVal).toFixed(2)}</span>
+                    </div>
+
+                    <div className="cart-item-qty-stepper">
+                      <button 
+                        className="cart-item-qty-btn" 
+                        onClick={() => handleUpdateQty(item.id, qtyVal - 1)} 
+                        aria-label="Decrease quantity"
+                      >
+                        −
+                      </button>
+                      <span className="cart-item-qty-val">{qtyVal}</span>
+                      <button 
+                        className="cart-item-qty-btn" 
+                        onClick={() => handleUpdateQty(item.id, qtyVal + 1)} 
+                        aria-label="Increase quantity"
+                      >
+                        +
+                      </button>
+                    </div>
+
+                    <button className="cart-item-remove-btn" onClick={() => handleRemove(item.id)} title="Remove item">
+                      <Trash2 size={15} />
+                    </button>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
+
+        {cartItems.length > 0 && (
+          <div className="cart-modal-footer">
+            <div className="cart-modal-subtotal-row">
+              <span className="cart-modal-subtotal-label">Subtotal</span>
+              <span className="cart-modal-subtotal-value">${subtotal.toFixed(2)}</span>
+            </div>
+
+            <div className="cart-modal-actions-row">
+              <Link 
+                to="/buyer/cart" 
+                onClick={onClose} 
+                className="bx-btn-ghost" 
+                style={{ flex: 1, justifyContent: 'center', padding: '10px 14px', fontSize: '0.85rem' }}
+              >
+                View Full Cart
+              </Link>
+              <Link 
+                to="/buyer/checkout" 
+                onClick={onClose} 
+                className="bx-btn-primary" 
+                style={{ flex: 1, justifyContent: 'center', padding: '10px 14px', fontSize: '0.85rem' }}
+              >
+                Checkout Now <ArrowRight size={14} />
+              </Link>
+            </div>
+            
+            <button 
+              onClick={() => dispatch({ type: 'CLEAR_CART' })} 
+              className="bx-btn-danger"
+              style={{ padding: '4px 8px', fontSize: '0.75rem', alignSelf: 'center', marginTop: 2 }}
+            >
+              Clear All Items
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
-}
 
+  return createPortal(modalContent, document.body);
+}

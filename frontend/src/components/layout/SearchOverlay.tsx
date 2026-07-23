@@ -38,7 +38,7 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
       if (e.key === 'Tab') {
         if (!panelRef.current) return;
         const focusableElements = panelRef.current.querySelectorAll<HTMLElement>(
-          'input, button, a, [href], [tabindex]:not([-1])'
+          'input, button, a, [href], [tabindex]:not([tabindex="-1"])'
         );
         if (focusableElements.length === 0) return;
         const first = focusableElements[0];

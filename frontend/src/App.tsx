@@ -214,7 +214,7 @@ export default function App() {
       <AuthProvider>
         <ShoppingProvider>
           <ToastProvider>
-            <ErrorBoundary fallback={<div className="glass-card" style={{ padding: 'var(--space-lg)', textAlign: 'center' }}>Something went wrong.</div>}>
+            <ErrorBoundary>
               <Suspense fallback={<LoadingSpinner />}>
                 <AppRoutes />
               </Suspense>

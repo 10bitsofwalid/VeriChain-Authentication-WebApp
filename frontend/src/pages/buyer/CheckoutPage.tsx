@@ -4,6 +4,7 @@ import { Check, CreditCard, MapPin, ShieldCheck, ChevronRight } from 'lucide-rea
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { mockCartItems, mockProfile } from './mockData';
+import { useShopping } from '../../context/ShoppingContext';
 
 type Step = 'shipping' | 'payment' | 'review' | 'confirmed';
 
@@ -15,13 +16,24 @@ const STEPS: { id: Step; label: string }[] = [
 ];
 
 export default function CheckoutPage() {
+  const { cart } = useShopping();
   const [step, setStep] = useState<Step>('shipping');
   const [selectedAddr, setSelectedAddr] = useState(mockProfile.addresses[0].id);
   const [selectedPM, setSelectedPM] = useState(mockProfile.paymentMethods[0].id);
 
-  const items = mockCartItems;
-  const subtotal = items.reduce((s, i) => s + i.price * i.quantity, 0);
-  const shipping = subtotal > 200 ? 0 : 14.99;
+  const cartItemsFormatted = cart.map(i => ({
+    id: i.id,
+    name: i.name,
+    brand: (i as any).brand || 'VeriChain',
+    price: Number(i.price) || 0,
+    quantity: i.quantity ?? 1,
+    image: i.imageUrl || (i as any).image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
+    verified: (i as any).verified !== false,
+  }));
+
+  const items = cartItemsFormatted.length > 0 ? cartItemsFormatted : mockCartItems;
+  const subtotal = items.reduce((s, i) => s + (Number(i.price) || 0) * (i.quantity ?? 1), 0);
+  const shipping = subtotal > 200 || subtotal === 0 ? 0 : 14.99;
   const total = subtotal + shipping;
 
   const stepIndex = (s: Step) => STEPS.findIndex(x => x.id === s);

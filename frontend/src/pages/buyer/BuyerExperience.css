@@ -4,9 +4,9 @@
 
 /* ── Page Shell ────────────────────────────────────────────── */
 .buyer-page {
-  min-height: 100vh;
-  background: var(--bg-primary);
-  padding: var(--space-xl) var(--space-lg);
+  min-height: calc(100vh - 80px);
+  background: transparent;
+  padding: 0 0 var(--space-2xl) 0;
   max-width: 1280px;
   margin: 0 auto;
   animation: bx-fade-in 0.4s ease both;
@@ -836,7 +836,8 @@
   padding: 0 5px;
 }
 
-.bx-checkout-grid {
+.bx-checkout-grid,
+.bx-cart-grid {
   display: grid;
   grid-template-columns: 1fr 340px;
   gap: var(--space-xl);
@@ -845,7 +846,8 @@
 
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 960px) {
-  .bx-checkout-grid {
+  .bx-checkout-grid,
+  .bx-cart-grid {
     grid-template-columns: 1fr;
   }
 }

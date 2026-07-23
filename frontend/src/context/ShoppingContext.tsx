@@ -29,78 +29,85 @@ export type ShoppingAction =
   | { type: 'ADD_TO_COMPARE'; payload: Product }
   | { type: 'REMOVE_FROM_COMPARE'; payload: string };
 
+const safeRetrieveArray = (key: string): Product[] => {
+  const data = retrieveState(key);
+  return Array.isArray(data) ? data : [];
+};
+
 const initialState: ShoppingState = {
-  cart: retrieveState(STORAGE_KEYS.CART) || [],
-  wishlist: retrieveState(STORAGE_KEYS.WISHLIST) || [],
-  compare: retrieveState(STORAGE_KEYS.COMPARE) || [],
+  cart: safeRetrieveArray(STORAGE_KEYS.CART),
+  wishlist: safeRetrieveArray(STORAGE_KEYS.WISHLIST),
+  compare: safeRetrieveArray(STORAGE_KEYS.COMPARE),
 };
 
 function shoppingReducer(state: ShoppingState, action: ShoppingAction): ShoppingState {
+  const cart = Array.isArray(state.cart) ? state.cart : [];
+  const wishlist = Array.isArray(state.wishlist) ? state.wishlist : [];
+  const compare = Array.isArray(state.compare) ? state.compare : [];
+
   switch (action.type) {
     case 'ADD_TO_CART': {
-      // If item exists, increase quantity; otherwise add with quantity 1
-      const existing = state.cart.find((p) => p.id === action.payload.id);
+      const existing = cart.find((p) => p.id === action.payload.id);
       let newCart;
       if (existing) {
-        newCart = state.cart.map((p) =>
+        newCart = cart.map((p) =>
           p.id === action.payload.id ? { ...p, quantity: (p.quantity ?? 1) + 1 } : p,
         );
       } else {
-        const itemWithQty = { ...action.payload, quantity: 1 };
-        newCart = [...state.cart, itemWithQty];
+        const itemWithQty = { ...action.payload, quantity: action.payload.quantity ?? 1 };
+        newCart = [...cart, itemWithQty];
       }
       persistState(STORAGE_KEYS.CART, newCart);
-      return { ...state, cart: newCart };
+      return { ...state, cart: newCart, wishlist, compare };
     }
     case 'REMOVE_FROM_CART': {
-      const newCart = state.cart.filter((p) => p.id !== action.payload);
+      const newCart = cart.filter((p) => p.id !== action.payload);
       persistState(STORAGE_KEYS.CART, newCart);
-      return { ...state, cart: newCart };
+      return { ...state, cart: newCart, wishlist, compare };
     }
     case 'UPDATE_QUANTITY': {
       const { id, quantity } = action.payload;
       if (quantity <= 0) {
-        // Remove if quantity zero or negative
-        const newCart = state.cart.filter((p) => p.id !== id);
+        const newCart = cart.filter((p) => p.id !== id);
         persistState(STORAGE_KEYS.CART, newCart);
-        return { ...state, cart: newCart };
+        return { ...state, cart: newCart, wishlist, compare };
       }
-      const newCart = state.cart.map((p) =>
+      const newCart = cart.map((p) =>
         p.id === id ? { ...p, quantity } : p,
       );
       persistState(STORAGE_KEYS.CART, newCart);
-      return { ...state, cart: newCart };
+      return { ...state, cart: newCart, wishlist, compare };
     }
     case 'CLEAR_CART': {
       persistState(STORAGE_KEYS.CART, []);
-      return { ...state, cart: [] };
+      return { ...state, cart: [], wishlist, compare };
     }
     case 'ADD_TO_WISHLIST': {
-      const exists = state.wishlist.some((p) => p.id === action.payload.id);
-      if (exists) return state;
-      const newWish = [...state.wishlist, action.payload];
+      const exists = wishlist.some((p) => p.id === action.payload.id);
+      if (exists) return { ...state, cart, wishlist, compare };
+      const newWish = [...wishlist, action.payload];
       persistState(STORAGE_KEYS.WISHLIST, newWish);
-      return { ...state, wishlist: newWish };
+      return { ...state, cart, wishlist: newWish, compare };
     }
     case 'REMOVE_FROM_WISHLIST': {
-      const newWish = state.wishlist.filter((p) => p.id !== action.payload);
+      const newWish = wishlist.filter((p) => p.id !== action.payload);
       persistState(STORAGE_KEYS.WISHLIST, newWish);
-      return { ...state, wishlist: newWish };
+      return { ...state, cart, wishlist: newWish, compare };
     }
     case 'ADD_TO_COMPARE': {
-      const exists = state.compare.some((p) => p.id === action.payload.id);
-      if (exists) return state;
-      const newComp = [...state.compare, action.payload];
+      const exists = compare.some((p) => p.id === action.payload.id);
+      if (exists) return { ...state, cart, wishlist, compare };
+      const newComp = [...compare, action.payload];
       persistState(STORAGE_KEYS.COMPARE, newComp);
-      return { ...state, compare: newComp };
+      return { ...state, cart, wishlist, compare: newComp };
     }
     case 'REMOVE_FROM_COMPARE': {
-      const newComp = state.compare.filter((p) => p.id !== action.payload);
+      const newComp = compare.filter((p) => p.id !== action.payload);
       persistState(STORAGE_KEYS.COMPARE, newComp);
-      return { ...state, compare: newComp };
+      return { ...state, cart, wishlist, compare: newComp };
     }
     default:
-      return state;
+      return { ...state, cart, wishlist, compare };
   }
 }
 
