@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { Package, ArrowLeft, Loader, Plus, Trash2, AlertTriangle } from 'lucide-react';
+import { Package, ArrowLeft, Loader, Plus, Trash2 } from 'lucide-react';
 import FileUpload from '../../components/FileUpload';
 
 export default function RegisterProduct() {

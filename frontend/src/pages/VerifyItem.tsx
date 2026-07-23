@@ -2,8 +2,8 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
 import {
-  Search,
   Shield,
+  Search,
   CheckCircle,
   XCircle,
   AlertTriangle,
@@ -17,14 +17,10 @@ import {
   Check,
   FileText,
   Award,
-  ExternalLink,
-  Globe,
-  Cpu,
   User,
   Building,
   Truck,
   Database,
-  ArrowRight,
   RefreshCw,
 } from 'lucide-react';
 import './VerifyItem.css';

@@ -1,10 +1,9 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { History, Search, ShieldCheck, Download, ExternalLink, RefreshCw, AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { mockPurchaseHistory } from './mockData';
-import type { PurchaseRecord } from './mockData';
 
 export default function PurchaseHistoryPage() {
   const [searchTerm, setSearchTerm] = useState('');

@@ -1,19 +1,22 @@
 .navbar {
   align-items: center;
   backdrop-filter: blur(22px);
-  background: rgba(245, 247, 251, 0.76);
-  border: 1px solid rgba(255, 255, 255, 0.72);
+  -webkit-backdrop-filter: blur(22px);
+  background: var(--bg-glass);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-sm), var(--vc-shadow-inset);
   display: flex;
   gap: var(--space-md);
   justify-content: space-between;
-  left: 50%;
-  max-width: 1200px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1240px;
   padding: 0.55rem;
   position: sticky;
   top: 16px;
-  transform: translateX(-50%);
   width: calc(100% - 32px);
   z-index: 90;
 }
@@ -79,13 +82,13 @@
 
 .navbar-links a.active,
 .navbar-links a:hover {
-  background: rgba(91, 95, 239, 0.1);
+  background: var(--accent-bg);
   color: var(--accent-primary);
 }
 
 .navbar-search {
   align-items: center;
-  background: rgba(255, 255, 255, 0.78);
+  background: var(--bg-input);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
   color: var(--text-muted);

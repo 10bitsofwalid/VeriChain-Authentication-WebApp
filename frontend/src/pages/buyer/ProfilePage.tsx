@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { User, ShieldCheck, MapPin, CreditCard, Lock, Bell, Check, Edit2, Plus, Key } from 'lucide-react';
+import { useState } from 'react';
+import { User, ShieldCheck, MapPin, CreditCard, Lock, Check, Edit2, Plus, Key } from 'lucide-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { mockProfile } from './mockData';

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Lock, Loader, CheckCircle, AlertTriangle } from 'lucide-react';
+import { Shield, Lock, Loader, CheckCircle } from 'lucide-react';
 import './Auth.css';
 
 export default function AcceptInvite() {

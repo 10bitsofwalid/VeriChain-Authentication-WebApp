@@ -1,4 +1,4 @@
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import './layout.css';
 import Breadcrumb from './Breadcrumb';
 

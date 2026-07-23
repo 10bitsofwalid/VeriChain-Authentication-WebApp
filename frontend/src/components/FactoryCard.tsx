@@ -38,11 +38,11 @@ const FactoryCard: React.FC<FactoryCardProps> = ({
       style={{
         position: 'relative',
         cursor: 'pointer',
-        padding: 'var(--space-lg)',
+        padding: 'var(--space-md)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
-        gap: 'var(--space-md)',
+        gap: 'var(--space-sm)',
         transition: 'transform 0.2s ease',
       }}
     >

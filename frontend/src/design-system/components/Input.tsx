@@ -5,7 +5,7 @@ type InputSize = 'sm' | 'md' | 'lg';
 
 type InputState = 'default' | 'error' | 'success';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+interface InputProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   size?: InputSize;
   state?: InputState;
   className?: string;

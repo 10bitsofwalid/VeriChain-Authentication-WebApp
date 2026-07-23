@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, CreditCard, MapPin, ShieldCheck, ChevronRight } from 'lucide-react';
 import './BuyerExperience.css';
@@ -91,7 +91,7 @@ export default function CheckoutPage() {
         ))}
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 'var(--space-xl)', alignItems: 'start' }}>
+      <div className="bx-checkout-grid">
         {/* Main panel */}
         <div className="bx-card" style={{ padding: 'var(--space-xl)' }}>
           {step === 'shipping' && (

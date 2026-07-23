@@ -2,9 +2,7 @@ import { useEffect, useState } from 'react';
 import PageLoader from '../components/ui/PageLoader';
 import AlertBanner from '../components/ui/AlertBanner';
 import client from '../api/client';
-import { useAuth } from '../context/AuthContext';
-import LazyImage from '../components/LazyImage';
-import { Search, ShoppingBag, Loader, ExternalLink, User } from 'lucide-react';
+import { ShoppingBag } from 'lucide-react';
 import SearchBar from '../design-system/components/SearchBar';
 import CategoryFilter from '../design-system/components/CategoryFilter';
 import ProductCard from '../components/ProductCard';
@@ -33,13 +31,11 @@ export interface ListedItem {
 }
 
 export default function Marketplace() {
-  const { user } = useAuth();
   const [items, setItems] = useState<ListedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [search, setSearch] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [buyingId, setBuyingId] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
@@ -59,21 +55,6 @@ export default function Marketplace() {
   useEffect(() => {
     fetchMarketplace();
   }, []);
-
-  const handleBuy = async (itemId: string) => {
-    setBuyingId(itemId);
-    setError('');
-    setSuccessMessage('');
-    try {
-      const res = await client.post(`/items/${itemId}/buy`);
-      setSuccessMessage(res.data.message || 'Item purchased successfully!');
-      setItems(prev => prev.filter(i => i._id !== itemId));
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to purchase the item.');
-    } finally {
-      setBuyingId(null);
-    }
-  };
 
   const categories = ['All', ...Array.from(new Set(items.map(i => i.product?.category).filter(Boolean)))];
 
@@ -124,9 +105,6 @@ export default function Marketplace() {
             <ProductCard
               key={item._id}
               item={item}
-              userRole={user?.role}
-              buyingId={buyingId}
-              onBuy={handleBuy}
             />
           ))}
         </div>

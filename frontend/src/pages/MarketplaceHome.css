@@ -2,7 +2,7 @@
   background: var(--vc-gradient-hero);
   min-height: 100vh;
   overflow-x: hidden;
-  padding: 1rem clamp(1rem, 4vw, 2.5rem) 0;
+  padding: 1rem clamp(1rem, 3vw, 2rem) 0;
 }
 
 .marketplace-home > :not(.navbar) {
@@ -16,8 +16,7 @@
   display: grid;
   gap: clamp(2rem, 5vw, 4rem);
   grid-template-columns: minmax(0, 1.05fr) minmax(320px, 0.95fr);
-  min-height: calc(100vh - 118px);
-  padding: clamp(3rem, 7vw, 6rem) 0 clamp(2rem, 5vw, 4rem);
+  padding: clamp(2rem, 5vw, 4rem) 0 clamp(2rem, 4vw, 3.5rem);
 }
 
 .marketplace-hero-copy {
@@ -36,7 +35,7 @@
 }
 
 .marketplace-hero-badge {
-  background: rgba(91, 95, 239, 0.1);
+  background: var(--accent-bg);
   border-radius: var(--radius-full);
   margin-bottom: var(--space-md);
   padding: 0.55rem 0.8rem;
@@ -44,9 +43,9 @@
 
 .marketplace-hero h1 {
   color: var(--text-primary);
-  font-size: clamp(3.2rem, 7vw, 4rem);
+  font-size: clamp(2.8rem, 6vw, 3.8rem);
   letter-spacing: 0;
-  line-height: 1.02;
+  line-height: 1.04;
   margin: 0;
   max-width: 780px;
 }
@@ -61,7 +60,7 @@
 
 .marketplace-hero-search {
   align-items: center;
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-md), var(--vc-shadow-inset);
@@ -115,7 +114,7 @@
 }
 
 .marketplace-hero-metrics span {
-  background: rgba(255, 255, 255, 0.68);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-sm), var(--vc-shadow-inset);
@@ -131,7 +130,7 @@
 
 .marketplace-hero-visual {
   aspect-ratio: 1;
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.9), rgba(238, 242, 255, 0.8));
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: 38px;
   box-shadow: var(--shadow-lg), var(--vc-shadow-inset);
@@ -149,7 +148,7 @@
 
 .hero-float-card {
   align-items: center;
-  background: rgba(255, 255, 255, 0.84);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-full);
   box-shadow: var(--shadow-md), var(--vc-shadow-inset);
@@ -229,7 +228,7 @@
 
 .category-card {
   align-items: flex-start;
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm), var(--vc-shadow-inset);
@@ -285,7 +284,7 @@
 }
 
 .product-card {
-  background: rgba(255, 255, 255, 0.86);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-sm), var(--vc-shadow-inset);
@@ -303,7 +302,7 @@
 
 .product-card-media {
   aspect-ratio: 4 / 3;
-  background: #edf2ff;
+  background: var(--bg-secondary);
   display: block;
   overflow: hidden;
   position: relative;
@@ -334,10 +333,10 @@
   top: 0.8rem;
 }
 
-.product-status-success { background: rgba(220, 252, 231, 0.86); color: #15803d; }
-.product-status-warning { background: rgba(254, 243, 199, 0.88); color: #b45309; }
-.product-status-danger { background: rgba(254, 226, 226, 0.9); color: #dc2626; }
-.product-status-neutral { background: rgba(255, 255, 255, 0.84); color: var(--text-secondary); }
+.product-status-success { background: var(--color-success-bg); color: var(--color-success-text); }
+.product-status-warning { background: var(--color-warning-bg); color: var(--color-warning-text); }
+.product-status-danger { background: var(--color-danger-bg); color: var(--color-danger-text); }
+.product-status-neutral { background: var(--bg-secondary); color: var(--text-secondary); }
 
 .product-card-body {
   display: flex;
@@ -365,14 +364,14 @@
 }
 
 .product-card-kicker span:first-child {
-  background: rgba(16, 24, 40, 0.05);
+  background: var(--bg-secondary);
   color: var(--text-secondary);
 }
 
 .product-risk-success { background: var(--color-success-bg); color: var(--color-success-text); }
-.product-risk-warning { background: var(--color-warning-bg); color: #b45309; }
+.product-risk-warning { background: var(--color-warning-bg); color: var(--color-warning-text); }
 .product-risk-danger { background: var(--color-danger-bg); color: var(--color-danger-text); }
-.product-risk-neutral { background: rgba(16, 24, 40, 0.05); color: var(--text-secondary); }
+.product-risk-neutral { background: var(--bg-secondary); color: var(--text-secondary); }
 
 .product-card-title {
   color: var(--text-primary);
@@ -399,7 +398,7 @@
 }
 
 .product-trust-row {
-  background: rgba(245, 247, 251, 0.9);
+  background: var(--bg-secondary);
   border-radius: var(--radius-md);
   justify-content: space-between;
   padding: var(--space-sm);
@@ -442,7 +441,7 @@
 }
 
 .product-card-actions {
-  border-top: 1px solid rgba(91, 95, 239, 0.08);
+  border-top: 1px solid var(--border-default);
   gap: 0.45rem;
   padding: var(--space-sm) var(--space-md) var(--space-md);
 }
@@ -472,20 +471,20 @@
 }
 
 .product-card-secondary {
-  background: rgba(91, 95, 239, 0.1);
+  background: var(--accent-bg);
   color: var(--accent-primary);
   padding: 0 0.85rem;
 }
 
 .product-icon-button {
   aspect-ratio: 1;
-  background: rgba(16, 24, 40, 0.05);
+  background: var(--bg-secondary);
   color: var(--text-secondary);
   width: 38px;
 }
 
 .product-icon-active {
-  background: rgba(91, 95, 239, 0.12);
+  background: var(--accent-bg);
   color: var(--accent-primary);
 }
 
@@ -496,7 +495,7 @@
 
 .marketplace-insight-card,
 .why-verichain {
-  background: rgba(255, 255, 255, 0.84);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   border-radius: var(--radius-xl);
   box-shadow: var(--shadow-sm), var(--vc-shadow-inset);
@@ -511,7 +510,7 @@
 
 .leader-list div,
 .why-grid div {
-  background: rgba(245, 247, 251, 0.82);
+  background: var(--bg-secondary);
   border-radius: var(--radius-md);
   padding: var(--space-md);
 }

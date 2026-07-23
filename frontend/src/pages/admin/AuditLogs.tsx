@@ -5,7 +5,6 @@ import client from '../../api/client';
 import {
   FileText,
   Clock,
-  ShieldAlert,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';

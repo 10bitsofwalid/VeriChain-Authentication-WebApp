@@ -1,4 +1,3 @@
-import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { ShoppingCart, CreditCard, Package, Heart, User, History } from 'lucide-react';
 import { mockCartItems, mockOrders, mockWishlist } from './mockData';

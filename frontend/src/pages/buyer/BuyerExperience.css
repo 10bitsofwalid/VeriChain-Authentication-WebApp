@@ -836,7 +836,20 @@
   padding: 0 5px;
 }
 
+.bx-checkout-grid {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: var(--space-xl);
+  align-items: start;
+}
+
 /* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 960px) {
+  .bx-checkout-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 900px) {
   .bx-profile-grid { grid-template-columns: 1fr; }
   .bx-form-row { grid-template-columns: 1fr; }
@@ -851,4 +864,5 @@
   .bx-stepper { gap: 0; }
   .bx-step-label { display: none; }
 }
+
 

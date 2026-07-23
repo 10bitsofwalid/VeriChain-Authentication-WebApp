@@ -1,10 +1,7 @@
-import React from 'react';
 import { useShopping } from '../context/ShoppingContext';
 import ProductCard from '../components/ProductCard';
-import EmptyState from '../components/ui/EmptyState';
-import { CheckCircle } from 'lucide-react';
 
-const Wishlist: React.FC = () => {
+export default function Wishlist() {
   const { wishlist, dispatch } = useShopping();
 
   if (wishlist.length === 0) {
@@ -39,6 +36,4 @@ const Wishlist: React.FC = () => {
       </div>
     </div>
   );
-};
-
-export default Wishlist;
+}

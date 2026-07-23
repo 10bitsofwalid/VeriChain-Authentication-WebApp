@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import PageLoader from '../../components/ui/PageLoader';
 import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
-import { Mail, User, Shield, Check, Copy, Trash2, ArrowLeft, Loader, Plus, AlertCircle, RefreshCw } from 'lucide-react';
+import { Mail, User, Shield, Check, Copy, Trash2, ArrowLeft, Loader, Plus, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Invitation {

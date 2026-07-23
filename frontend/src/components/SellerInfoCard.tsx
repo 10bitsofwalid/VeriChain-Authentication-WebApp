@@ -15,8 +15,8 @@ export default function SellerInfoCard({ seller }: SellerInfoCardProps) {
   const verified = seller.verified;
 
   return (
-    <section className="glass-card" style={{ marginBottom: 'var(--space-xl)' }}>
-      <h3 style={{ fontSize: '18px', fontWeight: 600, marginBottom: 'var(--space-md)' }}>Current Custodian / Seller</h3>
+    <section className="glass-card p-4">
+      <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: 'var(--space-sm)' }}>Current Custodian / Seller</h3>
       
       <div style={{ display: 'flex', gap: 'var(--space-md)', flexWrap: 'wrap', alignItems: 'center' }}>
         <div 

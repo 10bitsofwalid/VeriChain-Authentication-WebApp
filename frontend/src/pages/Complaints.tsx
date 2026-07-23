@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   Plus,
   Loader,
-  CheckCircle,
   Eye,
 } from 'lucide-react';
 

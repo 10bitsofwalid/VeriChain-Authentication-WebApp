@@ -2,6 +2,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { BrowserRouter } from 'react-router-dom';
 import { AuthProvider } from '../context/AuthContext';
+import { ShoppingProvider } from '../context/ShoppingContext';
 import Login from '../pages/Login';
 import VerifyItem from '../pages/VerifyItem';
 import Marketplace from '../pages/Marketplace';
@@ -171,7 +172,9 @@ describe('VeriChain Frontend Test Suite', () => {
       render(
         <BrowserRouter>
           <AuthProvider>
-            <Marketplace />
+            <ShoppingProvider>
+              <Marketplace />
+            </ShoppingProvider>
           </AuthProvider>
         </BrowserRouter>
       );

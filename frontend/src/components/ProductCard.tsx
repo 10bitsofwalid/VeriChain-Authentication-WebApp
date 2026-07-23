@@ -1,9 +1,10 @@
-import { memo, useMemo, useCallback } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { BadgeCheck, ExternalLink, Heart, Scale, ShoppingBag, Tag, User } from 'lucide-react';
 import LazyImage from './LazyImage';
 import { useShopping } from '../context/ShoppingContext';
 import { riskBadge, verificationBadge } from '../utils/badges';
+import { useProductPlaceholder } from '../hooks/useProductPlaceholder';
 
 interface ProductCardProps {
   item: any;
@@ -26,8 +27,49 @@ export const ProductCard = ({ item }: ProductCardProps) => {
   const riskTone = toneFromBadge(riskBadge(item.counterfeitRisk));
   const verificationTone = toneFromBadge(verificationBadge(item.product?.verifiedStatus));
 
-  const cartItemPayload = useCartActions(productId, placeholder, dispatch, inWishlist, inCompare, compare.length);
-  const { handleAddToCart, handleToggleWishlist, handleToggleCompare } = cartItemPayload;
+  const handleAddToCart = () => {
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: {
+        id: productId,
+        name: item.product?.name || 'Authenticated product',
+        price: Number(placeholder.price),
+        imageUrl: item.product?.imageUrl || '',
+        quantity: 1,
+      },
+    });
+  };
+
+  const handleToggleWishlist = () => {
+    if (inWishlist) {
+      dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: productId });
+    } else {
+      dispatch({
+        type: 'ADD_TO_WISHLIST',
+        payload: {
+          id: productId,
+          name: item.product?.name || 'Authenticated product',
+          price: Number(placeholder.price),
+          imageUrl: item.product?.imageUrl || '',
+        },
+      });
+    }
+  };
+
+  const handleToggleCompare = () => {
+    if (inCompare) {
+      dispatch({ type: 'REMOVE_FROM_COMPARE', payload: productId });
+    } else if (compare.length < 4) {
+      dispatch({
+        type: 'ADD_TO_COMPARE',
+        payload: {
+          id: productId,
+          name: item.product?.name || 'Authenticated product',
+          price: Number(placeholder.price),
+        },
+      });
+    }
+  };
 
   return (
     <article className="product-card">
