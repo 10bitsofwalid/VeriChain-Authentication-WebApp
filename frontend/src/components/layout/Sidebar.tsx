@@ -26,6 +26,10 @@ import {
   ChevronLeft,
   ChevronRight,
   CreditCard,
+  BarChart2,
+  Boxes,
+  Truck,
+  TrendingUp,
 } from 'lucide-react';
 import type { User } from '../../context/AuthContext';
 import StatusChip from '../ui/StatusChip';
@@ -210,14 +214,22 @@ function getNavSections(role: string): NavSection[] {
     factory: {
       title: 'FACTORY WORKSPACE',
       items: [
-        { to: '/dashboard/products', label: 'My Products', icon: Package },
+        { to: '/factory', label: 'Factory Dashboard', icon: LayoutDashboard, end: true },
+        { to: '/factory?tab=inventory', label: 'Inventory', icon: Boxes },
+        { to: '/factory?tab=production', label: 'Production', icon: TrendingUp },
+        { to: '/factory?tab=shipments', label: 'Shipments', icon: Truck },
+        { to: '/factory?tab=analytics', label: 'Analytics', icon: BarChart2 },
         { to: '/dashboard/register-product', label: 'Register Product', icon: ClipboardList },
       ],
     },
     seller: {
       title: 'SELLER WORKSPACE',
       items: [
-        { to: '/dashboard/inventory', label: 'Inventory', icon: Store },
+        { to: '/dashboard/inventory?tab=analytics', label: 'Analytics', icon: LayoutDashboard },
+        { to: '/dashboard/inventory?tab=products', label: 'Products', icon: Tags },
+        { to: '/dashboard/inventory?tab=inventory', label: 'Inventory', icon: Store },
+        { to: '/dashboard/inventory?tab=orders', label: 'Orders', icon: ShoppingBag },
+        { to: '/dashboard/inventory?tab=customers', label: 'Customers', icon: Users },
         { to: '/seller/sourcing', label: 'Seller Sourcing', icon: ClipboardList },
       ],
     },
