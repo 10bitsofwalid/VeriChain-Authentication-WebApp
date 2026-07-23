@@ -39,11 +39,6 @@
   width: 100%;
 }
 
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
 .recall-header-icon {
   width: 48px;
   height: 48px;
@@ -67,12 +62,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
-}
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #f8fafc;
-  margin: 0;
-  letter-spacing: -0.02em;
 }
 
 .recall-header-desc {
@@ -371,7 +360,7 @@
 
 .timeline-container::before {
   content: '';
-  position.absolute;
+  position: absolute;
   left: 12px;
   top: 12px;
   bottom: 12px;

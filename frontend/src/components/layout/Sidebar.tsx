@@ -192,6 +192,7 @@ function getNavSections(role: string): NavSection[] {
       { to: '/dashboard/marketplace', label: 'Categories', icon: Tags },
       { to: '/trust-center', label: 'Trust Center', icon: Shield },
       { to: '/dashboard/recalls', label: 'Recall Management', icon: AlertTriangle, badge: 'Active' },
+      { to: '/dashboard/order-management', label: 'Order Management', icon: ClipboardList },
       { to: '/dashboard/ai', label: 'AI Center', icon: Bot },
       { to: '/dashboard/community', label: 'Community', icon: Users },
       { to: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, end: true },
