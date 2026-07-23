@@ -244,9 +244,13 @@ function getNavSections(role: string): NavSection[] {
     admin: {
       title: 'ADMIN WORKSPACE',
       items: [
-        { to: '/dashboard/users', label: 'Users', icon: Users },
-        { to: '/dashboard/products-admin', label: 'Products', icon: Package },
-        { to: '/dashboard/invite', label: 'Invitations', icon: FileText },
+        { to: '/dashboard/admin?tab=mission', label: 'Mission', icon: Shield },
+        { to: '/dashboard/admin?tab=users', label: 'Users', icon: Users },
+        { to: '/dashboard/admin?tab=complaints', label: 'Complaints', icon: AlertTriangle },
+        { to: '/dashboard/admin?tab=moderation', label: 'Moderation', icon: ShieldCheck },
+        { to: '/dashboard/admin?tab=reports', label: 'Reports', icon: FileText },
+        { to: '/dashboard/admin?tab=statistics', label: 'Statistics', icon: BarChart2 },
+        { to: '/dashboard/admin?tab=settings', label: 'Settings', icon: Settings },
         { to: '/dashboard/audit-logs', label: 'Audit Logs', icon: FileText },
       ],
     },
