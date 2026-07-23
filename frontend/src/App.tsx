@@ -38,6 +38,8 @@ const RegisterProduct = lazy(() => import('./pages/factory/RegisterProduct'));
 // const QRVerification = lazy(() => import('./pages/QRVerification'));
 const AIHome = lazy(() => import('./pages/ai/AIHome'));
 const CommunityHome = lazy(() => import('./pages/community/CommunityHome'));
+const RecallManagementView = lazy(() => import('./pages/recalls/RecallManagementView'));
+
 
 // Buyer Experience Pages
 const CartPage = lazy(() => import('./pages/buyer/CartPage'));
@@ -189,6 +191,8 @@ function AppRoutes() {
         />
         <Route path="/dashboard/ai" element={<AIHome />} />
         <Route path="/dashboard/community" element={<CommunityHome />} />
+        <Route path="/dashboard/recalls" element={<RecallManagementView />} />
+
         
         {/* Buyer Experience routes */}
         <Route path="/buyer/cart" element={<CartPage />} />
