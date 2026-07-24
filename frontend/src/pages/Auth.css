@@ -128,3 +128,22 @@
   border: 1px solid var(--border-default);
   border-radius: var(--radius-md);
 }
+
+/* Auth Form Focus Visible */
+.auth-submit:focus-visible,
+.auth-switch a:focus-visible,
+.alert-close:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Responsive padding on small screens */
+@media (max-width: 480px) {
+  .auth-page {
+    padding: var(--space-lg) var(--space-sm);
+  }
+  .auth-card {
+    padding: var(--space-lg);
+  }
+}
+

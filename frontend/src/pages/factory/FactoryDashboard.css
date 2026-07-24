@@ -476,3 +476,20 @@
   color: var(--text-secondary);
   font-weight: 500;
 }
+
+/* Tab & Action Button Focus Visible */
+.fd-tab-btn:focus-visible,
+.fd-header-actions button:focus-visible,
+.fd-kpi-item:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Data Table Responsive Overflow */
+.fd-table-container,
+.fd-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+

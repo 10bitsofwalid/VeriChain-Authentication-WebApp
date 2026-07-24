@@ -1096,3 +1096,24 @@
     transform: translateY(0);
   }
 }
+
+/* Interactive Element Focus Visible */
+.back-link:focus-visible,
+.verify-page button:focus-visible,
+.verify-tab-btn:focus-visible,
+.verify-input-row input:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Responsive improvements */
+@media (max-width: 640px) {
+  .verify-page {
+    padding: var(--space-lg) var(--space-sm);
+  }
+  .verify-header,
+  .verify-content {
+    max-width: 100%;
+  }
+}
+

@@ -646,3 +646,13 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Interactive Element Focus Visible */
+.marketplace-text-button:focus-visible,
+.marketplace-home button:focus-visible,
+.marketplace-footer a:focus-visible,
+.navbar-links a:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+

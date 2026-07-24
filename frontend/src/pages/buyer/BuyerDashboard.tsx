@@ -41,10 +41,12 @@ export default function BuyerDashboard() {
           client.get('/items/my'),
           client.get('/complaints'),
         ]);
-        setItems(itemsRes.data.items);
-        setComplaints(complaintsRes.data.complaints);
+        setItems(itemsRes.data.items || []);
+        setComplaints(complaintsRes.data.complaints || []);
       } catch (err) {
         console.error('Failed to fetch data:', err);
+        setItems([]);
+        setComplaints([]);
       } finally {
         setLoading(false);
       }
@@ -56,10 +58,13 @@ export default function BuyerDashboard() {
     return <PageLoader />;
   }
 
+  const safeItems = items || [];
+  const safeComplaints = complaints || [];
+
   const stats = [
-    { label: 'My Products', value: items.length, icon: Package, color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)' },
-    { label: 'Verified', value: items.filter(i => i.product?.verifiedStatus === 'verified').length, icon: Shield, color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
-    { label: 'Open Complaints', value: complaints.filter(c => ['pending', 'under_review'].includes(c.status)).length, icon: AlertTriangle, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
+    { label: 'My Products', value: safeItems.length, icon: Package, color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)' },
+    { label: 'Verified', value: safeItems.filter(i => i.product?.verifiedStatus === 'verified').length, icon: Shield, color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
+    { label: 'Open Complaints', value: safeComplaints.filter(c => ['pending', 'under_review'].includes(c.status)).length, icon: AlertTriangle, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
   ];
 
 

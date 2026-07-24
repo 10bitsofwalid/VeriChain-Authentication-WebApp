@@ -36,12 +36,15 @@
 }
 
 .vc-action-button:focus-visible {
-  box-shadow: var(--vc-focus-ring);
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 88, 188, 0.15);
 }
 
 .vc-action-button:active {
   transform: translateY(1px) scale(0.99);
 }
+
 
 .vc-action-button:disabled {
   cursor: not-allowed;

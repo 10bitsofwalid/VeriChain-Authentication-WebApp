@@ -42,7 +42,7 @@ export default function AdminDashboard() {
     if (currentTab && currentTab !== activeTab) {
       setActiveTab(currentTab);
     }
-  }, [searchParams]);
+  }, [searchParams, activeTab]);
 
   const handleTabChange = (tab: AdminTab) => {
     setActiveTab(tab);

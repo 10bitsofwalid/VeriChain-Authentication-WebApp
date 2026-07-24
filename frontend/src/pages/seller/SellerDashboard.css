@@ -573,3 +573,31 @@
     transform: translateY(0);
   }
 }
+
+/* Tab & Interactive Element Focus Visible */
+.seller-tab-btn:focus-visible,
+.action-icon-btn:focus-visible,
+.seller-control-bar button:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Data Table Responsive Overflow */
+.seller-table-container,
+.inventory-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 768px) {
+  .seller-control-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .search-filter-group {
+    max-width: 100%;
+    flex-direction: column;
+  }
+}
+

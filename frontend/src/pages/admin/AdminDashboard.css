@@ -320,3 +320,20 @@
   0%, 100% { opacity: 1; }
   50% { opacity: 0.4; }
 }
+
+/* Tab & Modal Focus Visible */
+.admin-tab-btn:focus-visible,
+.admin-header-banner button:focus-visible,
+.admin-modal-card button:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Data Table Responsive Overflow */
+.admin-table-container,
+.admin-view-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+

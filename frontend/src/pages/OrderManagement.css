@@ -656,3 +656,20 @@
   from { opacity: 0; transform: translateY(12px); }
   to   { opacity: 1; transform: translateY(0); }
 }
+
+/* Order Chip & Button Focus Visible */
+.om-order-chip:focus-visible,
+.om-header-actions button:focus-visible,
+.om-panel button:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Table Responsive Container */
+.om-table-container,
+.om-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+

@@ -867,4 +867,13 @@
   .bx-step-label { display: none; }
 }
 
+/* Nav & Interactive Controls Focus Visible */
+.bx-subnav-item:focus-visible,
+.bx-card button:focus-visible,
+.bx-header button:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+
 

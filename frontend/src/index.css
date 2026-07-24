@@ -946,9 +946,17 @@ textarea:focus-visible {
 
 /* --------------------------------------------------- */
 /* Focus-visible outline for accessibility */
-:focus-visible {
-  outline: 3px solid var(--accent-cyan);
+:focus-visible,
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--accent-cyan);
   outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(0, 88, 188, 0.15);
 }
 
 /* Hover elevation for cards */
@@ -960,9 +968,68 @@ textarea:focus-visible {
 /* Button hover and focus styles */
 .btn:hover:not(:disabled),
 .btn:focus-visible {
-  background: var(--accent-gradient-hover);
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+
+/* Skeleton Loading Shimmer */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--bg-secondary) 25%,
+    var(--bg-input) 37%,
+    var(--bg-secondary) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+.skeleton-text {
+  height: 1rem;
+  width: 100%;
+  margin-bottom: 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.skeleton-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton-card {
+  height: 180px;
+  width: 100%;
+  border-radius: var(--radius-lg);
+}
+
+/* Responsive Data Table Container */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Monospace & Hash Truncation Utility */
+.text-mono,
+.mono-hash {
+  font-family: var(--font-mono);
+  word-break: break-all;
+  letter-spacing: -0.02em;
+}
+
+/* Accessibility: Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* Utility spacing classes */
@@ -1078,4 +1145,5 @@ textarea:focus-visible {
 .bg-emerald-500 { background-color: #10b981; }
 .bg-cyan-400 { background-color: #22d3ee; }
 .rounded-full { border-radius: 9999px; }
+
 

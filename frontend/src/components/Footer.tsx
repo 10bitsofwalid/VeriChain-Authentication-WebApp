@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { ShieldCheck } from 'lucide-react';
 
 export default function Footer() {
@@ -5,18 +6,19 @@ export default function Footer() {
     <footer className="marketplace-footer">
       <div>
         <div className="marketplace-footer-brand">
-          <span><ShieldCheck size={22} /></span>
+          <span aria-hidden="true"><ShieldCheck size={22} /></span>
           <strong>VeriChain</strong>
         </div>
         <p>Secure product authentication, supply-chain provenance, and trusted marketplace ownership.</p>
       </div>
       <nav aria-label="Footer navigation">
-        <a href="/trust-center">Trust Center</a>
-        <a href="/verify">Verify Product</a>
-        <a href="/compare">Compare</a>
-        <a href="/complaints">Reports</a>
+        <Link to="/trust-center">Trust Center</Link>
+        <Link to="/verify">Verify Product</Link>
+        <Link to="/compare">Compare</Link>
+        <Link to="/complaints">Reports</Link>
       </nav>
       <small>© {new Date().getFullYear()} VeriChain. Cryptographic product provenance for modern commerce.</small>
     </footer>
   );
 }
+

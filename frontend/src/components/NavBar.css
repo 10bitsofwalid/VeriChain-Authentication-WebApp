@@ -162,3 +162,21 @@
     flex-wrap: wrap;
   }
 }
+
+/* Focus Visible */
+.navbar-brand:focus-visible,
+.navbar-menu:focus-visible,
+.navbar-links a:focus-visible {
+  outline: 2px solid var(--accent-cyan);
+  outline-offset: 2px;
+}
+
+/* Minimum touch target on mobile */
+@media (max-width: 1060px) {
+  .navbar-links a {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
