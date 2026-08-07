@@ -1,7 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Shield,
   Search,
   ArrowRight,
   CheckCircle,
@@ -9,6 +8,7 @@ import {
   Lock,
   Zap,
 } from 'lucide-react';
+import Logo from '../components/Logo';
 import './Landing.css';
 
 export default function Landing() {
@@ -19,10 +19,9 @@ export default function Landing() {
       {/* Nav */}
       <header className="landing-nav">
         <div className="landing-nav-inner">
-          <div className="landing-logo">
-            <Shield size={24} />
-            <span>VeriChain</span>
-          </div>
+          <Link to="/" style={{ textDecoration: 'none' }} aria-label="VeriChain Home">
+            <Logo size={32} showText={true} />
+          </Link>
           <div className="landing-nav-links">
             <Link to="/verify" className="btn btn-ghost">Verify a Product</Link>
             {user ? (
@@ -113,10 +112,7 @@ export default function Landing() {
       {/* Footer */}
       <footer className="landing-footer">
         <div className="landing-footer-inner">
-          <div className="footer-brand">
-            <Shield size={18} />
-            <span>VeriChain</span>
-          </div>
+          <Logo size={24} showText={true} />
           <p>&copy; {new Date().getFullYear()} VeriChain. All rights reserved.</p>
         </div>
       </footer>

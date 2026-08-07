@@ -23,6 +23,7 @@ import {
   Database,
   RefreshCw,
 } from 'lucide-react';
+import logoSvg from '../assets/logo.svg';
 import './VerifyItem.css';
 
 interface VerifyResult {
@@ -362,7 +363,7 @@ export default function VerifyItem() {
                       </div>
                       
                       <div className="certificate-header-brand">
-                        <Shield size={24} className="gold-icon" />
+                        <img src={logoSvg} alt="VeriChain Trust Network" width={24} height={24} style={{ borderRadius: '50%', objectFit: 'contain' }} />
                         <span>VERICHAIN TRUST NETWORK</span>
                       </div>
 

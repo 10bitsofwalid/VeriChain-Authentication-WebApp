@@ -1,6 +1,6 @@
 import { ArrowRight, CheckCircle2, PackageSearch, Search, ShieldCheck, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import heroImage from '../assets/hero.png';
+import logoSvg from '../assets/logo.svg';
 import ActionButton from './ui/ActionButton';
 
 export default function HeroBanner() {
@@ -47,7 +47,11 @@ export default function HeroBanner() {
       </div>
 
       <div className="marketplace-hero-visual" aria-hidden="true">
-        <img src={heroImage} alt="" />
+        <div className="hero-emblem-halo" />
+        <div className="hero-emblem-rings" />
+        <div className="hero-emblem-core">
+          <img src={logoSvg} alt="VeriChain Emblem" className="hero-svg-emblem" />
+        </div>
         <div className="hero-float-card hero-float-card-top">
           <CheckCircle2 size={18} />
           <span>Certificate matched</span>
@@ -60,3 +64,4 @@ export default function HeroBanner() {
     </section>
   );
 }
+

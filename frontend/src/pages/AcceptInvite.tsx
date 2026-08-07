@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Lock, Loader, CheckCircle } from 'lucide-react';
+import { Lock, Loader, CheckCircle } from 'lucide-react';
+import Logo from '../components/Logo';
 import './Auth.css';
 
 export default function AcceptInvite() {
@@ -27,33 +28,23 @@ export default function AcceptInvite() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setLocalError('');
-    clearError();
-
-    if (!token) {
-      setLocalError('No invitation token present.');
-      return;
-    }
-
     if (password.length < 6) {
-      setLocalError('Password must be at least 6 characters long.');
+      setLocalError('Password must be at least 6 characters');
       return;
     }
-
     if (password !== confirmPassword) {
-      setLocalError('Passwords do not match.');
+      setLocalError('Passwords do not match');
       return;
     }
 
+    setSubmitting(true);
+    setLocalError('');
     try {
-      setSubmitting(true);
       await acceptInvitation(token, password);
       setSuccess(true);
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 3000);
+      setTimeout(() => navigate('/dashboard'), 2000);
     } catch {
-      // Error handled by AuthContext
+      // error handled by context
     } finally {
       setSubmitting(false);
     }
@@ -64,10 +55,9 @@ export default function AcceptInvite() {
       <div className="auth-glow" />
       <div className="auth-card glass-card animate-fade-in-up" style={{ maxWidth: 440 }}>
         <div className="auth-header">
-          <div className="auth-logo">
-            <Shield size={28} />
-            <span className="text-gradient">VeriChain</span>
-          </div>
+          <Link to="/" className="auth-logo" aria-label="VeriChain Home">
+            <Logo size={42} showText={true} />
+          </Link>
           <h1>Activate Account</h1>
           <p>Complete your admin or moderator registration</p>
         </div>

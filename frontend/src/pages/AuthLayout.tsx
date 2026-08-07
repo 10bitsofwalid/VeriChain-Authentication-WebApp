@@ -1,5 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import Logo from '../components/Logo';
 import './Auth.css';
 
 interface AuthLayoutProps {
@@ -13,9 +14,8 @@ export const AuthLayout: React.FC<AuthLayoutProps> = ({ children, title, subtitl
     <div className="auth-glow" />
     <div className="auth-card glass-card animate-fade-in-up" style={{ maxWidth: 440 }}>
       <div className="auth-header">
-        <Link to="/" className="auth-logo">
-          {/* Replace with your logo component or SVG */}
-          <span className="text-gradient">VeriChain</span>
+        <Link to="/" className="auth-logo" aria-label="VeriChain Home">
+          <Logo size={42} showText={true} />
         </Link>
         {title && <h1>{title}</h1>}
         {subtitle && <p>{subtitle}</p>}

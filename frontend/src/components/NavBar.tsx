@@ -1,9 +1,10 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Menu, Search, ShieldCheck, X } from 'lucide-react';
+import { Menu, Search, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import CartIcon from './CartIcon';
 import ActionButton from './ui/ActionButton';
+import Logo from './Logo';
 import './NavBar.css';
 
 const links = [
@@ -31,9 +32,8 @@ const NavBar: React.FC = () => {
 
   return (
     <nav className="navbar">
-      <button className="navbar-brand" onClick={() => navigate('/')} type="button">
-        <span className="navbar-brand-mark"><ShieldCheck size={21} /></span>
-        <span>VeriChain</span>
+      <button className="navbar-brand" onClick={() => navigate('/')} type="button" aria-label="VeriChain Home">
+        <Logo size={36} showText={true} />
       </button>
 
       <button className="navbar-menu" onClick={() => setOpen(!open)} type="button" aria-label="Toggle navigation">

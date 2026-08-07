@@ -33,6 +33,7 @@ import {
 } from 'lucide-react';
 import type { User } from '../../context/AuthContext';
 import StatusChip from '../ui/StatusChip';
+import logoSvg from '../../assets/logo.svg';
 import './layout.css';
 
 interface SidebarProps {
@@ -78,8 +79,14 @@ export default function Sidebar({
         {/* Sidebar Header with Brand Logo & Toggle Button */}
         <div className="vc-sidebar-header">
           <button className="vc-brand" onClick={() => navigate('/dashboard')} type="button" title="VeriChain Cloud">
-            <span className="vc-brand-mark">
-              <ShieldCheck size={22} aria-hidden="true" />
+            <span className="vc-brand-mark" style={{ background: 'transparent', boxShadow: 'none', padding: 0 }}>
+              <img
+                src={logoSvg}
+                alt="VeriChain"
+                width={collapsed ? 36 : 42}
+                height={collapsed ? 36 : 42}
+                style={{ width: collapsed ? 36 : 42, height: collapsed ? 36 : 42, borderRadius: '50%', objectFit: 'contain' }}
+              />
             </span>
             {!collapsed && (
               <span className="vc-brand-text">

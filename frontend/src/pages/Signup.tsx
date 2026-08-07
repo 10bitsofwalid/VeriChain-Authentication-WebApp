@@ -2,8 +2,9 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Mail, Lock, User, Loader, MapPin, Award, Hash } from 'lucide-react';
+import { Mail, Lock, User, Loader, MapPin, Award, Hash } from 'lucide-react';
 import FileUpload from '../components/FileUpload';
+import Logo from '../components/Logo';
 import './Auth.css';
 
 export default function Signup() {
@@ -45,9 +46,8 @@ export default function Signup() {
       <div className="auth-glow" />
       <div className="auth-card glass-card animate-fade-in-up" style={{ maxWidth: 460 }}>
         <div className="auth-header">
-          <Link to="/" className="auth-logo">
-            <Shield size={28} />
-            <span className="text-gradient">VeriChain</span>
+          <Link to="/" className="auth-logo" aria-label="VeriChain Home">
+            <Logo size={42} showText={true} />
           </Link>
           <h1>Create Account</h1>
           <p>Join the authenticity network</p>

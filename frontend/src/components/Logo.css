@@ -1,0 +1,49 @@
+.verichain-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  text-decoration: none;
+  color: var(--text-primary);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  user-select: none;
+}
+
+.verichain-logo:hover {
+  opacity: 0.92;
+}
+
+.verichain-logo-img {
+  display: block;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 8px rgba(227, 100, 20, 0.25));
+  transition: transform var(--transition-normal);
+}
+
+.verichain-logo:hover .verichain-logo-img {
+  transform: rotate(6deg) scale(1.04);
+}
+
+.verichain-logo-text {
+  display: inline-flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.verichain-logo-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.verichain-logo-subtitle {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}

@@ -2,7 +2,8 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Mail, Lock, Loader } from 'lucide-react';
+import { Mail, Lock, Loader } from 'lucide-react';
+import Logo from '../components/Logo';
 import './Auth.css';
 
 export default function Login() {
@@ -19,7 +20,7 @@ export default function Login() {
       await login(email, password);
       navigate('/dashboard');
     } catch {
-      // error handled by context
+      // error is set in AuthContext
     } finally {
       setSubmitting(false);
     }
@@ -30,9 +31,8 @@ export default function Login() {
       <div className="auth-glow" />
       <div className="auth-card glass-card animate-fade-in-up">
         <div className="auth-header">
-          <Link to="/" className="auth-logo">
-            <Shield size={28} />
-            <span className="text-gradient">VeriChain</span>
+          <Link to="/" className="auth-logo" aria-label="VeriChain Home">
+            <Logo size={42} showText={true} />
           </Link>
           <h1>Welcome Back</h1>
           <p>Sign in to your account</p>
