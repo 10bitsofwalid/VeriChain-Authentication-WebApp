@@ -140,23 +140,23 @@ export default function Sidebar({
           ))}
         </nav>
 
-        {/* Platform Trust Meter Card */}
+        {/* Network & Ledger Status Card */}
         <div className="vc-sidebar-trust">
           {!collapsed ? (
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span>Platform Trust</span>
-                <span className="vc-trust-badge">Verified</span>
+                <span>Ledger Network</span>
+                <span className="vc-trust-badge">Active</span>
               </div>
-              <strong>98.7%</strong>
+              <strong style={{ fontSize: '0.85rem', color: 'var(--accent-cyan, #06b6d4)' }}>VRC-721 Consensus</strong>
               <div className="vc-trust-meter" aria-hidden="true">
-                <span style={{ width: '98.7%' }} />
+                <span style={{ width: '100%' }} />
               </div>
             </>
           ) : (
-            <div className="vc-trust-compact" title="Platform Trust: 98.7%">
+            <div className="vc-trust-compact" title="Ledger Network: Active">
               <ShieldCheck size={18} color="var(--accent-primary)" />
-              <small style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-primary)' }}>98%</small>
+              <small style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-primary)' }}>Live</small>
             </div>
           )}
         </div>

@@ -2,9 +2,8 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useShopping } from '../context/ShoppingContext';
-import { mockCartItems } from '../pages/buyer/mockData';
 import './CartModal.css';
-import { X, Trash2, ShoppingBag, ArrowRight, Plus } from 'lucide-react';
+import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
 import LazyImage from './LazyImage';
 
 interface CartModalProps {
@@ -74,22 +73,6 @@ export default function CartModal({ onClose }: CartModalProps) {
     dispatch({ type: 'UPDATE_QUANTITY', payload: { id, quantity: newQty } });
   };
 
-  const seedMockItems = () => {
-    dispatch({ type: 'CLEAR_CART' });
-    mockCartItems.forEach(item => {
-      dispatch({
-        type: 'ADD_TO_CART',
-        payload: {
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          imageUrl: item.image,
-          quantity: item.quantity,
-        },
-      });
-    });
-  };
-
   const modalContent = (
     <div className="cart-modal-overlay" onClick={onClose}>
       <div 
@@ -125,9 +108,6 @@ export default function CartModal({ onClose }: CartModalProps) {
                 <Link to="/dashboard/marketplace" onClick={onClose} className="bx-btn-primary" style={{ padding: '9px 18px', fontSize: '0.85rem' }}>
                   Browse Marketplace
                 </Link>
-                <button onClick={seedMockItems} className="bx-btn-ghost" style={{ padding: '9px 16px', fontSize: '0.82rem' }}>
-                  <Plus size={14} /> Add Demo Items
-                </button>
               </div>
             </div>
           ) : (

@@ -1,6 +1,6 @@
 import { NavLink } from 'react-router-dom';
 import { ShoppingCart, CreditCard, Package, Heart, User, History } from 'lucide-react';
-import { mockCartItems, mockOrders, mockWishlist } from './mockData';
+import { useShopping } from '../../context/ShoppingContext';
 import './BuyerExperience.css';
 
 interface BuyerNavProps {
@@ -8,14 +8,17 @@ interface BuyerNavProps {
   wishlistCount?: number;
 }
 
-export default function BuyerNav({ cartCount = mockCartItems.reduce((acc, item) => acc + item.quantity, 0), wishlistCount = mockWishlist.length }: BuyerNavProps) {
-  const activeOrdersCount = mockOrders.filter(o => ['processing', 'shipped'].includes(o.status)).length;
+export default function BuyerNav({ cartCount, wishlistCount }: BuyerNavProps) {
+  const { cart, wishlist } = useShopping();
+
+  const realCartCount = cartCount ?? cart.reduce((acc, item) => acc + (item.quantity ?? 1), 0);
+  const realWishlistCount = wishlistCount ?? wishlist.length;
 
   const navItems = [
-    { to: '/buyer/cart', label: 'Cart', icon: ShoppingCart, badge: cartCount > 0 ? cartCount : undefined },
+    { to: '/buyer/cart', label: 'Cart', icon: ShoppingCart, badge: realCartCount > 0 ? realCartCount : undefined },
     { to: '/buyer/checkout', label: 'Checkout', icon: CreditCard },
-    { to: '/buyer/orders', label: 'Orders', icon: Package, badge: activeOrdersCount > 0 ? activeOrdersCount : undefined },
-    { to: '/buyer/wishlist', label: 'Wishlist', icon: Heart, badge: wishlistCount > 0 ? wishlistCount : undefined },
+    { to: '/buyer/orders', label: 'Orders', icon: Package },
+    { to: '/buyer/wishlist', label: 'Wishlist', icon: Heart, badge: realWishlistCount > 0 ? realWishlistCount : undefined },
     { to: '/buyer/profile', label: 'Profile', icon: User },
     { to: '/buyer/purchase-history', label: 'Purchase History', icon: History },
   ];

@@ -21,14 +21,8 @@ interface ApiKeyRecord {
   lastUsed: string;
 }
 
-const INITIAL_API_KEYS: ApiKeyRecord[] = [
-  { id: 'key-1', name: 'Mobile Scanning App Gateway', prefix: 'vc_live_9a82...', scope: 'Verification API', created: '2026-01-15', lastUsed: 'Just now' },
-  { id: 'key-2', name: 'Factory ERP Sync Pipeline', prefix: 'vc_live_3f11...', scope: 'Full Administrative', created: '2026-03-02', lastUsed: '5 mins ago' },
-  { id: 'key-3', name: 'Auditor External Integration', prefix: 'vc_live_0012...', scope: 'Read-Only', created: '2026-05-10', lastUsed: 'Yesterday' },
-];
-
 export default function AdminSettingsView() {
-  const [keys, setKeys] = useState<ApiKeyRecord[]>(INITIAL_API_KEYS);
+  const [keys, setKeys] = useState<ApiKeyRecord[]>([]);
   const [aiSensitivity, setAiSensitivity] = useState<'low' | 'medium' | 'strict'>('medium');
   const [autoFlagSeller, setAutoFlagSeller] = useState(true);
   const [require2FA, setRequire2FA] = useState(true);
@@ -198,30 +192,38 @@ export default function AdminSettingsView() {
               </tr>
             </thead>
             <tbody>
-              {keys.map(k => (
-                <tr key={k.id}>
-                  <td style={{ fontWeight: 600, color: '#f8fafc' }}>{k.name}</td>
-                  <td style={{ fontFamily: 'monospace', color: '#06b6d4', fontSize: '0.85rem' }}>{k.prefix}</td>
-                  <td>
-                    <StatusChip tone={k.scope === 'Full Administrative' ? 'danger' : 'info'}>
-                      {k.scope}
-                    </StatusChip>
-                  </td>
-                  <td style={{ color: '#94a3b8', fontSize: '0.825rem' }}>{k.created}</td>
-                  <td style={{ color: '#cbd5e1', fontSize: '0.825rem' }}>{k.lastUsed}</td>
-                  <td>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                      <button
-                        type="button"
-                        onClick={() => handleRevokeKey(k.id)}
-                        style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem' }}
-                      >
-                        <Trash2 size={15} /> Revoke
-                      </button>
-                    </div>
+              {keys.length === 0 ? (
+                <tr>
+                  <td colSpan={6} style={{ textAlign: 'center', padding: '28px', color: '#94a3b8' }}>
+                    No active API keys generated. Click "Generate New Key" above to provision a token.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                keys.map(k => (
+                  <tr key={k.id}>
+                    <td style={{ fontWeight: 600, color: '#f8fafc' }}>{k.name}</td>
+                    <td style={{ fontFamily: 'monospace', color: '#06b6d4', fontSize: '0.85rem' }}>{k.prefix}</td>
+                    <td>
+                      <StatusChip tone={k.scope === 'Full Administrative' ? 'danger' : 'info'}>
+                        {k.scope}
+                      </StatusChip>
+                    </td>
+                    <td style={{ color: '#94a3b8', fontSize: '0.825rem' }}>{k.created}</td>
+                    <td style={{ color: '#cbd5e1', fontSize: '0.825rem' }}>{k.lastUsed}</td>
+                    <td>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                        <button
+                          type="button"
+                          onClick={() => handleRevokeKey(k.id)}
+                          style={{ background: 'transparent', border: 'none', color: '#f87171', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 4, fontSize: '0.8rem' }}
+                        >
+                          <Trash2 size={15} /> Revoke
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

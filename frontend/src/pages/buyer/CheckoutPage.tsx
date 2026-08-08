@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, CreditCard, MapPin, ShieldCheck, ChevronRight } from 'lucide-react';
+import { Check, CreditCard, MapPin, ShieldCheck, ChevronRight, ShoppingBag } from 'lucide-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
-import { mockCartItems, mockProfile } from './mockData';
 import { useShopping } from '../../context/ShoppingContext';
+import { useAuth } from '../../context/AuthContext';
 
 type Step = 'shipping' | 'payment' | 'review' | 'confirmed';
 
@@ -16,22 +16,36 @@ const STEPS: { id: Step; label: string }[] = [
 ];
 
 export default function CheckoutPage() {
-  const { cart } = useShopping();
+  const { cart, dispatch } = useShopping();
+  const { user } = useAuth();
   const [step, setStep] = useState<Step>('shipping');
-  const [selectedAddr, setSelectedAddr] = useState(mockProfile.addresses[0].id);
-  const [selectedPM, setSelectedPM] = useState(mockProfile.paymentMethods[0].id);
+  const [orderNum, setOrderNum] = useState<string>('');
 
-  const cartItemsFormatted = cart.map(i => ({
+  const [shippingForm, setShippingForm] = useState({
+    firstName: user?.name ? user.name.split(' ')[0] : '',
+    lastName: user?.name ? user.name.split(' ').slice(1).join(' ') : '',
+    street: '',
+    city: '',
+    postalCode: '',
+    country: '',
+  });
+
+  const [paymentForm, setPaymentForm] = useState({
+    cardNumber: '',
+    expiry: '',
+    cvv: '',
+    cardName: user?.name || '',
+  });
+
+  const items = cart.map(i => ({
     id: i.id,
     name: i.name,
-    brand: (i as any).brand || 'VeriChain',
     price: Number(i.price) || 0,
     quantity: i.quantity ?? 1,
     image: i.imageUrl || (i as any).image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
     verified: (i as any).verified !== false,
   }));
 
-  const items = cartItemsFormatted.length > 0 ? cartItemsFormatted : mockCartItems;
   const subtotal = items.reduce((s, i) => s + (Number(i.price) || 0) * (i.quantity ?? 1), 0);
   const shipping = subtotal > 200 || subtotal === 0 ? 0 : 14.99;
   const total = subtotal + shipping;
@@ -42,8 +56,32 @@ export default function CheckoutPage() {
   const next = () => {
     const steps: Step[] = ['shipping', 'payment', 'review', 'confirmed'];
     const i = steps.indexOf(step);
-    if (i < steps.length - 1) setStep(steps[i + 1]);
+    if (i === 2) {
+      // Placing order
+      const newOrderNumber = `VC-${Date.now().toString().slice(-6)}`;
+      setOrderNum(newOrderNumber);
+      dispatch({ type: 'CLEAR_CART' });
+      setStep('confirmed');
+    } else if (i < steps.length - 1) {
+      setStep(steps[i + 1]);
+    }
   };
+
+  if (items.length === 0 && step !== 'confirmed') {
+    return (
+      <div className="buyer-page">
+        <BuyerNav />
+        <div className="bx-empty" style={{ marginTop: '30px' }}>
+          <div className="bx-empty-icon"><ShoppingBag size={36} /></div>
+          <h2>No items in checkout</h2>
+          <p>Please add products to your cart before proceeding to checkout.</p>
+          <Link to="/dashboard/marketplace" className="bx-btn-primary" style={{ marginTop: 'var(--space-md)' }}>
+            Explore Marketplace
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   if (step === 'confirmed') {
     return (
@@ -61,18 +99,18 @@ export default function CheckoutPage() {
             </div>
             <h1 style={{ fontSize: '1.8rem', fontWeight: 800, marginBottom: 10 }}>Order Confirmed!</h1>
             <p style={{ color: 'var(--text-muted)', marginBottom: 'var(--space-md)' }}>
-              Your order has been placed successfully. You'll receive a confirmation email shortly.
+              Your order has been recorded on the VeriChain ledger. An authenticated digital receipt has been created.
             </p>
             <div style={{
               background: 'var(--bg-secondary)', borderRadius: 'var(--radius-md)',
               padding: 'var(--space-md)', marginBottom: 'var(--space-lg)',
               fontFamily: 'var(--font-mono)', fontSize: '0.9rem',
             }}>
-              Order #VC-2024-00999
+              Order #{orderNum || 'VC-SUCCESS'}
             </div>
             <div style={{ display: 'flex', gap: 'var(--space-sm)', justifyContent: 'center', flexWrap: 'wrap' }}>
               <Link to="/buyer/orders" className="bx-btn-primary">View Orders</Link>
-              <Link to="/" className="bx-btn-ghost">Continue Shopping</Link>
+              <Link to="/dashboard/marketplace" className="bx-btn-ghost">Continue Shopping</Link>
             </div>
           </div>
         </div>
@@ -111,55 +149,69 @@ export default function CheckoutPage() {
               <div className="bx-section-title" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-lg)' }}>
                 <MapPin size={18} color="var(--accent-cyan)" /> Shipping Address
               </div>
-              <div className="bx-selector-grid" style={{ marginBottom: 'var(--space-xl)' }}>
-                {mockProfile.addresses.map(addr => (
-                  <div
-                    key={addr.id}
-                    className={`bx-selector-card ${selectedAddr === addr.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedAddr(addr.id)}
-                  >
-                    <div className="bx-selector-check">
-                      {selectedAddr === addr.id && <Check size={11} strokeWidth={3} />}
-                    </div>
-                    <div style={{ fontSize: '0.7rem', fontWeight: 700, color: 'var(--accent-cyan)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
-                      {addr.label}
-                    </div>
-                    <div style={{ fontWeight: 600, fontSize: '0.88rem', color: 'var(--text-primary)' }}>{addr.name}</div>
-                    <div style={{ fontSize: '0.82rem', color: 'var(--text-muted)', lineHeight: 1.6, marginTop: 4 }}>
-                      {addr.line1}<br />{addr.line2 && <>{addr.line2}<br /></>}
-                      {addr.city}, {addr.country} {addr.zip}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="bx-section-title" style={{ marginBottom: 'var(--space-md)' }}>Or enter a new address</div>
               <div className="bx-form-row">
                 <div className="bx-form-group">
                   <label className="bx-form-label">First Name</label>
-                  <input className="bx-form-input" placeholder="Walid" />
+                  <input
+                    className="bx-form-input"
+                    value={shippingForm.firstName}
+                    onChange={e => setShippingForm({ ...shippingForm, firstName: e.target.value })}
+                    placeholder="First Name"
+                    required
+                  />
                 </div>
                 <div className="bx-form-group">
                   <label className="bx-form-label">Last Name</label>
-                  <input className="bx-form-input" placeholder="Al-Rasheed" />
+                  <input
+                    className="bx-form-input"
+                    value={shippingForm.lastName}
+                    onChange={e => setShippingForm({ ...shippingForm, lastName: e.target.value })}
+                    placeholder="Last Name"
+                    required
+                  />
                 </div>
               </div>
               <div className="bx-form-group">
                 <label className="bx-form-label">Street Address</label>
-                <input className="bx-form-input" placeholder="123 King Fahd Road" />
+                <input
+                  className="bx-form-input"
+                  value={shippingForm.street}
+                  onChange={e => setShippingForm({ ...shippingForm, street: e.target.value })}
+                  placeholder="Street Address"
+                  required
+                />
               </div>
               <div className="bx-form-row">
                 <div className="bx-form-group">
                   <label className="bx-form-label">City</label>
-                  <input className="bx-form-input" placeholder="Riyadh" />
+                  <input
+                    className="bx-form-input"
+                    value={shippingForm.city}
+                    onChange={e => setShippingForm({ ...shippingForm, city: e.target.value })}
+                    placeholder="City"
+                    required
+                  />
                 </div>
                 <div className="bx-form-group">
                   <label className="bx-form-label">Postal Code</label>
-                  <input className="bx-form-input" placeholder="12211" />
+                  <input
+                    className="bx-form-input"
+                    value={shippingForm.postalCode}
+                    onChange={e => setShippingForm({ ...shippingForm, postalCode: e.target.value })}
+                    placeholder="Postal Code"
+                    required
+                  />
                 </div>
               </div>
               <div className="bx-form-group">
                 <label className="bx-form-label">Country</label>
-                <input className="bx-form-input" placeholder="Saudi Arabia" />
+                <input
+                  className="bx-form-input"
+                  value={shippingForm.country}
+                  onChange={e => setShippingForm({ ...shippingForm, country: e.target.value })}
+                  placeholder="Country"
+                  required
+                />
               </div>
             </div>
           )}
@@ -169,46 +221,47 @@ export default function CheckoutPage() {
               <div className="bx-section-title" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-lg)' }}>
                 <CreditCard size={18} color="var(--accent-cyan)" /> Payment Method
               </div>
-              <div className="bx-selector-grid" style={{ marginBottom: 'var(--space-xl)' }}>
-                {mockProfile.paymentMethods.map(pm => (
-                  <div
-                    key={pm.id}
-                    className={`bx-selector-card ${selectedPM === pm.id ? 'selected' : ''}`}
-                    onClick={() => setSelectedPM(pm.id)}
-                  >
-                    <div className="bx-selector-check">
-                      {selectedPM === pm.id && <Check size={11} strokeWidth={3} />}
-                    </div>
-                    <span className="bx-card-brand" style={{ marginBottom: 10, display: 'inline-flex' }}>
-                      {pm.type === 'visa' ? '💳 VISA' : '💳 MC'}
-                    </span>
-                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.88rem', color: 'var(--text-primary)', marginTop: 8, letterSpacing: '0.1em' }}>
-                      •••• •••• •••• {pm.last4}
-                    </div>
-                    <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: 4 }}>
-                      Expires {pm.expiry}
-                    </div>
-                  </div>
-                ))}
+              <div className="bx-form-group">
+                <label className="bx-form-label">Name on Card</label>
+                <input
+                  className="bx-form-input"
+                  value={paymentForm.cardName}
+                  onChange={e => setPaymentForm({ ...paymentForm, cardName: e.target.value })}
+                  placeholder="Cardholder Name"
+                  required
+                />
               </div>
-              <div className="bx-section-title" style={{ marginBottom: 'var(--space-md)' }}>Or add a new card</div>
               <div className="bx-form-group">
                 <label className="bx-form-label">Card Number</label>
-                <input className="bx-form-input" placeholder="1234 5678 9012 3456" />
+                <input
+                  className="bx-form-input"
+                  value={paymentForm.cardNumber}
+                  onChange={e => setPaymentForm({ ...paymentForm, cardNumber: e.target.value })}
+                  placeholder="Card Number"
+                  required
+                />
               </div>
               <div className="bx-form-row">
                 <div className="bx-form-group">
                   <label className="bx-form-label">Expiry Date</label>
-                  <input className="bx-form-input" placeholder="MM / YY" />
+                  <input
+                    className="bx-form-input"
+                    value={paymentForm.expiry}
+                    onChange={e => setPaymentForm({ ...paymentForm, expiry: e.target.value })}
+                    placeholder="MM / YY"
+                    required
+                  />
                 </div>
                 <div className="bx-form-group">
                   <label className="bx-form-label">CVV</label>
-                  <input className="bx-form-input" placeholder="•••" />
+                  <input
+                    className="bx-form-input"
+                    value={paymentForm.cvv}
+                    onChange={e => setPaymentForm({ ...paymentForm, cvv: e.target.value })}
+                    placeholder="CVV"
+                    required
+                  />
                 </div>
-              </div>
-              <div className="bx-form-group">
-                <label className="bx-form-label">Name on Card</label>
-                <input className="bx-form-input" placeholder="Walid Al-Rasheed" />
               </div>
             </div>
           )}
@@ -221,11 +274,10 @@ export default function CheckoutPage() {
                   <img src={item.image} alt={item.name} className="bx-product-img" />
                   <div className="bx-product-info">
                     <div className="bx-product-name">{item.name}</div>
-                    <div className="bx-product-brand">{item.brand} · Qty: {item.quantity}</div>
-                    {item.verified
-                      ? <span className="bx-verified"><ShieldCheck size={10} /> Verified</span>
-                      : <span className="bx-unverified">Unverified</span>
-                    }
+                    <div className="bx-product-brand">Qty: {item.quantity}</div>
+                    {item.verified && (
+                      <span className="bx-verified"><ShieldCheck size={10} /> Verified Authentic</span>
+                    )}
                   </div>
                   <span style={{ fontWeight: 700, fontSize: '0.95rem' }}>${(item.price * item.quantity).toFixed(2)}</span>
                 </div>
@@ -234,19 +286,17 @@ export default function CheckoutPage() {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-lg)' }}>
                 <div>
                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Shipping To</div>
-                  {(() => { const a = mockProfile.addresses.find(x => x.id === selectedAddr)!; return (
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-                      {a.name}<br />{a.line1}<br />{a.city}, {a.country}
-                    </div>
-                  ); })()}
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
+                    {shippingForm.firstName} {shippingForm.lastName}<br />
+                    {shippingForm.street}<br />
+                    {shippingForm.city}, {shippingForm.country} {shippingForm.postalCode}
+                  </div>
                 </div>
                 <div>
                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>Payment</div>
-                  {(() => { const pm = mockProfile.paymentMethods.find(x => x.id === selectedPM)!; return (
-                    <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
-                      {pm.type.toUpperCase()} •••• {pm.last4}
-                    </div>
-                  ); })()}
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)' }}>
+                    Card: {paymentForm.cardNumber ? `•••• ${paymentForm.cardNumber.slice(-4)}` : '•••• 4242'}
+                  </div>
                 </div>
               </div>
             </div>

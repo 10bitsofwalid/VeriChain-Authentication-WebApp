@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ActionButton from '../../../components/ui/ActionButton';
 import StatusChip from '../../../components/ui/StatusChip';
+import client from '../../../api/client';
 import {
   FileText,
   Download,
@@ -14,25 +15,50 @@ interface ReportTemplate {
   category: 'Audit' | 'Compliance' | 'Analytics' | 'Security';
   frequency: 'Realtime' | 'Daily' | 'Weekly' | 'Monthly';
   lastGenerated: string;
-  fileSize: string;
   recordsCount: number;
 }
 
-const REPORT_TEMPLATES: ReportTemplate[] = [
-  { id: 'rep-01', name: 'Master System Audit Log Export', category: 'Audit', frequency: 'Daily', lastGenerated: '2026-07-23 06:00', fileSize: '4.2 MB', recordsCount: 12450 },
-  { id: 'rep-02', name: 'Authenticity Verification & Scan Heatmap', category: 'Analytics', frequency: 'Weekly', lastGenerated: '2026-07-21 00:00', fileSize: '1.8 MB', recordsCount: 5320 },
-  { id: 'rep-03', name: 'Factory Production & NFC Tag Compliance', category: 'Compliance', frequency: 'Monthly', lastGenerated: '2026-07-01 00:00', fileSize: '8.9 MB', recordsCount: 42100 },
-  { id: 'rep-04', name: 'Anti-Counterfeit Threat & Incident Report', category: 'Security', frequency: 'Realtime', lastGenerated: '2026-07-23 14:00', fileSize: '980 KB', recordsCount: 89 },
-  { id: 'rep-05', name: 'Seller Dispute & Complaint Resolution Summary', category: 'Audit', frequency: 'Weekly', lastGenerated: '2026-07-20 00:00', fileSize: '1.2 MB', recordsCount: 430 },
-];
-
 export default function AdminReportsView() {
-  const reports = REPORT_TEMPLATES;
+  const [reports, setReports] = useState<ReportTemplate[]>([
+    { id: 'rep-01', name: 'Master System Audit Log Export', category: 'Audit', frequency: 'Daily', lastGenerated: 'Today', recordsCount: 0 },
+    { id: 'rep-02', name: 'Authenticity Verification & Scan Heatmap', category: 'Analytics', frequency: 'Weekly', lastGenerated: 'Today', recordsCount: 0 },
+    { id: 'rep-03', name: 'Factory Production & NFC Tag Compliance', category: 'Compliance', frequency: 'Monthly', lastGenerated: 'Today', recordsCount: 0 },
+    { id: 'rep-04', name: 'Anti-Counterfeit Threat & Incident Report', category: 'Security', frequency: 'Realtime', lastGenerated: 'Today', recordsCount: 0 },
+    { id: 'rep-05', name: 'Seller Dispute & Complaint Resolution Summary', category: 'Audit', frequency: 'Weekly', lastGenerated: 'Today', recordsCount: 0 },
+  ]);
+
   const [selectedFormat, setSelectedFormat] = useState<'csv' | 'json' | 'pdf'>('csv');
   const [dateRange, setDateRange] = useState('30d');
   const [autoEmailEnabled, setAutoEmailEnabled] = useState(true);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadReportMetrics() {
+      try {
+        const [auditRes, prodRes, compRes] = await Promise.allSettled([
+          client.get('/admin/audit-logs'),
+          client.get('/products'),
+          client.get('/complaints'),
+        ]);
+
+        const auditCount = auditRes.status === 'fulfilled' && auditRes.value.data?.logs ? auditRes.value.data.logs.length : 0;
+        const prodCount = prodRes.status === 'fulfilled' && Array.isArray(prodRes.value.data) ? prodRes.value.data.length : 0;
+        const compCount = compRes.status === 'fulfilled' && compRes.value.data?.complaints ? compRes.value.data.complaints.length : 0;
+
+        setReports([
+          { id: 'rep-01', name: 'Master System Audit Log Export', category: 'Audit', frequency: 'Daily', lastGenerated: 'Today', recordsCount: auditCount },
+          { id: 'rep-02', name: 'Authenticity Verification & Scan Heatmap', category: 'Analytics', frequency: 'Weekly', lastGenerated: 'Today', recordsCount: prodCount },
+          { id: 'rep-03', name: 'Factory Production & NFC Tag Compliance', category: 'Compliance', frequency: 'Monthly', lastGenerated: 'Today', recordsCount: prodCount },
+          { id: 'rep-04', name: 'Anti-Counterfeit Threat & Incident Report', category: 'Security', frequency: 'Realtime', lastGenerated: 'Today', recordsCount: compCount },
+          { id: 'rep-05', name: 'Seller Dispute & Complaint Resolution Summary', category: 'Audit', frequency: 'Weekly', lastGenerated: 'Today', recordsCount: compCount },
+        ]);
+      } catch (err) {
+        console.error('Failed to load report metrics', err);
+      }
+    }
+    loadReportMetrics();
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -42,9 +68,17 @@ export default function AdminReportsView() {
   const handleDownload = (report: ReportTemplate) => {
     setDownloadingId(report.id);
     setTimeout(() => {
+      // Create and trigger export download
+      const content = `Report: ${report.name}\nGenerated: ${new Date().toISOString()}\nTotal Records: ${report.recordsCount}\nFormat: ${selectedFormat.toUpperCase()}`;
+      const blob = new Blob([content], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${report.id}_report_${Date.now()}.${selectedFormat === 'json' ? 'json' : 'csv'}`;
+      a.click();
       setDownloadingId(null);
-      showToast(`Exported "${report.name}" in ${selectedFormat.toUpperCase()} format successfully!`);
-    }, 1000);
+      showToast(`Exported "${report.name}" successfully!`);
+    }, 600);
   };
 
   const handleGenerateNew = () => {
@@ -89,7 +123,7 @@ export default function AdminReportsView() {
               <option value="7d">Last 7 Days</option>
               <option value="30d">Last 30 Days</option>
               <option value="90d">Last 90 Days</option>
-              <option value="ytd">Year to Date (2026)</option>
+              <option value="ytd">Year to Date</option>
             </select>
 
             <select
@@ -99,7 +133,6 @@ export default function AdminReportsView() {
             >
               <option value="csv">CSV Spreadsheet</option>
               <option value="json">JSON Ledger Data</option>
-              <option value="pdf">PDF Official Report</option>
             </select>
 
             <ActionButton variant="primary" size="sm" onClick={handleGenerateNew}>
@@ -122,7 +155,7 @@ export default function AdminReportsView() {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Calendar size={18} color="#94a3b8" />
             <span style={{ color: '#cbd5e1', fontSize: '0.875rem' }}>
-              Automated Scheduled Digest: <strong>Weekly Executive PDF to Admins</strong>
+              Automated Scheduled Digest: <strong>Weekly Executive Summary to Admins</strong>
             </span>
           </div>
           <button
@@ -159,7 +192,6 @@ export default function AdminReportsView() {
                 <th>Category</th>
                 <th>Frequency</th>
                 <th>Last Generated</th>
-                <th>Dataset Size</th>
                 <th>Records</th>
                 <th style={{ textAlign: 'right' }}>Download Action</th>
               </tr>
@@ -177,7 +209,6 @@ export default function AdminReportsView() {
                   </td>
                   <td style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{rep.frequency}</td>
                   <td style={{ color: '#94a3b8', fontSize: '0.85rem' }}>{rep.lastGenerated}</td>
-                  <td style={{ fontFamily: 'monospace', fontSize: '0.85rem', color: '#cbd5e1' }}>{rep.fileSize}</td>
                   <td style={{ color: '#cbd5e1', fontWeight: 500 }}>{rep.recordsCount.toLocaleString()}</td>
                   <td>
                     <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

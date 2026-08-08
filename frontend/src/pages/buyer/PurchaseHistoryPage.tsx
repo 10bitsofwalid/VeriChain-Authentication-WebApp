@@ -1,26 +1,60 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { History, Search, ShieldCheck, Download, ExternalLink, RefreshCw, AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
+import { History, Search, ShieldCheck, Download, ExternalLink, AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
+import client from '../../api/client';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
-import { mockPurchaseHistory } from './mockData';
+import type { PurchaseRecord } from '../../types/buyer';
 
 export default function PurchaseHistoryPage() {
+  const [purchases, setPurchases] = useState<PurchaseRecord[]>([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'refunded' | 'disputed'>('all');
 
-  const filtered = mockPurchaseHistory.filter(item => {
+  useEffect(() => {
+    async function fetchPurchases() {
+      try {
+        const res = await client.get('/items/my');
+        if (res.data?.items && Array.isArray(res.data.items) && res.data.items.length > 0) {
+          const records: PurchaseRecord[] = res.data.items.map((item: any) => ({
+            id: item._id,
+            orderNumber: `ORD-${item.serialNumber || item._id.slice(-6).toUpperCase()}`,
+            date: item.createdAt || new Date().toISOString(),
+            product: item.product?.name || 'Verified Item',
+            brand: item.product?.sku || 'VeriChain',
+            category: item.product?.category || 'General',
+            price: Number(item.product?.price) || 0,
+            status: item.status === 'recalled' ? 'disputed' : 'completed',
+            verified: item.product?.verifiedStatus === 'verified',
+            serialNumber: item.serialNumber,
+            image: item.product?.imageUrl || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
+          }));
+          setPurchases(records);
+        } else {
+          setPurchases([]);
+        }
+      } catch {
+        setPurchases([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchPurchases();
+  }, []);
+
+  const filtered = purchases.filter(item => {
     const matchesSearch =
       item.product.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (item.brand && item.brand.toLowerCase().includes(searchTerm.toLowerCase())) ||
       item.orderNumber.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase());
+      (item.serialNumber && item.serialNumber.toLowerCase().includes(searchTerm.toLowerCase()));
 
     const matchesStatus = statusFilter === 'all' || item.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
-  const totalSpent = mockPurchaseHistory
+  const totalSpent = purchases
     .filter(i => i.status === 'completed')
     .reduce((acc, i) => acc + i.price, 0);
 
@@ -32,25 +66,27 @@ export default function PurchaseHistoryPage() {
         <div className="bx-header-left">
           <h1>
             Purchase History
-            <span className="bx-count-badge">{mockPurchaseHistory.length}</span>
+            <span className="bx-count-badge">{purchases.length}</span>
           </h1>
           <p>Complete ledger of all your authentic product purchases, certificates, and receipts</p>
         </div>
-        <button
-          className="bx-btn-ghost"
-          onClick={() => {
-            const csv = 'Order,Date,Product,Brand,Price,Status,Serial Number\n' +
-              mockPurchaseHistory.map(h => `"${h.orderNumber}","${h.date}","${h.product}","${h.brand}",${h.price},"${h.status}","${h.serialNumber}"`).join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `purchase_history_${Date.now()}.csv`;
-            a.click();
-          }}
-        >
-          <Download size={15} /> Export History (CSV)
-        </button>
+        {purchases.length > 0 && (
+          <button
+            className="bx-btn-ghost"
+            onClick={() => {
+              const csv = 'Order,Date,Product,Brand,Price,Status,Serial Number\n' +
+                purchases.map(h => `"${h.orderNumber}","${h.date}","${h.product}","${h.brand || ''}",${h.price},"${h.status}","${h.serialNumber || ''}"`).join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = `purchase_history_${Date.now()}.csv`;
+              a.click();
+            }}
+          >
+            <Download size={15} /> Export History (CSV)
+          </button>
+        )}
       </div>
 
       {/* Stats row */}
@@ -59,7 +95,7 @@ export default function PurchaseHistoryPage() {
           <div className="bx-stat-icon" style={{ background: 'rgba(0, 88, 188, 0.1)', color: 'var(--accent-cyan)' }}>
             <History size={20} />
           </div>
-          <div className="bx-stat-value">{mockPurchaseHistory.length}</div>
+          <div className="bx-stat-value">{purchases.length}</div>
           <div className="bx-stat-label">Total Transactions</div>
         </div>
 
@@ -76,7 +112,7 @@ export default function PurchaseHistoryPage() {
             <CheckCircle size={20} />
           </div>
           <div className="bx-stat-value">
-            {mockPurchaseHistory.filter(i => i.verified).length} / {mockPurchaseHistory.length}
+            {purchases.filter(i => i.verified).length} / {purchases.length || 0}
           </div>
           <div className="bx-stat-label">Verified Items</div>
         </div>
@@ -110,11 +146,18 @@ export default function PurchaseHistoryPage() {
 
       {/* Purchase table */}
       <div className="bx-card" style={{ padding: 0 }}>
-        {filtered.length === 0 ? (
+        {loading ? (
+          <div className="bx-empty">
+            <p>Loading purchase ledger...</p>
+          </div>
+        ) : filtered.length === 0 ? (
           <div className="bx-empty">
             <History size={32} />
-            <h2>No matching purchases found</h2>
-            <p>Try adjusting your search query or filter settings.</p>
+            <h2>No purchases recorded yet</h2>
+            <p>Your verified product acquisitions and transfer records will appear here.</p>
+            <Link to="/dashboard/marketplace" className="bx-btn-primary" style={{ marginTop: 'var(--space-md)' }}>
+              Explore Marketplace
+            </Link>
           </div>
         ) : (
           <div style={{ overflowX: 'auto' }}>
@@ -150,7 +193,7 @@ export default function PurchaseHistoryPage() {
                       {new Date(item.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}
                     </td>
                     <td style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                      {item.serialNumber}
+                      {item.serialNumber || '—'}
                     </td>
                     <td style={{ fontWeight: 700, color: 'var(--text-primary)' }}>
                       ${item.price.toFixed(2)}
@@ -176,22 +219,16 @@ export default function PurchaseHistoryPage() {
                     </td>
                     <td style={{ textAlign: 'right' }}>
                       <div style={{ display: 'flex', gap: 6, justifyContent: 'flex-end' }}>
-                        <Link
-                          to={`/verify?serial=${item.serialNumber}`}
-                          className="bx-btn-ghost"
-                          style={{ padding: '4px 8px', fontSize: '0.75rem' }}
-                          title="Verify Serial"
-                        >
-                          <ExternalLink size={13} /> Certificate
-                        </Link>
-                        <Link
-                          to="/buyer/checkout"
-                          className="bx-btn-ghost"
-                          style={{ padding: '4px 8px', fontSize: '0.75rem' }}
-                          title="Reorder Item"
-                        >
-                          <RefreshCw size={13} />
-                        </Link>
+                        {item.serialNumber && (
+                          <Link
+                            to={`/verify?serial=${item.serialNumber}`}
+                            className="bx-btn-ghost"
+                            style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                            title="Verify Serial"
+                          >
+                            <ExternalLink size={13} /> Certificate
+                          </Link>
+                        )}
                       </div>
                     </td>
                   </tr>

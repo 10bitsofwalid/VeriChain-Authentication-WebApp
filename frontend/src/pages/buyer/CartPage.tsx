@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, ShieldCheck, AlertTriangle, ArrowRight, ShoppingBag, Plus, RefreshCw, Lock, RotateCcw } from 'lucide-react';
+import { ShoppingCart, Trash2, ShieldCheck, AlertTriangle, ArrowRight, ShoppingBag, Lock, RotateCcw } from 'lucide-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { useShopping } from '../../context/ShoppingContext';
-import { mockCartItems } from './mockData';
 
 export default function CartPage() {
   const { cart, dispatch } = useShopping();
@@ -12,10 +11,8 @@ export default function CartPage() {
   const [promoApplied, setPromoApplied] = useState(false);
   const [promoError, setPromoError] = useState('');
 
-  // Fallback helper to format numbers safely
   const formatPrice = (val: any) => (Number(val) || 0).toFixed(2);
 
-  // Use items from ShoppingContext, or if user wants to seed mock items
   const items = cart;
 
   const updateQty = (id: string, newQty: number) => {
@@ -29,22 +26,6 @@ export default function CartPage() {
     dispatch({
       type: 'REMOVE_FROM_CART',
       payload: id,
-    });
-  };
-
-  const seedMockItems = () => {
-    dispatch({ type: 'CLEAR_CART' });
-    mockCartItems.forEach(item => {
-      dispatch({
-        type: 'ADD_TO_CART',
-        payload: {
-          id: item.id,
-          name: item.name,
-          price: item.price,
-          imageUrl: item.image,
-          quantity: item.quantity,
-        },
-      });
     });
   };
 
@@ -80,9 +61,6 @@ export default function CartPage() {
             <Link to="/dashboard/marketplace" className="bx-btn-primary">
               <ShoppingBag size={16} /> Browse Marketplace
             </Link>
-            <button className="bx-btn-ghost" onClick={seedMockItems}>
-              <Plus size={16} /> Load Demo Verified Items
-            </button>
           </div>
         </div>
       </div>
@@ -116,11 +94,8 @@ export default function CartPage() {
         <div className="bx-card">
           <div style={{ padding: 'var(--space-md) var(--space-lg)', borderBottom: '1px solid var(--border-subtle)', background: 'var(--bg-secondary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <span style={{ fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-secondary)' }}>
-              Cart Items ({items.length} unique products)
+              Cart Items ({items.length} unique {items.length === 1 ? 'product' : 'products'})
             </span>
-            <button className="bx-btn-ghost" style={{ padding: '4px 10px', fontSize: '0.75rem' }} onClick={seedMockItems}>
-              <RefreshCw size={12} /> Reset Demo Data
-            </button>
           </div>
 
           {items.map((item, idx) => {

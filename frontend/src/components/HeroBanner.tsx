@@ -38,11 +38,11 @@ export default function HeroBanner() {
           </ActionButton>
         </div>
 
-        <div className="marketplace-hero-metrics" aria-label="Platform metrics">
-          <span><strong>98.7%</strong> Trust score</span>
-          <span><strong>2.4k</strong> Verified today</span>
-          <span><strong>42k</strong> Products verified</span>
-          <span><strong>860</strong> Manufacturers</span>
+        <div className="marketplace-hero-metrics" aria-label="Platform assurances">
+          <span><strong>Ledger Backed</strong> Cryptographic Proof</span>
+          <span><strong>Instant</strong> Serial Verification</span>
+          <span><strong>Authentic</strong> Direct Sourcing</span>
+          <span><strong>Protected</strong> Buyer Escrow</span>
         </div>
       </div>
 

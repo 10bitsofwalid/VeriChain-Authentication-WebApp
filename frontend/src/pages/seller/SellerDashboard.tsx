@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import client from '../../api/client';
 import PageLoader from '../../components/ui/PageLoader';
 import AlertBanner from '../../components/ui/AlertBanner';
 import Modal from '../../components/ui/Modal';
@@ -94,252 +95,6 @@ interface Customer {
   verificationChecks: number;
 }
 
-// ============================================================
-// Mock Data definitions
-// ============================================================
-const INITIAL_PRODUCTS: Product[] = [
-  {
-    _id: 'prod-1',
-    name: 'Aether Luxe Handbag',
-    sku: 'AE-HB-0921',
-    category: 'Luxury Goods',
-    price: 1850,
-    stock: 14,
-    status: 'listed',
-    imageUrl: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=300',
-    authenticityRating: 99.8,
-    verifiedCount: 42,
-    description: 'Italian leather luxury handbag featuring smart tag verification and unique blockchain certificate.',
-  },
-  {
-    _id: 'prod-2',
-    name: 'Chronos Diver Watch X1',
-    sku: 'CH-WD-7741',
-    category: 'Watches',
-    price: 3200,
-    stock: 8,
-    status: 'listed',
-    imageUrl: 'https://images.unsplash.com/photo-1522312346375-d1a52e2b99b3?auto=format&fit=crop&q=80&w=300',
-    authenticityRating: 99.9,
-    verifiedCount: 31,
-    description: 'Precision mechanical watch with sapphire glass, 200m depth resistance, and secure chip in crown.',
-  },
-  {
-    _id: 'prod-3',
-    name: 'Apex Elite Sneakers (Red)',
-    sku: 'AP-SK-2290',
-    category: 'Apparel & Shoes',
-    price: 280,
-    stock: 0,
-    status: 'out_of_stock',
-    imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=300',
-    authenticityRating: 98.6,
-    verifiedCount: 154,
-    description: 'Limited edition high-performance athletic footwear with embedded NFC serial chip for resale validation.',
-  },
-  {
-    _id: 'prod-4',
-    name: 'Luminescent Serum Glow',
-    sku: 'LM-SR-5510',
-    category: 'Cosmetics',
-    price: 95,
-    stock: 45,
-    status: 'listed',
-    imageUrl: 'https://images.unsplash.com/photo-1608248597481-496100c8c836?auto=format&fit=crop&q=80&w=300',
-    authenticityRating: 99.4,
-    verifiedCount: 78,
-    description: 'Bio-active facial serum with anti-aging peptides. Tamper-evident scan code verification.',
-  },
-  {
-    _id: 'prod-5',
-    name: 'Elysian Diamond Ring 18K',
-    sku: 'EL-RG-8803',
-    category: 'Jewelry',
-    price: 4500,
-    stock: 3,
-    status: 'draft',
-    imageUrl: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=300',
-    authenticityRating: 100.0,
-    verifiedCount: 0,
-    description: 'Flawless 0.5ct diamond set in an 18K white gold band with laser-inscribed blockchain registry ID.',
-  },
-];
-
-const INITIAL_INVENTORY: InventoryItem[] = [
-  {
-    _id: 'inv-1',
-    serialNumber: 'VC-LUX-2026-0001',
-    productId: 'prod-1',
-    productName: 'Aether Luxe Handbag',
-    category: 'Luxury Goods',
-    status: 'listed',
-    createdAt: '2026-06-15T09:30:00Z',
-    location: 'Central Storage Hub, NY',
-    locationHistory: [
-      { date: '2026-06-15T09:30:00Z', status: 'manufactured', location: 'Milano Artisan Labs', description: 'Item created and tagged with digital signature.' },
-      { date: '2026-06-18T14:20:00Z', status: 'in_transit', location: 'Transit Hub Rome', description: 'Shipped to main seller inventory.' },
-      { date: '2026-06-20T11:00:00Z', status: 'listed', location: 'Central Storage Hub, NY', description: 'Received in stock. Listed for sale on VeriChain.' }
-    ]
-  },
-  {
-    _id: 'inv-2',
-    serialNumber: 'VC-LUX-2026-0002',
-    productId: 'prod-1',
-    productName: 'Aether Luxe Handbag',
-    category: 'Luxury Goods',
-    status: 'sold',
-    createdAt: '2026-06-15T09:32:00Z',
-    location: 'Brooklyn, NY (Customer)',
-    locationHistory: [
-      { date: '2026-06-15T09:32:00Z', status: 'manufactured', location: 'Milano Artisan Labs', description: 'Item registered on blockchain.' },
-      { date: '2026-06-22T08:00:00Z', status: 'listed', location: 'Central Storage Hub, NY', description: 'Listed on Marketplace.' },
-      { date: '2026-07-02T16:45:00Z', status: 'sold', location: 'Brooklyn, NY (Customer)', description: 'Delivered to buyer Alice Smith. Authenticity verified by customer.' }
-    ]
-  },
-  {
-    _id: 'inv-3',
-    serialNumber: 'VC-WCH-2026-4482',
-    productId: 'prod-2',
-    productName: 'Chronos Diver Watch X1',
-    category: 'Watches',
-    status: 'listed',
-    createdAt: '2026-07-01T10:15:00Z',
-    location: 'Central Storage Hub, NY',
-    locationHistory: [
-      { date: '2026-07-01T10:15:00Z', status: 'manufactured', location: 'Geneva Time Facility', description: 'Cryptographic crown microchip initialized.' },
-      { date: '2026-07-05T15:30:00Z', status: 'listed', location: 'Central Storage Hub, NY', description: 'Received and verified by Seller.' }
-    ]
-  },
-  {
-    _id: 'inv-4',
-    serialNumber: 'VC-SNK-2026-8910',
-    productId: 'prod-3',
-    productName: 'Apex Elite Sneakers (Red)',
-    category: 'Apparel & Shoes',
-    status: 'in_transit',
-    createdAt: '2026-07-10T12:00:00Z',
-    location: 'US Customs, LA Port',
-    locationHistory: [
-      { date: '2026-07-10T12:00:00Z', status: 'manufactured', location: 'Factory Line 4 - Tokyo', description: 'NFC chip sewn into collar.' },
-      { date: '2026-07-15T19:00:00Z', status: 'in_transit', location: 'US Customs, LA Port', description: 'Ocean freight arrival. In transit to seller warehouse.' }
-    ]
-  },
-  {
-    _id: 'inv-5',
-    serialNumber: 'VC-COS-2026-3023',
-    productId: 'prod-4',
-    productName: 'Luminescent Serum Glow',
-    category: 'Cosmetics',
-    status: 'recalled',
-    createdAt: '2026-05-20T08:00:00Z',
-    location: 'Quarantine Depot, NJ',
-    locationHistory: [
-      { date: '2026-05-20T08:00:00Z', status: 'manufactured', location: 'CosmoLab France', description: 'Batch verified and packaged.' },
-      { date: '2026-05-25T10:00:00Z', status: 'listed', location: 'Central Storage Hub, NY', description: 'Listed on storefront.' },
-      { date: '2026-07-18T14:00:00Z', status: 'recalled', location: 'Quarantine Depot, NJ', description: 'Withdrawn due to batch packaging defect. Cryptographic code marked Recalled.' }
-    ]
-  }
-];
-
-const INITIAL_ORDERS: Order[] = [
-  {
-    _id: 'ord-1001',
-    orderNumber: 'VC-ORD-2026-8849',
-    buyerName: 'John Doe',
-    buyerEmail: 'john.doe@example.com',
-    date: '2026-07-22T10:45:00Z',
-    total: 375,
-    status: 'pending',
-    items: [
-      { name: 'Luminescent Serum Glow', sku: 'LM-SR-5510', qty: 2, price: 95, serialNumber: 'VC-COS-2026-9041' },
-      { name: 'Apex Elite Sneakers (Red)', sku: 'AP-SK-2290', qty: 1, price: 280, serialNumber: 'VC-SNK-2026-5592' }
-    ]
-  },
-  {
-    _id: 'ord-1002',
-    orderNumber: 'VC-ORD-2026-8850',
-    buyerName: 'Alice Smith',
-    buyerEmail: 'alice.s@example.com',
-    date: '2026-07-21T14:30:00Z',
-    total: 1850,
-    status: 'shipped',
-    trackingNumber: '1Z999AA10123456784',
-    shippingCarrier: 'UPS',
-    items: [
-      { name: 'Aether Luxe Handbag', sku: 'AE-HB-0921', qty: 1, price: 1850, serialNumber: 'VC-LUX-2026-0002' }
-    ]
-  },
-  {
-    _id: 'ord-1003',
-    orderNumber: 'VC-ORD-2026-8851',
-    buyerName: 'Bob Johnson',
-    buyerEmail: 'bob.j@example.com',
-    date: '2026-07-19T09:15:00Z',
-    total: 3200,
-    status: 'delivered',
-    trackingNumber: 'DH774819200',
-    shippingCarrier: 'DHL Express',
-    items: [
-      { name: 'Chronos Diver Watch X1', sku: 'CH-WD-7741', qty: 1, price: 3200, serialNumber: 'VC-WCH-2026-8192' }
-    ]
-  },
-  {
-    _id: 'ord-1004',
-    orderNumber: 'VC-ORD-2026-8852',
-    buyerName: 'Charlie Brown',
-    buyerEmail: 'charlie.b@example.com',
-    date: '2026-07-23T11:00:00Z',
-    total: 95,
-    status: 'processing',
-    items: [
-      { name: 'Luminescent Serum Glow', sku: 'LM-SR-5510', qty: 1, price: 95, serialNumber: 'VC-COS-2026-3049' }
-    ]
-  }
-];
-
-const INITIAL_CUSTOMERS: Customer[] = [
-  {
-    _id: 'cust-1',
-    name: 'Alice Smith',
-    email: 'alice.s@example.com',
-    purchasesCount: 4,
-    totalSpent: 4200,
-    registrationDate: '2026-02-12',
-    trustLevel: 99.5,
-    verificationChecks: 12
-  },
-  {
-    _id: 'cust-2',
-    name: 'Bob Johnson',
-    email: 'bob.j@example.com',
-    purchasesCount: 2,
-    totalSpent: 3480,
-    registrationDate: '2026-03-24',
-    trustLevel: 100.0,
-    verificationChecks: 6
-  },
-  {
-    _id: 'cust-3',
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    purchasesCount: 5,
-    totalSpent: 1250,
-    registrationDate: '2026-01-05',
-    trustLevel: 98.2,
-    verificationChecks: 18
-  },
-  {
-    _id: 'cust-4',
-    name: 'Sarah Connor',
-    email: 's.connor@sky.net',
-    purchasesCount: 1,
-    totalSpent: 1850,
-    registrationDate: '2026-05-18',
-    trustLevel: 99.9,
-    verificationChecks: 4
-  }
-];
-
 export default function SellerDashboard() {
   const { user } = useAuth();
   const { addToast } = useToast();
@@ -348,11 +103,10 @@ export default function SellerDashboard() {
 
   const [loading, setLoading] = useState(true);
 
-  // Stateful databases for demo updates
-  const [products, setProducts] = useState<Product[]>(INITIAL_PRODUCTS);
-  const [inventory, setInventory] = useState<InventoryItem[]>(INITIAL_INVENTORY);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_ORDERS);
-  const [customers] = useState<Customer[]>(INITIAL_CUSTOMERS);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [customers] = useState<Customer[]>([]);
 
   // Selected entities for dialogs/drawers
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
@@ -395,12 +149,58 @@ export default function SellerDashboard() {
   const [trackingNum, setTrackingNum] = useState('');
   const [carrier, setCarrier] = useState('FedEx');
 
-  // Simulated Initial Load
+  // Load real items on mount
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 600);
-    return () => clearTimeout(timer);
+    async function loadSellerData() {
+      try {
+        const [itemsRes, prodsRes] = await Promise.allSettled([
+          client.get('/items/my'),
+          client.get('/products'),
+        ]);
+
+        if (itemsRes.status === 'fulfilled' && itemsRes.value.data?.items && Array.isArray(itemsRes.value.data.items)) {
+          const fetchedItems: InventoryItem[] = itemsRes.value.data.items.map((it: any) => ({
+            _id: it._id,
+            serialNumber: it.serialNumber || `VC-SN-${it._id.slice(-6).toUpperCase()}`,
+            productId: it.product?._id || it.product,
+            productName: it.product?.name || 'Verified Product',
+            category: it.product?.category || 'General',
+            status: it.status || 'listed',
+            createdAt: it.createdAt || new Date().toISOString(),
+            location: it.location || 'Seller Warehouse',
+            locationHistory: it.journey?.map((j: any) => ({
+              date: j.timestamp,
+              status: j.action || 'updated',
+              location: j.location || 'Facility',
+              description: j.details || `Item ${j.action}`,
+            })) || [],
+          }));
+          setInventory(fetchedItems);
+        }
+
+        if (prodsRes.status === 'fulfilled' && Array.isArray(prodsRes.value.data)) {
+          const fetchedProds: Product[] = prodsRes.value.data.map((p: any) => ({
+            _id: p._id,
+            name: p.name,
+            sku: p.sku || 'SKU-001',
+            category: p.category || 'General',
+            price: Number(p.price) || 100,
+            stock: 10,
+            status: p.verifiedStatus === 'verified' ? 'listed' : 'draft',
+            imageUrl: p.imageUrl || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=300',
+            authenticityRating: p.verifiedStatus === 'verified' ? 100 : 0,
+            verifiedCount: 1,
+            description: p.description || '',
+          }));
+          setProducts(fetchedProds);
+        }
+      } catch (err) {
+        console.error('Failed to load seller data', err);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadSellerData();
   }, []);
 
   const handleTabChange = (tab: string) => {
@@ -631,65 +431,34 @@ export default function SellerDashboard() {
           </div>
 
           <div className="analytics-main-row">
-            {/* Sales Chart using SVG */}
+            {/* Catalog & Inventory Overview */}
             <div className="chart-card">
               <div className="chart-header">
                 <div>
-                  <h3 className="chart-title">Sales Volume & Authenticity Verifications</h3>
-                  <span className="chart-subtitle">Correlation of sales value against blockchain status queries</span>
+                  <h3 className="chart-title">Store Inventory & Verification Status</h3>
+                  <span className="chart-subtitle">Real-time status of manufactured and listed inventory</span>
                 </div>
               </div>
-              <div className="chart-svg-container">
-                <svg viewBox="0 0 500 220" style={{ width: '100%', height: '100%' }}>
-                  <defs>
-                    <linearGradient id="chart-gradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor="var(--accent-cyan)" stopOpacity="0.4" />
-                      <stop offset="100%" stopColor="var(--accent-cyan)" stopOpacity="0.0" />
-                    </linearGradient>
-                  </defs>
+              <div style={{ padding: 'var(--space-md) 0' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.875rem' }}>
+                  <span>Verified Trackable Units</span>
+                  <strong>{inventory.length} units</strong>
+                </div>
+                <div className="progress-bar-wrap" style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 9999, overflow: 'hidden', marginBottom: 16 }}>
+                  <div style={{ width: '100%', height: '100%', background: 'var(--accent-cyan)' }} />
+                </div>
 
-                  {/* Grid Lines */}
-                  <line x1="40" y1="20" x2="480" y2="20" className="chart-grid-line" />
-                  <line x1="40" y1="70" x2="480" y2="70" className="chart-grid-line" />
-                  <line x1="40" y1="120" x2="480" y2="120" className="chart-grid-line" />
-                  <line x1="40" y1="170" x2="480" y2="170" className="chart-grid-line" />
-
-                  {/* Shaded Area */}
-                  <path d="M 40 170 L 40 130 L 110 110 L 180 150 L 250 80 L 320 60 L 390 120 L 460 40 L 460 170 Z" className="chart-area-path" />
-
-                  {/* Chart Line 1 (Sales) */}
-                  <path d="M 40 130 L 110 110 L 180 150 L 250 80 L 320 60 L 390 120 L 460 40" className="chart-line-path" />
-
-                  {/* Verification Dots (Second line indicator) */}
-                  <path d="M 40 150 L 110 135 L 180 160 L 250 100 L 320 90 L 390 130 L 460 65" fill="none" stroke="var(--color-info)" strokeWidth="2.5" strokeDasharray="3 3" />
-
-                  {/* Data Points */}
-                  <circle cx="40" cy="130" r="5" className="chart-point" />
-                  <circle cx="110" cy="110" r="5" className="chart-point" />
-                  <circle cx="180" cy="150" r="5" className="chart-point" />
-                  <circle cx="250" cy="80" r="5" className="chart-point" />
-                  <circle cx="320" cy="60" r="5" className="chart-point" />
-                  <circle cx="390" cy="120" r="5" className="chart-point" />
-                  <circle cx="460" cy="40" r="5" className="chart-point" />
-
-                  {/* Labels */}
-                  <text x="35" y="195" className="chart-axis-text">Mon</text>
-                  <text x="105" y="195" className="chart-axis-text">Tue</text>
-                  <text x="175" y="195" className="chart-axis-text">Wed</text>
-                  <text x="245" y="195" className="chart-axis-text">Thu</text>
-                  <text x="315" y="195" className="chart-axis-text">Fri</text>
-                  <text x="385" y="195" className="chart-axis-text">Sat</text>
-                  <text x="455" y="195" className="chart-axis-text">Sun</text>
-
-                  <text x="15" y="24" className="chart-axis-text">$10k</text>
-                  <text x="15" y="74" className="chart-axis-text">$5k</text>
-                  <text x="15" y="124" className="chart-axis-text">$2k</text>
-                  <text x="15" y="174" className="chart-axis-text">$0</text>
-                </svg>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.875rem' }}>
+                  <span>Catalog SKU Variants</span>
+                  <strong>{products.length} products</strong>
+                </div>
+                <div className="progress-bar-wrap" style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
+                  <div style={{ width: '100%', height: '100%', background: '#10b981' }} />
+                </div>
               </div>
             </div>
 
-            {/* Distribution */}
+            {/* Category Distribution */}
             <div className="chart-card" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
               <div className="chart-header">
                 <div>
@@ -697,32 +466,27 @@ export default function SellerDashboard() {
                   <span className="chart-subtitle">Store product classification</span>
                 </div>
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-md)', flexWrap: 'wrap', marginTop: 12 }}>
-                <svg className="donut-svg">
-                  <circle cx="80" cy="80" r="60" className="donut-center" />
-                  <circle cx="80" cy="80" r="60" className="donut-segment" stroke="var(--accent-cyan)" strokeWidth="18" strokeDasharray="140 376.8" strokeDashoffset="0" />
-                  <circle cx="80" cy="80" r="60" className="donut-segment" stroke="var(--color-info)" strokeWidth="18" strokeDasharray="100 376.8" strokeDashoffset="-140" />
-                  <circle cx="80" cy="80" r="60" className="donut-segment" stroke="#f59e0b" strokeWidth="18" strokeDasharray="80 376.8" strokeDashoffset="-240" />
-                  <circle cx="80" cy="80" r="60" className="donut-segment" stroke="#10b981" strokeWidth="18" strokeDasharray="56.8 376.8" strokeDashoffset="-320" />
-                </svg>
-                <div className="donut-legend">
-                  <div className="legend-item">
-                    <span><span className="legend-color-dot" style={{ backgroundColor: 'var(--accent-cyan)' }} />Luxury Goods</span>
-                    <strong>40%</strong>
+              <div style={{ marginTop: 12 }}>
+                {products.length === 0 ? (
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', textAlign: 'center', padding: '24px 0' }}>
+                    No products added to catalog yet.
+                  </p>
+                ) : (
+                  <div className="donut-legend" style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                    {Array.from(new Set(products.map(p => p.category || 'General'))).map((cat, idx) => {
+                      const count = products.filter(p => (p.category || 'General') === cat).length;
+                      const pct = Math.round((count / products.length) * 100);
+                      const colors = ['var(--accent-cyan)', 'var(--color-info)', '#f59e0b', '#10b981', '#8b5cf6'];
+                      const color = colors[idx % colors.length];
+                      return (
+                        <div key={cat} className="legend-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span><span className="legend-color-dot" style={{ backgroundColor: color }} />{cat}</span>
+                          <strong>{pct}% ({count})</strong>
+                        </div>
+                      );
+                    })}
                   </div>
-                  <div className="legend-item">
-                    <span><span className="legend-color-dot" style={{ backgroundColor: 'var(--color-info)' }} />Watches</span>
-                    <strong>27%</strong>
-                  </div>
-                  <div className="legend-item">
-                    <span><span className="legend-color-dot" style={{ backgroundColor: '#f59e0b' }} />Apparel</span>
-                    <strong>20%</strong>
-                  </div>
-                  <div className="legend-item">
-                    <span><span className="legend-color-dot" style={{ backgroundColor: '#10b981' }} />Cosmetics</span>
-                    <strong>13%</strong>
-                  </div>
-                </div>
+                )}
               </div>
             </div>
           </div>
@@ -730,8 +494,8 @@ export default function SellerDashboard() {
           {/* Blockchain check log */}
           <div className="chart-card">
             <div className="chart-header">
-              <h3 className="chart-title">Real-time Verification Stream</h3>
-              <span className="badge badge-success">Live Blockchain Checks</span>
+              <h3 className="chart-title">Trackable Inventory Stream</h3>
+              <span className="badge badge-success">Live Blockchain Records</span>
             </div>
             <div className="table-container">
               <table className="data-table">
@@ -739,33 +503,29 @@ export default function SellerDashboard() {
                   <tr>
                     <th>Serial Number</th>
                     <th>Product</th>
-                    <th>Verifier Location</th>
-                    <th>Result</th>
-                    <th>Time Checked</th>
+                    <th>Current Custody Location</th>
+                    <th>Ledger Status</th>
+                    <th>Created Date</th>
                   </tr>
                 </thead>
                 <tbody>
-                  <tr>
-                    <td><code style={{ color: 'var(--accent-cyan)' }}>VC-LUX-2026-0002</code></td>
-                    <td>Aether Luxe Handbag</td>
-                    <td>New York, US</td>
-                    <td><span className="badge badge-success">✓ Authentic</span></td>
-                    <td>2 mins ago</td>
-                  </tr>
-                  <tr>
-                    <td><code style={{ color: 'var(--accent-cyan)' }}>VC-SNK-2026-8910</code></td>
-                    <td>Apex Elite Sneakers (Red)</td>
-                    <td>Los Angeles, US</td>
-                    <td><span className="badge badge-success">✓ Authentic</span></td>
-                    <td>45 mins ago</td>
-                  </tr>
-                  <tr>
-                    <td><code style={{ color: 'var(--accent-cyan)' }}>VC-WCH-2026-4482</code></td>
-                    <td>Chronos Diver Watch X1</td>
-                    <td>Geneva, CH</td>
-                    <td><span className="badge badge-success">✓ Authentic</span></td>
-                    <td>3 hours ago</td>
-                  </tr>
+                  {inventory.length === 0 ? (
+                    <tr>
+                      <td colSpan={5} style={{ textAlign: 'center', padding: '24px', color: 'var(--text-muted)' }}>
+                        No trackable inventory items registered yet.
+                      </td>
+                    </tr>
+                  ) : (
+                    inventory.slice(0, 5).map((it) => (
+                      <tr key={it._id}>
+                        <td><code style={{ color: 'var(--accent-cyan)' }}>{it.serialNumber}</code></td>
+                        <td>{it.productName}</td>
+                        <td>{it.location}</td>
+                        <td><span className="badge badge-success">✓ Authentic</span></td>
+                        <td>{new Date(it.createdAt).toLocaleDateString()}</td>
+                      </tr>
+                    ))
+                  )}
                 </tbody>
               </table>
             </div>

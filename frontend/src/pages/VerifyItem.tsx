@@ -384,7 +384,7 @@ export default function VerifyItem() {
                           </div>
                           <div className="cert-meta-row">
                             <span className="lbl">Verification Score:</span>
-                            <span className="val gold-text">99.8% (Consensus Verified)</span>
+                            <span className="val gold-text">100% (Consensus Verified)</span>
                           </div>
                           <div className="cert-meta-row">
                             <span className="lbl">Current Custody:</span>

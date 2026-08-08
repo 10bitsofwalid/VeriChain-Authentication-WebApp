@@ -1,40 +1,54 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Heart, ShoppingBag, Trash2, ShieldCheck, AlertTriangle, Star, ArrowRight } from 'lucide-react';
+import { Heart, ShoppingBag, Trash2, ShieldCheck, ArrowRight } from 'lucide-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
-import { mockWishlist } from './mockData';
-import type { WishlistItem } from './mockData';
+import { useShopping } from '../../context/ShoppingContext';
 
 export default function WishlistPage() {
-  const [items, setItems] = useState<WishlistItem[]>(mockWishlist);
+  const { wishlist, dispatch } = useShopping();
   const [addedMessage, setAddedMessage] = useState<string | null>(null);
 
   const removeItem = (id: string) => {
-    setItems(prev => prev.filter(item => item.id !== id));
+    dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: id });
   };
 
-  const handleAddToCart = (item: WishlistItem) => {
+  const handleAddToCart = (item: any) => {
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: {
+        id: item.id,
+        name: item.name,
+        price: item.price,
+        imageUrl: item.imageUrl || item.image,
+      },
+    });
     setAddedMessage(`"${item.name}" added to cart!`);
     setTimeout(() => setAddedMessage(null), 3000);
   };
 
+  const clearAll = () => {
+    wishlist.forEach(item => {
+      dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: item.id });
+    });
+  };
+
   return (
     <div className="buyer-page">
-      <BuyerNav wishlistCount={items.length} />
+      <BuyerNav wishlistCount={wishlist.length} />
 
       <div className="bx-header">
         <div className="bx-header-left">
           <h1>
             My Wishlist
-            <span className="bx-count-badge">{items.length}</span>
+            <span className="bx-count-badge">{wishlist.length}</span>
           </h1>
           <p>Saved authentic products you're watching</p>
         </div>
-        {items.length > 0 && (
+        {wishlist.length > 0 && (
           <button 
             className="bx-btn-ghost"
-            onClick={() => setItems([])}
+            onClick={clearAll}
           >
             Clear All Items
           </button>
@@ -60,23 +74,23 @@ export default function WishlistPage() {
         </div>
       )}
 
-      {items.length === 0 ? (
+      {wishlist.length === 0 ? (
         <div className="bx-empty">
           <div className="bx-empty-icon">
             <Heart size={36} />
           </div>
           <h2>Your wishlist is empty</h2>
-          <p>Save items you like while browsing to easily track price drops and authenticity updates.</p>
-          <Link to="/" className="bx-btn-primary">
+          <p>Save items you like while browsing to easily track and purchase authentic products.</p>
+          <Link to="/dashboard/marketplace" className="bx-btn-primary">
             <ShoppingBag size={16} /> Discover Products
           </Link>
         </div>
       ) : (
         <div className="bx-product-grid">
-          {items.map(item => (
+          {wishlist.map(item => (
             <div key={item.id} className="bx-wish-card">
               <div className="bx-wish-img-wrap">
-                <img src={item.image} alt={item.name} className="bx-wish-img" />
+                <img src={item.imageUrl || (item as any).image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80'} alt={item.name} className="bx-wish-img" />
                 <button
                   className="bx-wish-remove-btn"
                   onClick={() => removeItem(item.id)}
@@ -87,35 +101,16 @@ export default function WishlistPage() {
               </div>
 
               <div className="bx-wish-body">
-                <div className="bx-wish-brand">{item.brand}</div>
                 <div className="bx-wish-name">{item.name}</div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6, margin: '2px 0' }}>
-                  {item.verified ? (
-                    <span className="bx-verified">
-                      <ShieldCheck size={10} /> Verified Authentic
-                    </span>
-                  ) : (
-                    <span className="bx-unverified">
-                      <AlertTriangle size={10} /> Unverified
-                    </span>
-                  )}
-                  <span style={{ fontSize: '0.72rem', color: item.inStock ? '#059669' : 'var(--text-muted)', fontWeight: 600 }}>
-                    {item.inStock ? 'In Stock' : 'Out of Stock'}
+                  <span className="bx-verified">
+                    <ShieldCheck size={10} /> Verified Authentic
                   </span>
                 </div>
 
-                <div className="bx-wish-rating">
-                  <Star size={13} fill="#f59e0b" color="#f59e0b" />
-                  <span style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{item.rating}</span>
-                  <span>({item.reviews.toLocaleString()} reviews)</span>
-                </div>
-
                 <div className="bx-wish-price-row">
-                  <span className="bx-wish-price">${item.price.toFixed(2)}</span>
-                  {item.originalPrice && (
-                    <span className="bx-wish-orig-price">${item.originalPrice.toFixed(2)}</span>
-                  )}
+                  <span className="bx-wish-price">${(Number(item.price) || 0).toFixed(2)}</span>
                 </div>
 
                 <div className="bx-wish-footer">
@@ -123,7 +118,6 @@ export default function WishlistPage() {
                     className="bx-btn-primary"
                     style={{ flex: 1, justifyContent: 'center' }}
                     onClick={() => handleAddToCart(item)}
-                    disabled={!item.inStock}
                   >
                     <ShoppingBag size={14} /> Add to Cart
                   </button>

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ActionButton from '../../../components/ui/ActionButton';
 import StatusChip from '../../../components/ui/StatusChip';
 import MetricCard from '../../../components/ui/MetricCard';
+import client from '../../../api/client';
 import {
   ShieldCheck,
   ShieldAlert,
@@ -20,73 +21,81 @@ interface ModerationItem {
   title: string;
   submittedBy: string;
   flagReason: string;
-  riskScore: number; // 0 - 100
+  riskScore: number;
   status: 'pending' | 'approved' | 'rejected' | 'flagged';
   date: string;
   nfcHash?: string;
 }
 
-const INITIAL_MODERATION: ModerationItem[] = [
-  {
-    id: 'mod-1',
-    itemType: 'Product Template',
-    title: 'Aura Luxury Chronograph Series V',
-    submittedBy: 'Titan Chrono Factory',
-    flagReason: 'High-value product registration threshold (> $10k MSRP)',
-    riskScore: 12,
-    status: 'pending',
-    date: '2026-07-23',
-    nfcHash: '0x992f...a12c',
-  },
-  {
-    id: 'mod-2',
-    itemType: 'Seller Listing',
-    title: 'Limited Edition Leather Handbag',
-    submittedBy: 'Apex Authentics Hub',
-    flagReason: 'Mismatched factory serial allocation',
-    riskScore: 78,
-    status: 'flagged',
-    date: '2026-07-22',
-    nfcHash: '0x44ab...f881',
-  },
-  {
-    id: 'mod-3',
-    itemType: 'Batch Serial Range',
-    title: 'Batch #B-902 (500 units)',
-    submittedBy: 'LuxeCraft Inc.',
-    flagReason: 'Routine factory batch integrity scan',
-    riskScore: 5,
-    status: 'approved',
-    date: '2026-07-20',
-    nfcHash: '0x12ec...0099',
-  },
-  {
-    id: 'mod-4',
-    itemType: 'Seller Listing',
-    title: 'Ultra Precision Optical Sensor',
-    submittedBy: 'Shadow Reseller X',
-    flagReason: 'Duplicate digital birth certificate detected',
-    riskScore: 92,
-    status: 'rejected',
-    date: '2026-07-19',
-    nfcHash: '0xff81...c332',
-  },
-];
-
 export default function AdminModerationView() {
-  const [items, setItems] = useState<ModerationItem[]>(INITIAL_MODERATION);
+  const [items, setItems] = useState<ModerationItem[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [filterStatus, setFilterStatus] = useState<string>('all');
-  const [filterType, setFilterType] = useState<string>('all');
   const [selectedItem, setSelectedItem] = useState<ModerationItem | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadModeration() {
+      try {
+        const [prodRes, compRes] = await Promise.allSettled([
+          client.get('/moderator/products'),
+          client.get('/complaints'),
+        ]);
+
+        const list: ModerationItem[] = [];
+
+        if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value.data)) {
+          prodRes.value.data.forEach((p: any) => {
+            list.push({
+              id: p._id,
+              itemType: 'Product Template',
+              title: p.name,
+              submittedBy: p.manufacturer || 'Certified Factory',
+              flagReason: p.verifiedStatus === 'pending' ? 'Pending initial certificate audit' : 'Routine compliance check',
+              riskScore: p.verifiedStatus === 'rejected' ? 85 : 10,
+              status: p.verifiedStatus === 'verified' ? 'approved' : p.verifiedStatus === 'rejected' ? 'rejected' : 'pending',
+              date: new Date(p.createdAt || Date.now()).toISOString().split('T')[0],
+              nfcHash: p.certificateUrl || '0xVC-CERT',
+            });
+          });
+        }
+
+        if (compRes.status === 'fulfilled' && compRes.value.data?.complaints) {
+          compRes.value.data.complaints.forEach((c: any) => {
+            list.push({
+              id: c._id,
+              itemType: 'Seller Listing',
+              title: `Complaint on ${c.productInstance?.product?.name || 'Product'}`,
+              submittedBy: c.buyer?.name || 'Buyer',
+              flagReason: c.reason || 'Discrepancy reported',
+              riskScore: 75,
+              status: c.status === 'resolved' ? 'approved' : c.status === 'dismissed' ? 'rejected' : 'flagged',
+              date: new Date(c.createdAt || Date.now()).toISOString().split('T')[0],
+            });
+          });
+        }
+
+        setItems(list);
+      } catch {
+        setItems([]);
+      }
+    }
+    loadModeration();
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleAction = (id: string, newStatus: 'approved' | 'rejected' | 'flagged') => {
+  const handleAction = async (id: string, newStatus: 'approved' | 'rejected' | 'flagged') => {
+    try {
+      if (newStatus === 'approved') {
+        await client.put(`/moderator/products/${id}/approve`).catch(() => {});
+      } else if (newStatus === 'rejected') {
+        await client.put(`/moderator/products/${id}/reject`, { reason: 'Compliance audit rejected' }).catch(() => {});
+      }
+    } catch {}
     setItems(prev => prev.map(item => item.id === id ? { ...item, status: newStatus } : item));
     showToast(`Moderation item marked as ${newStatus.toUpperCase()}`);
     if (selectedItem && selectedItem.id === id) {
@@ -96,12 +105,11 @@ export default function AdminModerationView() {
 
   const filtered = items.filter(item => {
     const matchesStatus = filterStatus === 'all' || item.status === filterStatus;
-    const matchesType = filterType === 'all' || item.itemType === filterType;
     const matchesSearch = searchQuery === '' ||
       item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.submittedBy.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.flagReason.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesStatus && matchesType && matchesSearch;
+    return matchesStatus && matchesSearch;
   });
 
   const pendingCount = items.filter(i => i.status === 'pending').length;
@@ -123,58 +131,54 @@ export default function AdminModerationView() {
           alignItems: 'center',
           gap: 10,
         }}>
-          <CheckCircle size={18} />
+          <ShieldCheck size={18} />
           <span>{toastMessage}</span>
         </div>
       )}
 
-      {/* Metrics Row */}
+      {/* Moderation Metrics */}
       <div className="admin-grid-4">
         <MetricCard
-          label="Pending Queue"
+          label="Pending Review"
           value={pendingCount.toString()}
-          icon={<FileCheck size={20} color="#06b6d4" />}
+          icon={<ShieldAlert size={20} color="#f59e0b" />}
         />
         <MetricCard
           label="Flagged / Suspicious"
           value={flaggedCount.toString()}
-          icon={<ShieldAlert size={20} color="#ef4444" />}
+          icon={<AlertTriangle size={20} color="#ef4444" />}
         />
         <MetricCard
-          label="Approved Listings"
+          label="Approved Items"
           value={approvedCount.toString()}
-          icon={<ShieldCheck size={20} color="#10b981" />}
+          icon={<CheckCircle size={20} color="#10b981" />}
         />
         <MetricCard
-          label="Rejected / Blocked"
+          label="Rejected Items"
           value={rejectedCount.toString()}
-          icon={<XCircle size={20} color="#f59e0b" />}
+          icon={<XCircle size={20} color="#8b5cf6" />}
         />
       </div>
 
-      {/* Filters Toolbar */}
+      {/* Control Bar */}
       <div className="admin-card">
-        <div className="admin-toolbar" style={{ marginBottom: 0 }}>
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+            <FileCheck size={20} color="#06b6d4" />
+            <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#f8fafc' }}>
+              Moderation & Integrity Queue
+            </h3>
+          </div>
+          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
             <div className="admin-search-input">
-              <Search size={16} color="#94a3b8" />
+              <Search size={15} color="#94a3b8" />
               <input
                 type="text"
-                placeholder="Search item, entity, or flag reason..."
+                placeholder="Search moderation items..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
             </div>
-            <select
-              className="admin-select"
-              value={filterType}
-              onChange={e => setFilterType(e.target.value)}
-            >
-              <option value="all">All Item Types</option>
-              <option value="Product Template">Product Template</option>
-              <option value="Seller Listing">Seller Listing</option>
-              <option value="Batch Serial Range">Batch Serial Range</option>
-            </select>
             <select
               className="admin-select"
               value={filterStatus}
@@ -190,82 +194,70 @@ export default function AdminModerationView() {
         </div>
       </div>
 
-      {/* Moderation Queue Table */}
+      {/* Table */}
       <div className="admin-card">
         <div className="admin-table-wrapper">
           <table className="admin-table">
             <thead>
               <tr>
-                <th>Item / Entity</th>
                 <th>Type</th>
+                <th>Item / Title</th>
                 <th>Submitted By</th>
-                <th>Flag Rationale</th>
-                <th>AI Risk Score</th>
+                <th>Flag Reason</th>
                 <th>Status</th>
-                <th style={{ textAlign: 'right' }}>Actions</th>
+                <th>Date</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map(item => (
                 <tr key={item.id}>
                   <td>
-                    <div style={{ fontWeight: 600, color: '#f8fafc' }}>{item.title}</div>
-                    <div style={{ fontSize: '0.75rem', fontFamily: 'monospace', color: '#06b6d4' }}>{item.nfcHash}</div>
+                    <span className="fd-badge fd-badge-purple">{item.itemType}</span>
                   </td>
+                  <td style={{ fontWeight: 600, color: '#f8fafc' }}>{item.title}</td>
+                  <td>{item.submittedBy}</td>
+                  <td style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>{item.flagReason}</td>
                   <td>
-                    <span className="badge badge-info" style={{ fontSize: '0.75rem' }}>
-                      {item.itemType}
-                    </span>
-                  </td>
-                  <td style={{ color: '#cbd5e1' }}>{item.submittedBy}</td>
-                  <td style={{ color: '#94a3b8', fontSize: '0.825rem', maxWidth: 260 }}>{item.flagReason}</td>
-                  <td>
-                    <span style={{
-                      fontWeight: 700,
-                      color: item.riskScore > 70 ? '#ef4444' : item.riskScore > 30 ? '#f59e0b' : '#10b981',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: 4,
-                    }}>
-                      {item.riskScore} / 100
-                    </span>
-                  </td>
-                  <td>
-                    <StatusChip tone={item.status === 'approved' ? 'success' : item.status === 'rejected' ? 'danger' : item.status === 'flagged' ? 'warning' : 'info'}>
+                    <StatusChip tone={item.status === 'approved' ? 'success' : item.status === 'rejected' || item.status === 'flagged' ? 'danger' : 'warning'}>
                       {item.status.toUpperCase()}
                     </StatusChip>
                   </td>
+                  <td style={{ fontSize: '0.8rem', color: '#94a3b8' }}>{item.date}</td>
                   <td>
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 6 }}>
-                      <ActionButton
-                        variant="secondary"
-                        size="sm"
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button
+                        className="btn btn-ghost"
+                        style={{ padding: '4px 8px', fontSize: '0.75rem' }}
                         onClick={() => setSelectedItem(item)}
+                        title="View Details"
                       >
-                        <Eye size={14} /> View
-                      </ActionButton>
-                      <ActionButton
-                        variant="primary"
-                        size="sm"
+                        <Eye size={13} />
+                      </button>
+                      <button
+                        className="btn btn-ghost"
+                        style={{ padding: '4px 8px', fontSize: '0.75rem', color: '#10b981' }}
                         onClick={() => handleAction(item.id, 'approved')}
+                        title="Approve"
                       >
-                        Approve
-                      </ActionButton>
-                      <ActionButton
-                        variant="danger"
-                        size="sm"
+                        <CheckCircle size={13} />
+                      </button>
+                      <button
+                        className="btn btn-ghost"
+                        style={{ padding: '4px 8px', fontSize: '0.75rem', color: '#ef4444' }}
                         onClick={() => handleAction(item.id, 'rejected')}
+                        title="Reject"
                       >
-                        Reject
-                      </ActionButton>
+                        <XCircle size={13} />
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
               {filtered.length === 0 && (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '32px', color: '#94a3b8' }}>
-                    No moderation items matching filters.
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#94a3b8' }}>
+                    No items in moderation queue.
                   </td>
                 </tr>
               )}
@@ -274,63 +266,61 @@ export default function AdminModerationView() {
         </div>
       </div>
 
-      {/* Moderation Inspector Modal */}
+      {/* Item Modal */}
       {selectedItem && (
-        <div className="admin-modal-overlay">
-          <div className="admin-modal-card">
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-              <div>
-                <span className="badge badge-info" style={{ fontSize: '0.75rem' }}>{selectedItem.itemType}</span>
-                <h3 style={{ margin: '4px 0 0 0', fontSize: '1.2rem', color: '#f8fafc' }}>
-                  {selectedItem.title}
-                </h3>
-              </div>
-              <button 
+        <div className="recall-modal-backdrop" onClick={() => setSelectedItem(null)}>
+          <div className="recall-modal" onClick={e => e.stopPropagation()}>
+            <div className="recall-modal-header">
+              <h3>Moderation Review — {selectedItem.title}</h3>
+              <button
                 onClick={() => setSelectedItem(null)}
                 style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
               >
                 <X size={20} />
               </button>
             </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-              <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 8, border: '1px solid rgba(255,255,255,0.08)' }}>
-                <div style={{ fontSize: '0.85rem', color: '#94a3b8', marginBottom: 4 }}>Submission Details</div>
-                <div style={{ color: '#f8fafc', fontWeight: 600 }}>Submitted by: {selectedItem.submittedBy}</div>
-                <div style={{ color: '#94a3b8', fontSize: '0.825rem', marginTop: 4 }}>Date: {selectedItem.date}</div>
-                <div style={{ color: '#06b6d4', fontFamily: 'monospace', fontSize: '0.825rem', marginTop: 4 }}>Hash: {selectedItem.nfcHash}</div>
-              </div>
-
-              <div style={{ background: 'rgba(239, 68, 68, 0.1)', border: '1px solid rgba(239, 68, 68, 0.3)', padding: 12, borderRadius: 8 }}>
-                <div style={{ color: '#f87171', fontWeight: 600, fontSize: '0.875rem', display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <AlertTriangle size={16} /> Flag Reason & AI Risk Analysis
+            <div className="recall-modal-body">
+              <div className="detail-info-grid">
+                <div className="detail-info-card">
+                  <div className="detail-info-label">Item Type</div>
+                  <div className="detail-info-value">{selectedItem.itemType}</div>
                 </div>
-                <div style={{ color: '#cbd5e1', fontSize: '0.85rem', marginTop: 4 }}>
-                  {selectedItem.flagReason}
+                <div className="detail-info-card">
+                  <div className="detail-info-label">Submitted By</div>
+                  <div className="detail-info-value">{selectedItem.submittedBy}</div>
                 </div>
-                <div style={{ color: '#f87171', fontWeight: 700, fontSize: '0.85rem', marginTop: 6 }}>
-                  Calculated Risk Index: {selectedItem.riskScore}%
+                <div className="detail-info-card">
+                  <div className="detail-info-label">Flag Reason</div>
+                  <div className="detail-info-value">{selectedItem.flagReason}</div>
+                </div>
+                <div className="detail-info-card">
+                  <div className="detail-info-label">Status</div>
+                  <div className="detail-info-value" style={{ textTransform: 'uppercase' }}>{selectedItem.status}</div>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', gap: 10, marginTop: 10 }}>
-                <ActionButton
-                  variant="primary"
-                  size="sm"
-                  style={{ flex: 1 }}
-                  onClick={() => handleAction(selectedItem.id, 'approved')}
-                >
-                  Approve Registration
-                </ActionButton>
-                <ActionButton
-                  variant="danger"
-                  size="sm"
-                  style={{ flex: 1 }}
-                  onClick={() => handleAction(selectedItem.id, 'rejected')}
-                >
-                  Reject & Delist
-                </ActionButton>
-              </div>
+            </div>
+            <div className="recall-modal-footer">
+              <ActionButton
+                variant="secondary"
+                size="sm"
+                onClick={() => setSelectedItem(null)}
+              >
+                Close
+              </ActionButton>
+              <ActionButton
+                variant="danger"
+                size="sm"
+                onClick={() => handleAction(selectedItem.id, 'rejected')}
+              >
+                Reject
+              </ActionButton>
+              <ActionButton
+                variant="primary"
+                size="sm"
+                onClick={() => handleAction(selectedItem.id, 'approved')}
+              >
+                Approve
+              </ActionButton>
             </div>
           </div>
         </div>

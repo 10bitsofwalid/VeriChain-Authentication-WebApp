@@ -1,12 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Truck, CheckCircle, XCircle, Clock, RotateCcw, ChevronDown, ChevronUp, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { Package, Truck, CheckCircle, XCircle, Clock, RotateCcw, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
+import client from '../../api/client';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
-import { mockOrders } from './mockData';
-import type { Order } from './mockData';
+import type { Order } from '../../types/buyer';
 
-const STATUS_ICONS: Record<Order['status'], React.ReactNode> = {
+const STATUS_ICONS: Record<string, React.ReactNode> = {
   delivered:  <CheckCircle size={13} />,
   shipped:    <Truck size={13} />,
   processing: <Clock size={13} />,
@@ -14,13 +14,49 @@ const STATUS_ICONS: Record<Order['status'], React.ReactNode> = {
   returned:   <RotateCcw size={13} />,
 };
 
-const ALL_FILTERS: Array<Order['status'] | 'all'> = ['all', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
+const ALL_FILTERS = ['all', 'processing', 'shipped', 'delivered', 'cancelled', 'returned'];
 
 export default function OrdersPage() {
-  const [filter, setFilter] = useState<Order['status'] | 'all'>('all');
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>('all');
   const [expanded, setExpanded] = useState<string | null>(null);
 
-  const filtered = filter === 'all' ? mockOrders : mockOrders.filter(o => o.status === filter);
+  useEffect(() => {
+    async function fetchOrders() {
+      try {
+        const res = await client.get('/items/my');
+        if (res.data?.items && Array.isArray(res.data.items) && res.data.items.length > 0) {
+          const transformed: Order[] = res.data.items.map((item: any) => ({
+            id: item._id,
+            orderNumber: `ORD-${item.serialNumber || item._id.slice(-6).toUpperCase()}`,
+            date: item.createdAt || new Date().toISOString(),
+            status: (item.status === 'sold' ? 'delivered' : item.status === 'in_transit' ? 'shipped' : 'processing') as Order['status'],
+            total: Number(item.product?.price) || 0,
+            items: [
+              {
+                name: item.product?.name || 'Verified Product',
+                qty: 1,
+                price: Number(item.product?.price) || 0,
+                image: item.product?.imageUrl || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
+                verified: item.product?.verifiedStatus === 'verified',
+              },
+            ],
+          }));
+          setOrders(transformed);
+        } else {
+          setOrders([]);
+        }
+      } catch {
+        setOrders([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchOrders();
+  }, []);
+
+  const filtered = filter === 'all' ? orders : orders.filter(o => o.status === filter);
 
   const toggle = (id: string) => setExpanded(prev => prev === id ? null : id);
 
@@ -31,9 +67,9 @@ export default function OrdersPage() {
         <div className="bx-header-left">
           <h1>
             My Orders
-            <span className="bx-count-badge">{mockOrders.length}</span>
+            <span className="bx-count-badge">{orders.length}</span>
           </h1>
-          <p>Track and manage all your purchases</p>
+          <p>Track and manage all your verified purchases</p>
         </div>
         <Link to="/buyer/purchase-history" className="bx-btn-ghost">
           Purchase History
@@ -51,19 +87,23 @@ export default function OrdersPage() {
             {f === 'all' ? `All Orders` : f.charAt(0).toUpperCase() + f.slice(1)}
             {f !== 'all' && (
               <span className="bx-count-badge" style={{ marginLeft: 6, fontSize: '0.65rem', minWidth: 18, height: 18, padding: '0 5px' }}>
-                {mockOrders.filter(o => o.status === f).length}
+                {orders.filter(o => o.status === f).length}
               </span>
             )}
           </button>
         ))}
       </div>
 
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="bx-empty">
+          <p>Loading your orders...</p>
+        </div>
+      ) : filtered.length === 0 ? (
         <div className="bx-empty">
           <div className="bx-empty-icon"><Package size={32} /></div>
           <h2>No orders found</h2>
           <p>No orders match this filter. Browse our marketplace to find verified authentic products.</p>
-          <Link to="/" className="bx-btn-primary">Browse Products</Link>
+          <Link to="/dashboard/marketplace" className="bx-btn-primary">Browse Marketplace</Link>
         </div>
       ) : (
         <div>
@@ -134,18 +174,14 @@ export default function OrdersPage() {
                       <div className="bx-product-info">
                         <div className="bx-product-name">{item.name}</div>
                         <div className="bx-product-brand">Qty: {item.qty}</div>
-                        {item.verified
-                          ? <span className="bx-verified"><ShieldCheck size={10} /> Verified Authentic</span>
-                          : <span className="bx-unverified"><AlertTriangle size={10} /> Not Verified</span>
-                        }
+                        {item.verified ? (
+                          <span className="bx-verified"><ShieldCheck size={10} /> Verified Authentic</span>
+                        ) : null}
                       </div>
                       <span style={{ fontWeight: 700, fontSize: '0.9rem' }}>${item.price.toFixed(2)}</span>
                     </div>
                   ))}
                   <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)', flexWrap: 'wrap' }}>
-                    {order.status === 'delivered' && <button className="bx-btn-ghost" style={{ fontSize: '0.8rem', padding: '8px 14px' }}>Write a Review</button>}
-                    {order.status === 'delivered' && <button className="bx-btn-ghost" style={{ fontSize: '0.8rem', padding: '8px 14px' }}>Request Return</button>}
-                    <button className="bx-btn-ghost" style={{ fontSize: '0.8rem', padding: '8px 14px' }}>Download Invoice</button>
                     <Link to="/complaints" className="bx-btn-ghost" style={{ fontSize: '0.8rem', padding: '8px 14px' }}>Report Issue</Link>
                   </div>
                 </div>

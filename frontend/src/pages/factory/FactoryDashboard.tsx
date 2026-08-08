@@ -9,12 +9,12 @@ import AnalyticsView from './views/AnalyticsView';
 import './FactoryDashboard.css';
 
 const TABS = [
-  { id: 'inventory',       label: 'Inventory',       icon: Package,    badge: 142 },
-  { id: 'production',      label: 'Production',      icon: Boxes,      badge: 8   },
-  { id: 'allocations',     label: 'Allocations',     icon: TrendingUp, badge: 24  },
-  { id: 'seller-requests', label: 'Seller Requests', icon: Users,      badge: 5   },
-  { id: 'shipments',       label: 'Shipments',       icon: Truck,      badge: 11  },
-  { id: 'analytics',       label: 'Analytics',       icon: BarChart2,  badge: undefined },
+  { id: 'inventory',       label: 'Inventory',       icon: Package },
+  { id: 'production',      label: 'Production',      icon: Boxes },
+  { id: 'allocations',     label: 'Allocations',     icon: TrendingUp },
+  { id: 'seller-requests', label: 'Seller Requests', icon: Users },
+  { id: 'shipments',       label: 'Shipments',       icon: Truck },
+  { id: 'analytics',       label: 'Analytics',       icon: BarChart2 },
 ] as const;
 
 type TabId = (typeof TABS)[number]['id'];
@@ -47,9 +47,6 @@ export default function FactoryDashboard() {
             >
               <Icon size={15} aria-hidden="true" />
               {tab.label}
-              {tab.badge !== undefined && (
-                <span className="fd-tab-badge">{tab.badge}</span>
-              )}
             </button>
           );
         })}

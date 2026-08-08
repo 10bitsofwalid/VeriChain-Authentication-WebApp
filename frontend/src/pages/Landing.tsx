@@ -66,18 +66,18 @@ export default function Landing() {
           </div>
           <div className="hero-stats">
             <div className="hero-stat">
-              <span className="hero-stat-value">50K+</span>
-              <span className="hero-stat-label">Products Verified</span>
+              <span className="hero-stat-value">End-to-End</span>
+              <span className="hero-stat-label">Chain of Custody</span>
             </div>
             <div className="hero-stat-divider" />
             <div className="hero-stat">
-              <span className="hero-stat-value">2,500+</span>
-              <span className="hero-stat-label">Manufacturers</span>
+              <span className="hero-stat-value">Immutable</span>
+              <span className="hero-stat-label">Cryptographic Records</span>
             </div>
             <div className="hero-stat-divider" />
             <div className="hero-stat">
-              <span className="hero-stat-value">99.9%</span>
-              <span className="hero-stat-label">Accuracy Rate</span>
+              <span className="hero-stat-value">Instant</span>
+              <span className="hero-stat-label">Real-Time Verification</span>
             </div>
           </div>
         </div>

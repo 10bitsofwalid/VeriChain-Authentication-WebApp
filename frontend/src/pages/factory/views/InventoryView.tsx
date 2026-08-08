@@ -1,24 +1,17 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, Search, Filter, AlertCircle, CheckCircle, Clock, Zap } from 'lucide-react';
+import client from '../../../api/client';
 
-const INVENTORY = [
-  { id: 'SN-10001', name: 'AirMax Pro Sneaker', sku: 'AMP-WHT-42', category: 'Footwear',  status: 'In Stock',   qty: 240, location: 'Warehouse A',  updated: '2026-07-20' },
-  { id: 'SN-10002', name: 'Heritage Leather Bag', sku: 'HLB-BRN-01', category: 'Bags',    status: 'Low Stock',  qty: 18,  location: 'Warehouse B',  updated: '2026-07-21' },
-  { id: 'SN-10003', name: 'ChromePlus Watch',    sku: 'CPW-SLV-05', category: 'Watches',  status: 'In Stock',   qty: 95,  location: 'Vault C',      updated: '2026-07-19' },
-  { id: 'SN-10004', name: 'UltraFit Cap',        sku: 'UFC-RED-02', category: 'Apparel',  status: 'Out of Stock',qty: 0,  location: 'Warehouse A',  updated: '2026-07-18' },
-  { id: 'SN-10005', name: 'NebulaX Backpack',    sku: 'NBX-BLK-10', category: 'Bags',    status: 'In Stock',   qty: 312, location: 'Warehouse D',  updated: '2026-07-22' },
-  { id: 'SN-10006', name: 'PrimeRun Shorts',     sku: 'PRS-NVY-08', category: 'Apparel', status: 'Low Stock',  qty: 11,  location: 'Warehouse B',  updated: '2026-07-20' },
-  { id: 'SN-10007', name: 'AlphaCore Hoodie',    sku: 'ACH-GRY-14', category: 'Apparel', status: 'In Stock',   qty: 188, location: 'Warehouse A',  updated: '2026-07-21' },
-  { id: 'SN-10008', name: 'StealthPod Earbuds',  sku: 'SPE-BLK-03', category: 'Electronics', status: 'In Stock', qty: 74, location: 'Vault C',   updated: '2026-07-22' },
-];
-
-const STATS = [
-  { label: 'Total SKUs',    value: '148',  trend: '+12 this month', icon: Package,      color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
-  { label: 'In Stock',      value: '122',  trend: '82% of total',   icon: CheckCircle,  color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-  { label: 'Low Stock',     value: '18',   trend: 'Action needed',  icon: AlertCircle,  color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-  { label: 'Out of Stock',  value: '8',    trend: 'Reorder required',icon: Clock,       color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
-  { label: 'Total Units',   value: '4,820',trend: '+320 vs last wk', icon: Zap,         color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
-];
+interface FactoryInventoryItem {
+  id: string;
+  name: string;
+  sku: string;
+  category: string;
+  status: 'In Stock' | 'Low Stock' | 'Out of Stock';
+  qty: number;
+  location: string;
+  updated: string;
+}
 
 const statusBadge: Record<string, string> = {
   'In Stock':     'fd-badge fd-badge-green',
@@ -27,10 +20,54 @@ const statusBadge: Record<string, string> = {
 };
 
 export default function InventoryView() {
+  const [items, setItems] = useState<FactoryInventoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState('All');
 
-  const filtered = INVENTORY.filter(item => {
+  useEffect(() => {
+    async function loadInventory() {
+      try {
+        const res = await client.get('/products/factory');
+        if (res.data?.products && Array.isArray(res.data.products)) {
+          const list: FactoryInventoryItem[] = res.data.products.map((p: any) => ({
+            id: p._id,
+            name: p.name,
+            sku: p.sku || 'SKU-001',
+            category: p.category || 'General',
+            status: (p.stock === 0 ? 'Out of Stock' : (p.stock < 10 ? 'Low Stock' : 'In Stock')) as any,
+            qty: p.stock ?? 25,
+            location: p.location || 'Factory Main Warehouse',
+            updated: p.updatedAt ? new Date(p.updatedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+          }));
+          setItems(list);
+        } else {
+          setItems([]);
+        }
+      } catch {
+        setItems([]);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadInventory();
+  }, []);
+
+  const totalSKUs = items.length;
+  const inStock = items.filter(i => i.status === 'In Stock').length;
+  const lowStock = items.filter(i => i.status === 'Low Stock').length;
+  const outOfStock = items.filter(i => i.status === 'Out of Stock').length;
+  const totalUnits = items.reduce((s, i) => s + i.qty, 0);
+
+  const stats = [
+    { label: 'Total SKUs',   value: totalSKUs.toString(), icon: Package,     color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
+    { label: 'In Stock',     value: inStock.toString(),   icon: CheckCircle, color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
+    { label: 'Low Stock',    value: lowStock.toString(),  icon: AlertCircle, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+    { label: 'Out of Stock', value: outOfStock.toString(),icon: Clock,       color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
+    { label: 'Total Units',  value: totalUnits.toString(),icon: Zap,         color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+  ];
+
+  const filtered = items.filter(item => {
     const matchSearch = item.name.toLowerCase().includes(search.toLowerCase()) ||
                         item.sku.toLowerCase().includes(search.toLowerCase());
     const matchFilter = filter === 'All' || item.status === filter;
@@ -41,7 +78,7 @@ export default function InventoryView() {
     <div>
       {/* Stats */}
       <div className="fd-stats-grid">
-        {STATS.map(s => (
+        {stats.map(s => (
           <div className="fd-stat-card" key={s.label}>
             <div className="fd-stat-icon" style={{ background: s.bg }}>
               <s.icon size={22} color={s.color} />
@@ -49,7 +86,6 @@ export default function InventoryView() {
             <div>
               <p className="fd-stat-label">{s.label}</p>
               <p className="fd-stat-value">{s.value}</p>
-              <span className="fd-stat-trend">{s.trend}</span>
             </div>
           </div>
         ))}
@@ -100,18 +136,32 @@ export default function InventoryView() {
             </tr>
           </thead>
           <tbody>
-            {filtered.map(item => (
-              <tr key={item.id}>
-                <td style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12 }}>{item.id}</td>
-                <td>{item.name}</td>
-                <td style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12 }}>{item.sku}</td>
-                <td>{item.category}</td>
-                <td><span className={statusBadge[item.status]}>{item.status}</span></td>
-                <td style={{ fontWeight: 700, color: item.qty === 0 ? '#ef4444' : item.qty < 20 ? '#f59e0b' : 'var(--text-primary)' }}>{item.qty}</td>
-                <td>{item.location}</td>
-                <td>{item.updated}</td>
+            {loading ? (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
+                  Loading factory inventory...
+                </td>
               </tr>
-            ))}
+            ) : filtered.length === 0 ? (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
+                  No inventory items recorded yet.
+                </td>
+              </tr>
+            ) : (
+              filtered.map(item => (
+                <tr key={item.id}>
+                  <td style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12 }}>{item.id}</td>
+                  <td>{item.name}</td>
+                  <td style={{ fontFamily: 'var(--font-mono, monospace)', fontSize: 12 }}>{item.sku}</td>
+                  <td>{item.category}</td>
+                  <td><span className={statusBadge[item.status]}>{item.status}</span></td>
+                  <td style={{ fontWeight: 700, color: item.qty === 0 ? '#ef4444' : item.qty < 20 ? '#f59e0b' : 'var(--text-primary)' }}>{item.qty}</td>
+                  <td>{item.location}</td>
+                  <td>{item.updated}</td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>

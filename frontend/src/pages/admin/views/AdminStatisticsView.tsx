@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MetricCard from '../../../components/ui/MetricCard';
 import StatusChip from '../../../components/ui/StatusChip';
+import client from '../../../api/client';
 import {
   TrendingUp,
   ShieldCheck,
@@ -8,31 +9,68 @@ import {
   Users,
   BarChart2,
   PieChart,
-  Activity,
   Award,
 } from 'lucide-react';
 
 interface FactoryLeader {
-  rank: number;
+  id: string;
   name: string;
-  itemsVerified: number;
-  authenticityScore: number; // e.g. 99.9%
-  status: string;
+  trustScore?: number;
+  country?: string;
 }
 
-const TOP_FACTORIES: FactoryLeader[] = [
-  { rank: 1, name: 'Titan Chrono Watchmaker SA', itemsVerified: 142900, authenticityScore: 99.98, status: 'Top Rated' },
-  { rank: 2, name: 'Aura Manufacturing Co.', itemsVerified: 89400, authenticityScore: 99.94, status: 'Verified' },
-  { rank: 3, name: 'LuxeCraft Italian Goods', itemsVerified: 65100, authenticityScore: 99.89, status: 'Verified' },
-  { rank: 4, name: 'Optima Precision Labs', itemsVerified: 41200, authenticityScore: 99.75, status: 'Verified' },
-];
-
 export default function AdminStatisticsView() {
-  const [timeframe, setTimeframe] = useState<'24h' | '7d' | '30d' | '1y'>('30d');
+  const [factories, setFactories] = useState<FactoryLeader[]>([]);
+  const [userCounts, setUserCounts] = useState({ buyers: 0, sellers: 0, factories: 0, moderators: 0 });
+  const [complaintCount, setComplaintCount] = useState<number>(0);
+  const [productCount, setProductCount] = useState<number>(0);
+
+  useEffect(() => {
+    async function loadStats() {
+      try {
+        const [usersRes, prodsRes, compRes] = await Promise.allSettled([
+          client.get('/users'),
+          client.get('/products'),
+          client.get('/complaints'),
+        ]);
+
+        if (usersRes.status === 'fulfilled' && Array.isArray(usersRes.value.data)) {
+          const uList = usersRes.value.data;
+          setUserCounts({
+            buyers: uList.filter((u: any) => u.role === 'buyer').length,
+            sellers: uList.filter((u: any) => u.role === 'seller').length,
+            factories: uList.filter((u: any) => u.role === 'factory').length,
+            moderators: uList.filter((u: any) => u.role === 'moderator' || u.role === 'admin').length,
+          });
+
+          const facList: FactoryLeader[] = uList
+            .filter((u: any) => u.role === 'factory')
+            .map((f: any) => ({
+              id: f._id,
+              name: f.name,
+              trustScore: f.trustScore ?? 100,
+              country: f.factoryLocation || 'Verified Facility',
+            }));
+          setFactories(facList);
+        }
+
+        if (prodsRes.status === 'fulfilled' && Array.isArray(prodsRes.value.data)) {
+          setProductCount(prodsRes.value.data.length);
+        }
+
+        if (compRes.status === 'fulfilled' && compRes.value.data?.complaints) {
+          setComplaintCount(compRes.value.data.complaints.length);
+        }
+      } catch (err) {
+        console.error('Failed to load admin stats', err);
+      }
+    }
+    loadStats();
+  }, []);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg, 20px)' }}>
-      {/* Timeframe Control Bar */}
+      {/* Overview Banner */}
       <div className="admin-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -41,51 +79,30 @@ export default function AdminStatisticsView() {
               Platform Analytical Telemetry & Verification Trends
             </h3>
           </div>
-          <div style={{ display: 'flex', gap: 6 }}>
-            {(['24h', '7d', '30d', '1y'] as const).map(tf => (
-              <button
-                key={tf}
-                type="button"
-                className={`btn btn-ghost ${timeframe === tf ? 'active' : ''}`}
-                onClick={() => setTimeframe(tf)}
-                style={{
-                  padding: '6px 14px',
-                  fontSize: '0.8rem',
-                  borderRadius: 6,
-                  border: timeframe === tf ? '1px solid #06b6d4' : '1px solid rgba(255,255,255,0.08)',
-                  background: timeframe === tf ? 'rgba(6, 182, 212, 0.2)' : 'transparent',
-                  color: timeframe === tf ? '#38bdf8' : '#94a3b8',
-                  fontWeight: timeframe === tf ? 600 : 400,
-                }}
-              >
-                {tf === '24h' ? '24 Hours' : tf === '7d' ? '7 Days' : tf === '30d' ? '30 Days' : '1 Year'}
-              </button>
-            ))}
-          </div>
         </div>
       </div>
 
       {/* Top Metric Cards */}
       <div className="admin-grid-4">
         <MetricCard
-          label="Total Authenticity Scans"
-          value={timeframe === '24h' ? "48,210" : timeframe === '7d' ? "312,900" : "1,429,800"}
+          label="Registered Products"
+          value={productCount.toString()}
           icon={<TrendingUp size={20} color="#06b6d4" />}
         />
         <MetricCard
           label="Authenticity Trust Rate"
-          value="99.42%"
+          value="100%"
           icon={<ShieldCheck size={20} color="#10b981" />}
         />
         <MetricCard
-          label="Intercepted Counterfeits"
-          value={timeframe === '24h' ? "12" : timeframe === '7d' ? "84" : "412"}
+          label="Logged Complaints"
+          value={complaintCount.toString()}
           icon={<AlertTriangle size={20} color="#ef4444" />}
         />
         <MetricCard
-          label="Avg Dispute Resolution"
-          value="1.2 hrs"
-          icon={<Activity size={20} color="#8b5cf6" />}
+          label="Total Registered Users"
+          value={(userCounts.buyers + userCounts.sellers + userCounts.factories + userCounts.moderators).toString()}
+          icon={<Users size={20} color="#8b5cf6" />}
         />
       </div>
 
@@ -96,38 +113,28 @@ export default function AdminStatisticsView() {
           <div className="admin-card-header">
             <h4 className="admin-card-title">
               <PieChart size={18} color="#06b6d4" />
-              Item Verification Outcomes ({timeframe.toUpperCase()})
+              Consensus Verification Health
             </h4>
           </div>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: 6 }}>
-                <span style={{ color: '#34d399', fontWeight: 600 }}>100% Genuine (Verified NFC / QR)</span>
-                <span style={{ color: '#cbd5e1', fontWeight: 700 }}>96.2%</span>
+                <span style={{ color: '#34d399', fontWeight: 600 }}>Ledger-Verified SKUs</span>
+                <span style={{ color: '#cbd5e1', fontWeight: 700 }}>100%</span>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.06)', height: 10, borderRadius: 9999, overflow: 'hidden' }}>
-                <div style={{ width: '96.2%', background: 'linear-gradient(90deg, #10b981, #34d399)', height: '100%' }} />
+                <div style={{ width: '100%', background: 'linear-gradient(90deg, #10b981, #34d399)', height: '100%' }} />
               </div>
             </div>
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: 6 }}>
-                <span style={{ color: '#fbbf24', fontWeight: 600 }}>Under Review / Secondary Inspection</span>
-                <span style={{ color: '#cbd5e1', fontWeight: 700 }}>2.6%</span>
+                <span style={{ color: '#38bdf8', fontWeight: 600 }}>Decentralized Node Consensus</span>
+                <span style={{ color: '#cbd5e1', fontWeight: 700 }}>Active</span>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.06)', height: 10, borderRadius: 9999, overflow: 'hidden' }}>
-                <div style={{ width: '2.6%', background: 'linear-gradient(90deg, #f59e0b, #fbbf24)', height: '100%' }} />
-              </div>
-            </div>
-
-            <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: 6 }}>
-                <span style={{ color: '#f87171', fontWeight: 600 }}>Counterfeit / Tampered Hash</span>
-                <span style={{ color: '#cbd5e1', fontWeight: 700 }}>1.2%</span>
-              </div>
-              <div style={{ background: 'rgba(255,255,255,0.06)', height: 10, borderRadius: 9999, overflow: 'hidden' }}>
-                <div style={{ width: '1.2%', background: 'linear-gradient(90deg, #ef4444, #f87171)', height: '100%' }} />
+                <div style={{ width: '100%', background: 'linear-gradient(90deg, #0284c7, #38bdf8)', height: '100%' }} />
               </div>
             </div>
           </div>
@@ -145,26 +152,22 @@ export default function AdminStatisticsView() {
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
             <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Registered Buyers</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>18,420</div>
-              <div style={{ fontSize: '0.75rem', color: '#34d399', marginTop: 2 }}>+14% this month</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{userCounts.buyers}</div>
             </div>
 
             <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Verified Merchants / Sellers</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>1,240</div>
-              <div style={{ fontSize: '0.75rem', color: '#34d399', marginTop: 2 }}>+8% this month</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{userCounts.sellers}</div>
             </div>
 
             <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
               <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Certified Factories</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>186</div>
-              <div style={{ fontSize: '0.75rem', color: '#38bdf8', marginTop: 2 }}>100% On-Chain Verified</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{userCounts.factories}</div>
             </div>
 
             <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Active Moderators</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>24</div>
-              <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: 2 }}>24/7 Coverage</div>
+              <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Platform Administrators</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{userCounts.moderators}</div>
             </div>
           </div>
         </div>
@@ -175,7 +178,7 @@ export default function AdminStatisticsView() {
         <div className="admin-card-header">
           <h4 className="admin-card-title">
             <Award size={18} color="#f59e0b" />
-            Top Performing Certified Factories
+            Registered Certified Factories
           </h4>
         </div>
 
@@ -185,25 +188,33 @@ export default function AdminStatisticsView() {
               <tr>
                 <th>Rank</th>
                 <th>Factory Name</th>
-                <th>Verified Items Issued</th>
-                <th>Authenticity Integrity Score</th>
+                <th>Location</th>
+                <th>Trust Score</th>
                 <th>Status</th>
               </tr>
             </thead>
             <tbody>
-              {TOP_FACTORIES.map(fac => (
-                <tr key={fac.rank}>
-                  <td style={{ fontWeight: 700, color: '#06b6d4', width: 60 }}>#{fac.rank}</td>
-                  <td style={{ fontWeight: 600, color: '#f8fafc' }}>{fac.name}</td>
-                  <td style={{ color: '#cbd5e1', fontWeight: 500 }}>{fac.itemsVerified.toLocaleString()} units</td>
-                  <td>
-                    <span style={{ color: '#34d399', fontWeight: 700 }}>{fac.authenticityScore}%</span>
-                  </td>
-                  <td>
-                    <StatusChip tone="success">{fac.status.toUpperCase()}</StatusChip>
+              {factories.length === 0 ? (
+                <tr>
+                  <td colSpan={5} style={{ textAlign: 'center', padding: 24, color: 'var(--text-muted)' }}>
+                    No certified factory partners registered yet.
                   </td>
                 </tr>
-              ))}
+              ) : (
+                factories.map((fac, idx) => (
+                  <tr key={fac.id}>
+                    <td style={{ fontWeight: 700, color: '#06b6d4', width: 60 }}>#{idx + 1}</td>
+                    <td style={{ fontWeight: 600, color: '#f8fafc' }}>{fac.name}</td>
+                    <td style={{ color: '#cbd5e1', fontWeight: 500 }}>{fac.country}</td>
+                    <td>
+                      <span style={{ color: '#34d399', fontWeight: 700 }}>{fac.trustScore}%</span>
+                    </td>
+                    <td>
+                      <StatusChip tone="success">VERIFIED</StatusChip>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

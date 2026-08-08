@@ -88,7 +88,7 @@ const SellerSourcing: React.FC = () => {
 
 
 
-  // Fetch verified factories on mount (with robust mock fallback)
+  // Fetch verified factories on mount
   useEffect(() => {
     const fetchFactories = async () => {
       try {
@@ -97,210 +97,44 @@ const SellerSourcing: React.FC = () => {
         if (factoryList && factoryList.length > 0) {
           setFactories(factoryList);
           setSelectedFactoryId(factoryList[0]._id);
-          setLoadingFactories(false);
-          return;
+        } else {
+          setFactories([]);
+          setSelectedFactoryId('');
         }
       } catch (err: any) {
-        console.warn('API /users failed, using high-quality mock factories.', err);
+        console.warn('API /users failed to load factories', err);
+        setFactories([]);
+        setSelectedFactoryId('');
+      } finally {
+        setLoadingFactories(false);
       }
-
-      // Fallback mock factories
-      const mockFactories: Factory[] = [
-        {
-          _id: 'factory_1',
-          name: 'Apex Manufacturing Co.',
-          logoUrl: 'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=120&auto=format&fit=crop&q=60',
-          verificationStatus: 'verified',
-          trustScore: 98,
-          country: 'Germany',
-          yearsVerified: 5,
-          certifications: ['ISO 9001', 'ISO 14001', 'CE Mark', 'GMP'],
-          categories: ['Apparel', 'Footwear', 'Textiles']
-        },
-        {
-          _id: 'factory_2',
-          name: 'Nova Electronics Ltd.',
-          logoUrl: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=120&auto=format&fit=crop&q=60',
-          verificationStatus: 'verified',
-          trustScore: 95,
-          country: 'Japan',
-          yearsVerified: 3,
-          certifications: ['ISO 9001', 'RoHS', 'FCC', 'UL'],
-          categories: ['Electronics', 'Smart Home', 'Gadgets']
-        },
-        {
-          _id: 'factory_3',
-          name: 'BioSynthetix Organics',
-          logoUrl: 'https://images.unsplash.com/photo-1532187863486-abf9d39d66e8?w=120&auto=format&fit=crop&q=60',
-          verificationStatus: 'verified',
-          trustScore: 92,
-          country: 'Canada',
-          yearsVerified: 4,
-          certifications: ['USDA Organic', 'GMP', 'HACCP', 'ISO 22000'],
-          categories: ['Cosmetics', 'Skincare', 'Wellness']
-        },
-        {
-          _id: 'factory_4',
-          name: 'Summit Leathercraft',
-          logoUrl: 'https://images.unsplash.com/photo-1453728013993-6d66e9c9123a?w=120&auto=format&fit=crop&q=60',
-          verificationStatus: 'verified',
-          trustScore: 89,
-          country: 'Italy',
-          yearsVerified: 6,
-          certifications: ['ISO 9001', 'LWG Gold Medal', 'REACH'],
-          categories: ['Fashion Accessories', 'Bags', 'Leather Goods']
-        }
-      ];
-      setFactories(mockFactories);
-      setSelectedFactoryId(mockFactories[0]._id);
-      setLoadingFactories(false);
     };
     fetchFactories();
   }, []);
 
-  // Fetch products whenever a factory is selected (with mock fallback)
+  // Fetch products whenever a factory is selected
   useEffect(() => {
-    if (!selectedFactoryId) return;
+    if (!selectedFactoryId) {
+      setProducts([]);
+      setLoadingProducts(false);
+      return;
+    }
     const fetchProducts = async () => {
       setLoadingProducts(true);
       setError('');
       try {
         const res = await client.get('/products/factory', { params: { factoryId: selectedFactoryId } });
-        if (res.data && res.data.products && res.data.products.length > 0) {
+        if (res.data && res.data.products && Array.isArray(res.data.products)) {
           setProducts(res.data.products);
-          setLoadingProducts(false);
-          return;
+        } else {
+          setProducts([]);
         }
       } catch (err: any) {
-        console.warn(`API /products/factory failed for ${selectedFactoryId}, using mock products.`, err);
+        console.warn(`API /products/factory failed for ${selectedFactoryId}`, err);
+        setProducts([]);
+      } finally {
+        setLoadingProducts(false);
       }
-
-      // Fallback mock products
-      let mockProducts: Product[];
-      if (selectedFactoryId === 'factory_1') {
-        mockProducts = [
-          {
-            _id: 'prod_1_1',
-            name: 'AeroFlex Breathable Sneakers',
-            imageUrl: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&auto=format&fit=crop&q=60',
-            batchId: 'BAT-AF-2026-01',
-            availableQty: 250,
-            wholesalePrice: 45.00,
-            manufacturingDate: '2026-05-10T00:00:00.000Z',
-            certifications: ['Oeko-Tex Standard 100', 'ISO 9001'],
-            authenticityStatus: 'verified',
-            category: 'Footwear'
-          },
-          {
-            _id: 'prod_1_2',
-            name: 'ThermoShield Waterproof Jacket',
-            imageUrl: 'https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&auto=format&fit=crop&q=60',
-            batchId: 'BAT-TS-2026-04',
-            availableQty: 180,
-            wholesalePrice: 65.00,
-            manufacturingDate: '2026-06-01T00:00:00.000Z',
-            certifications: ['ISO 9001', 'CE Mark'],
-            authenticityStatus: 'verified',
-            category: 'Apparel'
-          }
-        ];
-      } else if (selectedFactoryId === 'factory_2') {
-        mockProducts = [
-          {
-            _id: 'prod_2_1',
-            name: 'Quantum Sound ANC Earbuds',
-            imageUrl: 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=400&auto=format&fit=crop&q=60',
-            batchId: 'BAT-QS-2026-09',
-            availableQty: 500,
-            wholesalePrice: 35.00,
-            manufacturingDate: '2026-04-15T00:00:00.000Z',
-            certifications: ['RoHS', 'FCC', 'CE Mark'],
-            authenticityStatus: 'verified',
-            category: 'Electronics'
-          },
-          {
-            _id: 'prod_2_2',
-            name: 'AuraHue Smart Desk Lamp',
-            imageUrl: 'https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&auto=format&fit=crop&q=60',
-            batchId: 'BAT-AH-2026-02',
-            availableQty: 320,
-            wholesalePrice: 22.50,
-            manufacturingDate: '2026-05-20T00:00:00.000Z',
-            certifications: ['RoHS', 'UL Listed'],
-            authenticityStatus: 'verified',
-            category: 'Smart Home'
-          }
-        ];
-      } else if (selectedFactoryId === 'factory_3') {
-        mockProducts = [
-          {
-            _id: 'prod_3_1',
-            name: 'HydraGlow Hyaluronic Serum',
-            imageUrl: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=400&auto=format&fit=crop&q=60',
-            batchId: 'BAT-HG-2026-11',
-            availableQty: 450,
-            wholesalePrice: 18.00,
-            manufacturingDate: '2026-06-12T00:00:00.000Z',
-            certifications: ['USDA Organic', 'GMP Certified'],
-            authenticityStatus: 'verified',
-            category: 'Skincare'
-          },
-          {
-            _id: 'prod_3_2',
-            name: 'BioRestore Anti-Aging Cream',
-            imageUrl: 'https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?w=400&auto=format&fit=crop&q=60',
-            batchId: 'BAT-BR-2026-07',
-            availableQty: 300,
-            wholesalePrice: 25.00,
-            manufacturingDate: '2026-05-28T00:00:00.000Z',
-            certifications: ['GMP Certified', 'HACCP'],
-            authenticityStatus: 'verified',
-            category: 'Cosmetics'
-          }
-        ];
-      } else if (selectedFactoryId === 'factory_4') {
-        mockProducts = [
-          {
-            _id: 'prod_4_1',
-            name: 'Heritage Full-Grain Leather Satchel',
-            imageUrl: 'https://images.unsplash.com/photo-1547949003-9792a18a2601?w=400&auto=format&fit=crop&q=60',
-            batchId: 'BAT-HL-2026-03',
-            availableQty: 120,
-            wholesalePrice: 120.00,
-            manufacturingDate: '2026-04-30T00:00:00.000Z',
-            certifications: ['LWG Gold Certified', 'ISO 9001'],
-            authenticityStatus: 'verified',
-            category: 'Leather Goods'
-          },
-          {
-            _id: 'prod_4_2',
-            name: 'Classic Leather Bi-Fold Wallet',
-            imageUrl: 'https://images.unsplash.com/photo-1627123424574-724758594e93?w=400&auto=format&fit=crop&q=60',
-            batchId: 'BAT-LW-2026-08',
-            availableQty: 200,
-            wholesalePrice: 30.00,
-            manufacturingDate: '2026-06-05T00:00:00.000Z',
-            certifications: ['REACH Compliant'],
-            authenticityStatus: 'verified',
-            category: 'Bags'
-          }
-        ];
-      } else {
-        mockProducts = [
-          {
-            _id: 'prod_generic',
-            name: 'Generic Factory Product',
-            batchId: 'BAT-GEN-01',
-            availableQty: 100,
-            wholesalePrice: 10.00,
-            manufacturingDate: new Date().toISOString(),
-            authenticityStatus: 'verified',
-            category: 'General'
-          }
-        ];
-      }
-      setProducts(mockProducts);
-      setLoadingProducts(false);
     };
     fetchProducts();
   }, [selectedFactoryId]);

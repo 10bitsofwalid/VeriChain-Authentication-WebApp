@@ -31,14 +31,6 @@ import type {
   QuarantineState,
 } from '../../types/recallManagement';
 
-import {
-  MOCK_RECALLS,
-  MOCK_AFFECTED_UNITS,
-  MOCK_TIMELINE_EVENTS,
-  MOCK_NOTIFICATIONS,
-  MOCK_AUDIT_HISTORY,
-} from '../../mock/recallManagementData';
-
 import './RecallManagement.css';
 
 type TabType = 'list' | 'details' | 'products' | 'timeline' | 'notifications' | 'history';
@@ -46,13 +38,13 @@ type TabType = 'list' | 'details' | 'products' | 'timeline' | 'notifications' | 
 export default function RecallManagementView() {
   // State
   const [activeTab, setActiveTab] = useState<TabType>('list');
-  const [recalls, setRecalls] = useState<RecallItem[]>(MOCK_RECALLS);
-  const [units, setUnits] = useState<AffectedProductUnit[]>(MOCK_AFFECTED_UNITS);
-  const [timelineEvents] = useState<RecallTimelineEvent[]>(MOCK_TIMELINE_EVENTS);
-  const [notifications, setNotifications] = useState<RecallNotificationDispatch[]>(MOCK_NOTIFICATIONS);
-  const [auditLogs, setAuditLogs] = useState<RecallAuditRecord[]>(MOCK_AUDIT_HISTORY);
+  const [recalls, setRecalls] = useState<RecallItem[]>([]);
+  const [units, setUnits] = useState<AffectedProductUnit[]>([]);
+  const [timelineEvents] = useState<RecallTimelineEvent[]>([]);
+  const [notifications, setNotifications] = useState<RecallNotificationDispatch[]>([]);
+  const [auditLogs, setAuditLogs] = useState<RecallAuditRecord[]>([]);
 
-  const [selectedRecallId, setSelectedRecallId] = useState<string>('rec-001');
+  const [selectedRecallId, setSelectedRecallId] = useState<string>('');
   const [searchQuery, setSearchQuery] = useState('');
   const [severityFilter, setSeverityFilter] = useState<string>('all');
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -71,6 +63,7 @@ export default function RecallManagementView() {
 
   // Selected Recall Object
   const selectedRecall = useMemo(() => {
+    if (recalls.length === 0) return null;
     return recalls.find((r) => r.id === selectedRecallId) || recalls[0];
   }, [recalls, selectedRecallId]);
 
@@ -97,21 +90,25 @@ export default function RecallManagementView() {
 
   // Filtered Units for selected recall
   const filteredUnits = useMemo(() => {
+    if (!selectedRecall) return [];
     return units.filter((u) => u.recallId === selectedRecall.id);
   }, [units, selectedRecall]);
 
   // Filtered Timeline for selected recall
   const filteredTimeline = useMemo(() => {
+    if (!selectedRecall) return [];
     return timelineEvents.filter((t) => t.recallId === selectedRecall.id);
   }, [timelineEvents, selectedRecall]);
 
   // Filtered Notifications for selected recall
   const filteredNotifications = useMemo(() => {
+    if (!selectedRecall) return [];
     return notifications.filter((n) => n.recallId === selectedRecall.id);
   }, [notifications, selectedRecall]);
 
   // Filtered History for selected recall
   const filteredAuditLogs = useMemo(() => {
+    if (!selectedRecall) return [];
     return auditLogs.filter((a) => a.recallId === selectedRecall.id);
   }, [auditLogs, selectedRecall]);
 
@@ -140,6 +137,7 @@ export default function RecallManagementView() {
   };
 
   const handleUpdateStatus = (newStatus: RecallStatus) => {
+    if (!selectedRecall) return;
     setRecalls((prev) =>
       prev.map((r) => {
         if (r.id === selectedRecall.id) {
@@ -175,7 +173,7 @@ export default function RecallManagementView() {
     if (!newRecallTitle || !newRecallProduct) return;
 
     const newId = `rec-${Date.now()}`;
-    const code = `REC-2026-${Math.floor(100 + Math.random() * 900)}`;
+    const code = `REC-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
 
     const item: RecallItem = {
       id: newId,
@@ -188,12 +186,12 @@ export default function RecallManagementView() {
       status: 'Active',
       reason: newRecallReason || 'Safety inspection anomaly detected.',
       rootCause: 'Investigation under progress by QA team.',
-      riskLevel: 'Class II - Precautionary isolation',
-      affectedUnitsCount: 500,
+      riskLevel: 'Precautionary isolation',
+      affectedUnitsCount: 1,
       quarantinedCount: 0,
       quarantineDirectives: 'Isolate batch from main sales distribution channels.',
       initiatedDate: new Date().toISOString().replace('T', ' ').substring(0, 19),
-      owner: 'Current Admin',
+      owner: 'Quality Officer',
       regulatoryNotified: true,
     };
 
@@ -208,6 +206,7 @@ export default function RecallManagementView() {
   };
 
   const handleDispatchNotification = () => {
+    if (!selectedRecall) return;
     const newDispatch: RecallNotificationDispatch = {
       id: `notif-${Date.now()}`,
       recallId: selectedRecall.id,
@@ -215,14 +214,14 @@ export default function RecallManagementView() {
       channel: 'Push Notification',
       targetGroup: 'End Customers',
       totalRecipients: selectedRecall.affectedUnitsCount,
-      deliveryRate: '99.2%',
+      deliveryRate: '100%',
       status: 'Sent',
       messageTemplate: `URGENT ALERT: Safety recall initiated for ${selectedRecall.productName} (Batch ${selectedRecall.batchId}). Please inspect product serial.`,
     };
 
     setNotifications((prev) => [newDispatch, ...prev]);
     setShowDispatchModal(false);
-    triggerNotification(`Emergency Alert Broadcast dispatched to ${selectedRecall.affectedUnitsCount} end-users`);
+    triggerNotification(`Emergency Alert Broadcast dispatched for ${selectedRecall.productName}`);
   };
 
   const getToneFromSeverity = (sev: RecallSeverity) => {
@@ -305,14 +304,16 @@ export default function RecallManagementView() {
                 <Plus size={16} />
                 Initiate New Recall
               </ActionButton>
-              <ActionButton
-                variant="secondary"
-                size="sm"
-                onClick={() => setShowDispatchModal(true)}
-              >
-                <Send size={16} />
-                Broadcast Alert
-              </ActionButton>
+              {selectedRecall && (
+                <ActionButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowDispatchModal(true)}
+                >
+                  <Send size={16} />
+                  Broadcast Alert
+                </ActionButton>
+              )}
             </div>
           </div>
         </div>
@@ -342,31 +343,33 @@ export default function RecallManagementView() {
         </div>
 
         {/* Active Focus Bar */}
-        <div className="recall-focus-bar">
-          <div className="recall-focus-left">
-            <span className="recall-focus-label">ACTIVE RECALL FOCUS:</span>
-            <select
-              className="recall-select"
-              value={selectedRecall.id}
-              onChange={(e) => setSelectedRecallId(e.target.value)}
-            >
-              {recalls.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.recallCode} - {r.productName} ({r.severity})
-                </option>
-              ))}
-            </select>
-          </div>
+        {selectedRecall && (
+          <div className="recall-focus-bar">
+            <div className="recall-focus-left">
+              <span className="recall-focus-label">ACTIVE RECALL FOCUS:</span>
+              <select
+                className="recall-select"
+                value={selectedRecall.id}
+                onChange={(e) => setSelectedRecallId(e.target.value)}
+              >
+                {recalls.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.recallCode} - {r.productName} ({r.severity})
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-            <StatusChip tone={getToneFromSeverity(selectedRecall.severity)}>
-              SEVERITY: {selectedRecall.severity.toUpperCase()}
-            </StatusChip>
-            <StatusChip tone={getToneFromStatus(selectedRecall.status)}>
-              STATUS: {selectedRecall.status.toUpperCase()}
-            </StatusChip>
+            <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
+              <StatusChip tone={getToneFromSeverity(selectedRecall.severity)}>
+                SEVERITY: {selectedRecall.severity.toUpperCase()}
+              </StatusChip>
+              <StatusChip tone={getToneFromStatus(selectedRecall.status)}>
+                STATUS: {selectedRecall.status.toUpperCase()}
+              </StatusChip>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Sub-view Nav Tabs */}
         <div className="recall-tabs-bar">
@@ -493,7 +496,7 @@ export default function RecallManagementView() {
                     <tr
                       key={r.id}
                       style={{
-                        background: r.id === selectedRecall.id ? 'rgba(6, 182, 212, 0.06)' : undefined,
+                        background: r.id === selectedRecall?.id ? 'rgba(6, 182, 212, 0.06)' : undefined,
                       }}
                     >
                       <td>
@@ -534,7 +537,7 @@ export default function RecallManagementView() {
                   {filteredRecalls.length === 0 && (
                     <tr>
                       <td colSpan={7} style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>
-                        No product recalls found matching criteria.
+                        No product recalls reported. Click "Initiate New Recall" to open a safety action.
                       </td>
                     </tr>
                   )}
@@ -547,77 +550,83 @@ export default function RecallManagementView() {
         {/* TAB 2: RECALL DETAILS */}
         {activeTab === 'details' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-            <div className="recall-card">
-              <div className="recall-card-header">
-                <div>
-                  <h3 className="recall-card-title">
-                    <FileText size={18} color="#06b6d4" />
-                    Recall Specification & Risk Assessment — {selectedRecall.recallCode}
-                  </h3>
-                  <p className="recall-card-subtitle">{selectedRecall.title}</p>
-                </div>
-
-                <div style={{ display: 'flex', gap: 10 }}>
-                  {selectedRecall.status !== 'Resolved' && (
-                    <ActionButton variant="primary" size="sm" onClick={() => handleUpdateStatus('Resolved')}>
-                      Mark Resolved
-                    </ActionButton>
-                  )}
-                  {selectedRecall.status === 'Active' && (
-                    <ActionButton variant="danger" size="sm" onClick={() => handleUpdateStatus('Quarantined')}>
-                      Enforce Quarantined Lock
-                    </ActionButton>
-                  )}
-                </div>
+            {!selectedRecall ? (
+              <div className="recall-card" style={{ textAlign: 'center', padding: 36, color: '#94a3b8' }}>
+                No recall selected. Please initiate or select a recall from the list.
               </div>
+            ) : (
+              <div className="recall-card">
+                <div className="recall-card-header">
+                  <div>
+                    <h3 className="recall-card-title">
+                      <FileText size={18} color="#06b6d4" />
+                      Recall Specification & Risk Assessment — {selectedRecall.recallCode}
+                    </h3>
+                    <p className="recall-card-subtitle">{selectedRecall.title}</p>
+                  </div>
 
-              <div className="detail-info-grid" style={{ marginBottom: 20 }}>
-                <div className="detail-info-card">
-                  <div className="detail-info-label">Product Name</div>
-                  <div className="detail-info-value">{selectedRecall.productName}</div>
-                </div>
-                <div className="detail-info-card">
-                  <div className="detail-info-label">Batch ID / SKU</div>
-                  <div className="detail-info-value" style={{ fontFamily: 'monospace' }}>
-                    {selectedRecall.batchId} ({selectedRecall.sku})
+                  <div style={{ display: 'flex', gap: 10 }}>
+                    {selectedRecall.status !== 'Resolved' && (
+                      <ActionButton variant="primary" size="sm" onClick={() => handleUpdateStatus('Resolved')}>
+                        Mark Resolved
+                      </ActionButton>
+                    )}
+                    {selectedRecall.status === 'Active' && (
+                      <ActionButton variant="danger" size="sm" onClick={() => handleUpdateStatus('Quarantined')}>
+                        Enforce Quarantined Lock
+                      </ActionButton>
+                    )}
                   </div>
                 </div>
-                <div className="detail-info-card">
-                  <div className="detail-info-label">Initiated By</div>
-                  <div className="detail-info-value">{selectedRecall.owner}</div>
+
+                <div className="detail-info-grid" style={{ marginBottom: 20 }}>
+                  <div className="detail-info-card">
+                    <div className="detail-info-label">Product Name</div>
+                    <div className="detail-info-value">{selectedRecall.productName}</div>
+                  </div>
+                  <div className="detail-info-card">
+                    <div className="detail-info-label">Batch ID / SKU</div>
+                    <div className="detail-info-value" style={{ fontFamily: 'monospace' }}>
+                      {selectedRecall.batchId} ({selectedRecall.sku})
+                    </div>
+                  </div>
+                  <div className="detail-info-card">
+                    <div className="detail-info-label">Initiated By</div>
+                    <div className="detail-info-value">{selectedRecall.owner}</div>
+                  </div>
+                  <div className="detail-info-card">
+                    <div className="detail-info-label">Regulatory Authority Alert</div>
+                    <div className="detail-info-value" style={{ color: selectedRecall.regulatoryNotified ? '#10b981' : '#f59e0b' }}>
+                      {selectedRecall.regulatoryNotified ? 'CONFIRMED DISPATCH' : 'PENDING NOTIFICATION'}
+                    </div>
+                  </div>
                 </div>
-                <div className="detail-info-card">
-                  <div className="detail-info-label">Regulatory Authority Alert</div>
-                  <div className="detail-info-value" style={{ color: selectedRecall.regulatoryNotified ? '#10b981' : '#f59e0b' }}>
-                    {selectedRecall.regulatoryNotified ? 'CONFIRMED DISPATCH' : 'PENDING NOTIFICATION'}
+
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+                  <div className="detail-info-card" style={{ borderLeft: '3px solid #ef4444' }}>
+                    <div className="detail-info-label" style={{ color: '#ef4444' }}>Reason for Recall</div>
+                    <p style={{ color: '#f8fafc', margin: '4px 0 0 0', lineHeight: 1.5 }}>{selectedRecall.reason}</p>
+                  </div>
+
+                  <div className="detail-info-card" style={{ borderLeft: '3px solid #f59e0b' }}>
+                    <div className="detail-info-label" style={{ color: '#f59e0b' }}>Root Cause Analysis</div>
+                    <p style={{ color: '#f8fafc', margin: '4px 0 0 0', lineHeight: 1.5 }}>{selectedRecall.rootCause}</p>
+                  </div>
+
+                  <div className="detail-info-card" style={{ borderLeft: '3px solid #06b6d4' }}>
+                    <div className="detail-info-label" style={{ color: '#06b6d4' }}>Health & Risk Assessment Level</div>
+                    <p style={{ color: '#f8fafc', margin: '4px 0 0 0', fontWeight: 600 }}>{selectedRecall.riskLevel}</p>
+                  </div>
+
+                  <div className="detail-info-card" style={{ background: 'rgba(15, 23, 42, 0.8)' }}>
+                    <div className="detail-info-label">Quarantine & Handling Directives</div>
+                    <p style={{ color: '#e2e8f0', margin: '4px 0 0 0', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                      {selectedRecall.quarantineDirectives}
+                    </p>
                   </div>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-                <div className="detail-info-card" style={{ borderLeft: '3px solid #ef4444' }}>
-                  <div className="detail-info-label" style={{ color: '#ef4444' }}>Reason for Recall</div>
-                  <p style={{ color: '#f8fafc', margin: '4px 0 0 0', lineHeight: 1.5 }}>{selectedRecall.reason}</p>
-                </div>
-
-                <div className="detail-info-card" style={{ borderLeft: '3px solid #f59e0b' }}>
-                  <div className="detail-info-label" style={{ color: '#f59e0b' }}>Root Cause Analysis</div>
-                  <p style={{ color: '#f8fafc', margin: '4px 0 0 0', lineHeight: 1.5 }}>{selectedRecall.rootCause}</p>
-                </div>
-
-                <div className="detail-info-card" style={{ borderLeft: '3px solid #06b6d4' }}>
-                  <div className="detail-info-label" style={{ color: '#06b6d4' }}>Health & Risk Assessment Level</div>
-                  <p style={{ color: '#f8fafc', margin: '4px 0 0 0', fontWeight: 600 }}>{selectedRecall.riskLevel}</p>
-                </div>
-
-                <div className="detail-info-card" style={{ background: 'rgba(15, 23, 42, 0.8)' }}>
-                  <div className="detail-info-label">Quarantine & Handling Directives</div>
-                  <p style={{ color: '#e2e8f0', margin: '4px 0 0 0', fontSize: '0.9rem', lineHeight: 1.5 }}>
-                    {selectedRecall.quarantineDirectives}
-                  </p>
-                </div>
-              </div>
-            </div>
+            )}
           </div>
         )}
 
@@ -628,7 +637,7 @@ export default function RecallManagementView() {
               <div>
                 <h3 className="recall-card-title">
                   <Boxes size={18} color="#06b6d4" />
-                  Affected Item Units & Serial Distribution — {selectedRecall.batchId}
+                  Affected Item Units & Serial Distribution {selectedRecall ? `— ${selectedRecall.batchId}` : ''}
                 </h3>
                 <p className="recall-card-subtitle">
                   Individual cryptographic serial unit tracking and live warehouse/transit quarantine states
@@ -649,32 +658,28 @@ export default function RecallManagementView() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredUnits.map((unit) => (
-                    <tr key={unit.id}>
-                      <td style={{ fontFamily: 'monospace', fontWeight: 600, color: '#38bdf8' }}>
-                        {unit.serialNumber}
-                      </td>
-                      <td>{unit.location}</td>
+                  {filteredUnits.map((u) => (
+                    <tr key={u.id}>
+                      <td style={{ fontFamily: 'monospace', color: '#38bdf8', fontWeight: 600 }}>{u.serialNumber}</td>
+                      <td>{u.location}</td>
+                      <td>{u.distributionStatus}</td>
                       <td>
-                        <span className="recall-tab-badge">{unit.distributionStatus}</span>
-                      </td>
-                      <td>
-                        <StatusChip tone={unit.customerNotified ? 'success' : 'warning'}>
-                          {unit.customerNotified ? 'YES' : 'NO'}
+                        <StatusChip tone={u.customerNotified ? 'success' : 'warning'}>
+                          {u.customerNotified ? 'NOTIFIED' : 'PENDING'}
                         </StatusChip>
                       </td>
                       <td>
-                        <StatusChip tone={unit.quarantineState === 'Quarantined' ? 'danger' : unit.quarantineState === 'Returned' ? 'success' : 'warning'}>
-                          {unit.quarantineState.toUpperCase()}
+                        <StatusChip tone={u.quarantineState === 'Quarantined' ? 'danger' : 'neutral'}>
+                          {u.quarantineState}
                         </StatusChip>
                       </td>
                       <td>
                         <ActionButton
-                          variant={unit.quarantineState === 'Quarantined' ? 'secondary' : 'danger'}
+                          variant={u.quarantineState === 'Quarantined' ? 'secondary' : 'danger'}
                           size="sm"
-                          onClick={() => handleToggleUnitQuarantine(unit.id)}
+                          onClick={() => handleToggleUnitQuarantine(u.id)}
                         >
-                          {unit.quarantineState === 'Quarantined' ? 'Release Hold' : 'Quarantine Unit'}
+                          {u.quarantineState === 'Quarantined' ? 'Release Lock' : 'Quarantine Unit'}
                         </ActionButton>
                       </td>
                     </tr>
@@ -682,7 +687,7 @@ export default function RecallManagementView() {
                   {filteredUnits.length === 0 && (
                     <tr>
                       <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>
-                        No affected serial units registered for this recall.
+                        No serialized units logged under this recall batch.
                       </td>
                     </tr>
                   )}
@@ -699,50 +704,29 @@ export default function RecallManagementView() {
               <div>
                 <h3 className="recall-card-title">
                   <Clock size={18} color="#06b6d4" />
-                  Recall Resolution Progress & Event Timeline
+                  Recall Milestones & Custody Timeline {selectedRecall ? `— ${selectedRecall.recallCode}` : ''}
                 </h3>
-                <p className="recall-card-subtitle">
-                  Chronological milestone tracking from initial sample detection to final audit closing
-                </p>
+                <p className="recall-card-subtitle">Chronological ledger of incident discoveries, inspections, and resolutions</p>
               </div>
             </div>
 
-            <div className="timeline-container">
-              {filteredTimeline.map((step) => (
-                <div key={step.id} className={`timeline-step ${step.status}`}>
-                  <div className="timeline-marker">
-                    {step.status === 'completed' ? (
-                      <CheckCircle2 size={14} />
-                    ) : step.status === 'in_progress' ? (
-                      <Clock size={14} />
-                    ) : (
-                      <Tag size={14} />
-                    )}
+            <div className="recall-timeline">
+              {filteredTimeline.map((t) => (
+                <div key={t.id} className="timeline-entry">
+                  <div className="timeline-dot" />
+                  <div className="timeline-header-info">
+                    <span className="timeline-title-text">{t.title}</span>
+                    <span className="timeline-timestamp">{t.timestamp}</span>
                   </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 8 }}>
-                    <div>
-                      <h4 style={{ margin: 0, color: '#f8fafc', fontSize: '1rem', fontWeight: 600 }}>
-                        {step.title}
-                      </h4>
-                      <span style={{ fontSize: '0.78rem', color: '#06b6d4', fontWeight: 600 }}>
-                        Stage: {step.stage} | Performed by: {step.performedBy}
-                      </span>
-                    </div>
-                    <span style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#94a3b8' }}>
-                      {step.timestamp}
-                    </span>
+                  <p className="timeline-desc">{t.description}</p>
+                  <div className="timeline-meta-bar">
+                    <span>Recorded By: <strong>{t.performedBy}</strong> ({t.stage})</span>
                   </div>
-
-                  <p style={{ color: '#94a3b8', fontSize: '0.88rem', margin: '8px 0 0 0', lineHeight: 1.5 }}>
-                    {step.description}
-                  </p>
                 </div>
               ))}
-
               {filteredTimeline.length === 0 && (
                 <div style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>
-                  No timeline milestone events recorded yet.
+                  No milestone events recorded for this recall yet.
                 </div>
               )}
             </div>
@@ -756,16 +740,10 @@ export default function RecallManagementView() {
               <div>
                 <h3 className="recall-card-title">
                   <Bell size={18} color="#06b6d4" />
-                  Emergency Notification Broadcasts & Alerts
+                  Broadcasts & Regulatory Notifications
                 </h3>
-                <p className="recall-card-subtitle">
-                  Multi-channel alert log for buyers, authorized distributors, and regulatory webhooks
-                </p>
+                <p className="recall-card-subtitle">Dispatch logs sent to retailers, logistics hubs, and verified owners</p>
               </div>
-              <ActionButton variant="primary" size="sm" onClick={() => setShowDispatchModal(true)}>
-                <Send size={15} />
-                Dispatch New Alert
-              </ActionButton>
             </div>
 
             <div className="recall-table-wrapper">
@@ -778,35 +756,32 @@ export default function RecallManagementView() {
                     <th>Recipients</th>
                     <th>Delivery Rate</th>
                     <th>Status</th>
-                    <th>Message Preview</th>
+                    <th>Template Excerpt</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredNotifications.map((n) => (
                     <tr key={n.id}>
-                      <td style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#94a3b8' }}>
-                        {n.timestamp}
-                      </td>
-                      <td style={{ fontWeight: 600, color: '#f8fafc' }}>{n.channel}</td>
+                      <td style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{n.timestamp}</td>
                       <td>
-                        <span className="recall-tab-badge">{n.targetGroup}</span>
+                        <Tag size={13} style={{ display: 'inline', marginRight: 4 }} />
+                        {n.channel}
                       </td>
-                      <td>{n.totalRecipients}</td>
+                      <td>{n.targetGroup}</td>
+                      <td><strong>{n.totalRecipients.toLocaleString()}</strong></td>
                       <td style={{ color: '#10b981', fontWeight: 600 }}>{n.deliveryRate}</td>
                       <td>
-                        <StatusChip tone={n.status === 'Sent' ? 'success' : 'warning'}>
-                          {n.status}
-                        </StatusChip>
+                        <StatusChip tone="success">{n.status}</StatusChip>
                       </td>
-                      <td style={{ maxWidth: 300 }}>
-                        <div className="notif-preview-box">{n.messageTemplate}</div>
+                      <td style={{ fontSize: '0.82rem', maxWidth: 280, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {n.messageTemplate}
                       </td>
                     </tr>
                   ))}
                   {filteredNotifications.length === 0 && (
                     <tr>
                       <td colSpan={7} style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>
-                        No notification dispatches logged for this recall.
+                        No broadcast alerts dispatched for this recall yet.
                       </td>
                     </tr>
                   )}
@@ -816,18 +791,16 @@ export default function RecallManagementView() {
           </div>
         )}
 
-        {/* TAB 6: HISTORY */}
+        {/* TAB 6: HISTORY AUDIT LOG */}
         {activeTab === 'history' && (
           <div className="recall-card">
             <div className="recall-card-header">
               <div>
                 <h3 className="recall-card-title">
                   <HistoryIcon size={18} color="#06b6d4" />
-                  Audit Trail & Historical Resolution Logs
+                  Compliance Audit Trail
                 </h3>
-                <p className="recall-card-subtitle">
-                  Immutable record of compliance actions, operator notes, and cryptographic state transitions
-                </p>
+                <p className="recall-card-subtitle">Immutable system and operator log of all quarantine modifications</p>
               </div>
             </div>
 
@@ -837,40 +810,33 @@ export default function RecallManagementView() {
                   <tr>
                     <th>Timestamp</th>
                     <th>Action</th>
-                    <th>Actor / Operator</th>
+                    <th>Operator</th>
                     <th>Role</th>
-                    <th>State Change</th>
-                    <th>Audit Notes</th>
+                    <th>Previous State</th>
+                    <th>New State</th>
+                    <th>Notes</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredAuditLogs.map((a) => (
                     <tr key={a.id}>
-                      <td style={{ fontFamily: 'monospace', fontSize: '0.8rem', color: '#94a3b8' }}>
-                        {a.timestamp}
-                      </td>
-                      <td style={{ fontWeight: 600, color: '#38bdf8' }}>{a.action}</td>
-                      <td style={{ color: '#f8fafc' }}>{a.actor}</td>
-                      <td style={{ fontSize: '0.85rem', color: '#94a3b8' }}>{a.role}</td>
+                      <td style={{ fontSize: '0.85rem', color: '#94a3b8', fontFamily: 'monospace' }}>{a.timestamp}</td>
+                      <td style={{ fontWeight: 600, color: '#f8fafc' }}>{a.action}</td>
+                      <td>{a.actor}</td>
+                      <td style={{ color: '#94a3b8' }}>{a.role}</td>
                       <td>
-                        {a.newState ? (
-                          <span style={{ fontSize: '0.8rem' }}>
-                            <span style={{ textDecoration: 'line-through', color: '#64748b', marginRight: 4 }}>
-                              {a.previousState || 'None'}
-                            </span>
-                            <strong style={{ color: '#10b981' }}>→ {a.newState}</strong>
-                          </span>
-                        ) : (
-                          <span style={{ color: '#64748b' }}>N/A</span>
-                        )}
+                        <span style={{ color: '#94a3b8' }}>{a.previousState || '—'}</span>
                       </td>
-                      <td style={{ color: '#cbd5e1', fontSize: '0.85rem' }}>{a.notes}</td>
+                      <td>
+                        <strong style={{ color: '#38bdf8' }}>{a.newState || '—'}</strong>
+                      </td>
+                      <td style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>{a.notes}</td>
                     </tr>
                   ))}
                   {filteredAuditLogs.length === 0 && (
                     <tr>
-                      <td colSpan={6} style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>
-                        No audit records logged for this recall.
+                      <td colSpan={7} style={{ textAlign: 'center', padding: 24, color: '#94a3b8' }}>
+                        No compliance audit modifications recorded yet.
                       </td>
                     </tr>
                   )}
@@ -880,108 +846,89 @@ export default function RecallManagementView() {
           </div>
         )}
 
-        {/* MODAL 1: INITIATE NEW RECALL */}
+        {/* MODAL: Initiate New Recall */}
         {showNewRecallModal && (
-          <div className="recall-modal-backdrop" onClick={() => setShowNewRecallModal(false)}>
-            <div className="recall-modal-content" onClick={(e) => e.stopPropagation()}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <ShieldAlert size={20} color="#ef4444" />
-                  Initiate New Product Recall Order
-                </h3>
+          <div className="recall-modal-backdrop">
+            <div className="recall-modal">
+              <div className="recall-modal-header">
+                <h3>Initiate Product Recall Event</h3>
                 <button
                   onClick={() => setShowNewRecallModal(false)}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
                 >
-                  <X size={18} />
+                  <X size={20} />
                 </button>
               </div>
-
-              <form onSubmit={handleCreateRecall} style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
-                <div>
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block', marginBottom: 4 }}>
-                    Recall Title / Directive
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="e.g. PureSoap Batch B-1024 Chemical Contamination"
-                    className="recall-search-input"
-                    style={{ width: '100%', padding: '8px 12px' }}
-                    value={newRecallTitle}
-                    onChange={(e) => setNewRecallTitle(e.target.value)}
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
-                  <div>
-                    <label style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block', marginBottom: 4 }}>
-                      Product Name
-                    </label>
+              <form onSubmit={handleCreateRecall}>
+                <div className="recall-modal-body">
+                  <div className="recall-form-group">
+                    <label>Recall Directive Title</label>
                     <input
                       type="text"
+                      placeholder="e.g. Voluntary Battery Isolation Protocol"
+                      value={newRecallTitle}
+                      onChange={(e) => setNewRecallTitle(e.target.value)}
                       required
-                      placeholder="e.g. PureSoap Organic 200g"
-                      className="recall-search-input"
-                      style={{ width: '100%', padding: '8px 12px' }}
+                    />
+                  </div>
+
+                  <div className="recall-form-group">
+                    <label>Product Name</label>
+                    <input
+                      type="text"
+                      placeholder="e.g. AeroChron Titanium S1"
                       value={newRecallProduct}
                       onChange={(e) => setNewRecallProduct(e.target.value)}
+                      required
                     />
                   </div>
 
-                  <div>
-                    <label style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block', marginBottom: 4 }}>
-                      Batch ID
-                    </label>
+                  <div className="recall-form-group">
+                    <label>Affected Batch ID</label>
                     <input
                       type="text"
-                      required
-                      placeholder="e.g. B-1024"
-                      className="recall-search-input"
-                      style={{ width: '100%', padding: '8px 12px' }}
+                      placeholder="e.g. BATCH-2026-X9"
                       value={newRecallBatch}
                       onChange={(e) => setNewRecallBatch(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="recall-form-group">
+                    <label>Severity Level</label>
+                    <select
+                      value={newRecallSeverity}
+                      onChange={(e) => setNewRecallSeverity(e.target.value as RecallSeverity)}
+                    >
+                      <option value="Critical">Critical - Immediate Health Hazard</option>
+                      <option value="High">High - Performance Failure</option>
+                      <option value="Medium">Medium - Packaging / Label Discrepancy</option>
+                      <option value="Low">Low - Precautionary Advisory</option>
+                    </select>
+                  </div>
+
+                  <div className="recall-form-group">
+                    <label>Reason & Preliminary Root Cause</label>
+                    <textarea
+                      rows={3}
+                      placeholder="Describe the failure mode or inspection anomaly..."
+                      value={newRecallReason}
+                      onChange={(e) => setNewRecallReason(e.target.value)}
+                      required
                     />
                   </div>
                 </div>
-
-                <div>
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block', marginBottom: 4 }}>
-                    Severity Level
-                  </label>
-                  <select
-                    className="recall-filter-select"
-                    style={{ width: '100%' }}
-                    value={newRecallSeverity}
-                    onChange={(e) => setNewRecallSeverity(e.target.value as RecallSeverity)}
+                <div className="recall-modal-footer">
+                  <ActionButton
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => setShowNewRecallModal(false)}
+                    type="button"
                   >
-                    <option value="Critical">Critical (Class I)</option>
-                    <option value="High">High (Class II)</option>
-                    <option value="Medium">Medium (Class III)</option>
-                    <option value="Low">Low (Precautionary)</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block', marginBottom: 4 }}>
-                    Reason for Recall & Anomaly Description
-                  </label>
-                  <textarea
-                    rows={3}
-                    placeholder="Describe detected defect, laboratory result, or quality anomaly..."
-                    className="recall-search-input"
-                    style={{ width: '100%', padding: '8px 12px', resize: 'vertical' }}
-                    value={newRecallReason}
-                    onChange={(e) => setNewRecallReason(e.target.value)}
-                  />
-                </div>
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
-                  <ActionButton variant="secondary" size="sm" type="button" onClick={() => setShowNewRecallModal(false)}>
                     Cancel
                   </ActionButton>
-                  <ActionButton variant="danger" size="sm" type="submit">
-                    Initiate Recall Order
+                  <ActionButton variant="primary" size="sm" type="submit">
+                    Publish Recall Order
                   </ActionButton>
                 </div>
               </form>
@@ -989,56 +936,42 @@ export default function RecallManagementView() {
           </div>
         )}
 
-        {/* MODAL 2: DISPATCH BROADCAST ALERT */}
-        {showDispatchModal && (
-          <div className="recall-modal-backdrop" onClick={() => setShowDispatchModal(false)}>
-            <div className="recall-modal-content" onClick={(e) => e.stopPropagation()}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <h3 style={{ margin: 0, color: '#f8fafc', display: 'flex', alignItems: 'center', gap: 8 }}>
-                  <Send size={20} color="#06b6d4" />
-                  Broadcast Multi-Channel Emergency Alert
-                </h3>
+        {/* MODAL: Emergency Dispatch Broadcast */}
+        {showDispatchModal && selectedRecall && (
+          <div className="recall-modal-backdrop">
+            <div className="recall-modal">
+              <div className="recall-modal-header">
+                <h3>Dispatch Emergency Consumer Notice</h3>
                 <button
                   onClick={() => setShowDispatchModal(false)}
-                  style={{ background: 'none', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
+                  style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}
                 >
-                  <X size={18} />
+                  <X size={20} />
                 </button>
               </div>
-
-              <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 8 }}>
-                <div style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Target Recall Order:</div>
-                <strong style={{ color: '#38bdf8' }}>{selectedRecall.recallCode} - {selectedRecall.productName}</strong>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-                <div>
-                  <label style={{ fontSize: '0.8rem', color: '#94a3b8', display: 'block', marginBottom: 4 }}>
-                    Audience Channel
-                  </label>
-                  <select className="recall-filter-select" style={{ width: '100%' }}>
-                    <option>Push Notification + Mobile App Alert</option>
-                    <option>Email Notification to Retailers & Hubs</option>
-                    <option>Regulatory Compliance API Webhook</option>
-                    <option>All Channels Simultaneous Broadcast</option>
-                  </select>
-                </div>
-
-                <div className="notif-preview-box">
-                  <strong>Template Preview:</strong>
-                  <p style={{ margin: '6px 0 0 0' }}>
-                    URGENT RECALL ALERT: Safety order initiated for {selectedRecall.productName} (Batch {selectedRecall.batchId}).
-                    Please halt use immediately. Contact support for return instructions.
+              <div className="recall-modal-body">
+                <p style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: 1.5 }}>
+                  This will broadcast cryptographic safety push notifications & emails to all registered owners of batch{' '}
+                  <strong style={{ color: '#38bdf8' }}>{selectedRecall.batchId}</strong> ({selectedRecall.productName}).
+                </p>
+                <div className="detail-info-card" style={{ marginTop: 14 }}>
+                  <div className="detail-info-label">Broadcast Template</div>
+                  <p style={{ fontSize: '0.85rem', color: '#f8fafc', margin: '4px 0 0 0' }}>
+                    URGENT: Safety recall issued for {selectedRecall.productName} ({selectedRecall.recallCode}). Please check your device serial against the VeriChain trust ledger.
                   </p>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 10, marginTop: 10 }}>
-                <ActionButton variant="secondary" size="sm" onClick={() => setShowDispatchModal(false)}>
+              <div className="recall-modal-footer">
+                <ActionButton
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setShowDispatchModal(false)}
+                >
                   Cancel
                 </ActionButton>
-                <ActionButton variant="primary" size="sm" onClick={handleDispatchNotification}>
-                  Dispatch Immediate Broadcast
+                <ActionButton variant="danger" size="sm" onClick={handleDispatchNotification}>
+                  <Send size={15} />
+                  Execute Broadcast
                 </ActionButton>
               </div>
             </div>

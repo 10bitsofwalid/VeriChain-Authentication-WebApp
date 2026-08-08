@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import MetricCard from '../../../components/ui/MetricCard';
 import ActionButton from '../../../components/ui/ActionButton';
 import StatusChip from '../../../components/ui/StatusChip';
+import client from '../../../api/client';
 import {
   ShieldCheck,
   Server,
@@ -24,37 +25,44 @@ interface MissionLog {
   details: string;
 }
 
-const INITIAL_LOGS: MissionLog[] = [
-  { id: 'log-101', timestamp: '2026-07-23 14:52:10', source: 'Node-EU-Central', event: 'Block Verification Complete', severity: 'normal', details: 'Batch #88241 consensus achieved in 12ms' },
-  { id: 'log-102', timestamp: '2026-07-23 14:48:33', source: 'AI-Fraud-Sentinel', event: 'Suspicious Serial Flagged', severity: 'warning', details: 'Multiple scan attempts for SKU-7729 from duplicate IPs' },
-  { id: 'log-103', timestamp: '2026-07-23 14:35:01', source: 'Auth-Gateway', event: 'Factory Certificate Renewed', severity: 'normal', details: 'LuxeCraft Inc. security keys re-indexed' },
-  { id: 'log-104', timestamp: '2026-07-23 14:12:45', source: 'DB-Sync-Engine', event: 'Replication Latency Spike', severity: 'warning', details: 'Secondary replica lag reached 140ms' },
-  { id: 'log-105', timestamp: '2026-07-23 13:59:19', source: 'Admin-Audit', event: 'Role Escalation Request', severity: 'critical', details: 'Unverified seller requested factory role access' },
-];
-
 export default function AdminMissionView() {
-  const [logs, setLogs] = useState<MissionLog[]>(INITIAL_LOGS);
+  const [logs, setLogs] = useState<MissionLog[]>([]);
   const [filterSeverity, setFilterSeverity] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lockdownMode, setLockdownMode] = useState(false);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
-  const handleRefresh = () => {
+  const fetchLogs = async () => {
+    try {
+      const res = await client.get('/admin/audit-logs');
+      if (res.data?.logs && Array.isArray(res.data.logs)) {
+        const mapped: MissionLog[] = res.data.logs.map((l: any) => ({
+          id: l._id,
+          timestamp: new Date(l.timestamp || Date.now()).toISOString().replace('T', ' ').substring(0, 19),
+          source: l.actor?.name || 'System Gateway',
+          event: l.action || 'Audit Event',
+          severity: l.action?.toLowerCase().includes('reject') || l.action?.toLowerCase().includes('delete') ? 'warning' : 'normal',
+          details: l.details || '',
+        }));
+        setLogs(mapped);
+      } else {
+        setLogs([]);
+      }
+    } catch {
+      setLogs([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchLogs();
+  }, []);
+
+  const handleRefresh = async () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      const newLog: MissionLog = {
-        id: `log-${Date.now()}`,
-        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-        source: 'Admin-Health-Check',
-        event: 'Manual System Heartbeat',
-        severity: 'normal',
-        details: 'System diagnostic verified all cluster nodes operational',
-      };
-      setLogs(prev => [newLog, ...prev]);
-      setIsRefreshing(false);
-      showNotification('System health re-verified successfully');
-    }, 600);
+    await fetchLogs();
+    setIsRefreshing(false);
+    showNotification('System health and audit telemetry refreshed');
   };
 
   const showNotification = (msg: string) => {
@@ -137,18 +145,18 @@ export default function AdminMissionView() {
       {/* Mission Metrics Grid */}
       <div className="admin-grid-4">
         <MetricCard
-          label="System Health Rate"
-          value="99.98%"
+          label="System Health Status"
+          value="Operational"
           icon={<Activity size={20} color="#10b981" />}
         />
         <MetricCard
-          label="Verification Latency"
-          value="18 ms"
+          label="Network Protocol"
+          value="VRC-721"
           icon={<Zap size={20} color="#06b6d4" />}
         />
         <MetricCard
-          label="Active Blockchain Nodes"
-          value="24 / 24"
+          label="Decentralized Ledger"
+          value="Synchronized"
           icon={<Server size={20} color="#8b5cf6" />}
         />
         <MetricCard
@@ -196,7 +204,7 @@ export default function AdminMissionView() {
             <thead>
               <tr>
                 <th>Timestamp</th>
-                <th>Source Node</th>
+                <th>Source / Actor</th>
                 <th>Event</th>
                 <th>Severity</th>
                 <th>Details</th>
@@ -223,7 +231,7 @@ export default function AdminMissionView() {
               {filteredLogs.length === 0 && (
                 <tr>
                   <td colSpan={5} style={{ textAlign: 'center', padding: '24px', color: '#94a3b8' }}>
-                    No telemetry log events matching filters
+                    No telemetry log events recorded.
                   </td>
                 </tr>
               )}

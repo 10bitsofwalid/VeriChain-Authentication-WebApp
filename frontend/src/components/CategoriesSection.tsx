@@ -1,12 +1,12 @@
 import { Gem, Laptop, Pill, Shirt, Sparkles, Watch } from 'lucide-react';
 
 const categories = [
-  { name: 'Electronics', icon: Laptop, count: '1,240 verified', tone: 'blue' },
-  { name: 'Luxury Goods', icon: Gem, count: '850 verified', tone: 'violet' },
-  { name: 'Apparel', icon: Shirt, count: '3,110 verified', tone: 'rose' },
-  { name: 'Cosmetics', icon: Sparkles, count: '940 verified', tone: 'emerald' },
-  { name: 'Pharmaceuticals', icon: Pill, count: '4,520 verified', tone: 'amber' },
-  { name: 'Wearables', icon: Watch, count: '720 verified', tone: 'sky' },
+  { name: 'Electronics', icon: Laptop, label: 'Verified Catalog', tone: 'blue' },
+  { name: 'Luxury Goods', icon: Gem, label: 'Verified Catalog', tone: 'violet' },
+  { name: 'Apparel', icon: Shirt, label: 'Verified Catalog', tone: 'rose' },
+  { name: 'Cosmetics', icon: Sparkles, label: 'Verified Catalog', tone: 'emerald' },
+  { name: 'Pharmaceuticals', icon: Pill, label: 'Verified Catalog', tone: 'amber' },
+  { name: 'Wearables', icon: Watch, label: 'Verified Catalog', tone: 'sky' },
 ];
 
 export default function CategoriesSection() {
@@ -28,7 +28,7 @@ export default function CategoriesSection() {
             </span>
             <span>
               <strong>{cat.name}</strong>
-              <small>{cat.count}</small>
+              <small>{cat.label}</small>
             </span>
           </button>
         ))}

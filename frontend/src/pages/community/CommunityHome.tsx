@@ -1,5 +1,6 @@
-import { useState } from 'react';
-import { MessageSquare, Users, ShieldAlert, Award, ArrowUp, Search } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { MessageSquare, Users, ShieldAlert, ArrowUp, Search } from 'lucide-react';
+import client from '../../api/client';
 
 interface Thread {
   id: string;
@@ -15,49 +16,47 @@ interface Thread {
 export default function CommunityHome() {
   const [activeCategory, setActiveCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState('');
-  
-  const [threads, setThreads] = useState<Thread[]>([
-    {
-      id: '1',
-      title: 'How to detect duplicate serial stamps on high-end electronics',
-      category: 'guides',
-      author: 'Erich Schwarz',
-      role: 'moderator',
-      replies: 18,
-      upvotes: 42,
-      time: '2 hours ago'
-    },
-    {
-      id: '2',
-      title: 'Urgent: Flagged batch of SKU-HEADPHONE-B from unverified reseller',
-      category: 'alert',
-      author: 'Alice Johnson',
-      role: 'buyer',
-      replies: 29,
-      upvotes: 112,
-      time: '1 day ago'
-    },
-    {
-      id: '3',
-      title: 'VeriSphere integration with private EVM subnets discussed',
-      category: 'discussion',
-      author: 'DevLead Factory',
-      role: 'factory',
-      replies: 8,
-      upvotes: 21,
-      time: '3 days ago'
-    },
-    {
-      id: '4',
-      title: 'Best practices for storing product digital twin QR certificates',
-      category: 'guides',
-      author: 'VeriChain Support',
-      role: 'admin',
-      replies: 5,
-      upvotes: 19,
-      time: '4 days ago'
+  const [threads, setThreads] = useState<Thread[]>([]);
+  const [recalledItems, setRecalledItems] = useState<any[]>([]);
+
+  useEffect(() => {
+    async function loadCommunityData() {
+      try {
+        const [complaintsRes, itemsRes] = await Promise.allSettled([
+          client.get('/complaints'),
+          client.get('/items/marketplace'),
+        ]);
+
+        const threadList: Thread[] = [];
+
+        if (complaintsRes.status === 'fulfilled' && complaintsRes.value.data?.complaints) {
+          complaintsRes.value.data.complaints.forEach((c: any) => {
+            threadList.push({
+              id: c._id,
+              title: `Reported Discrepancy: ${c.reason || 'Verification Audit'}`,
+              category: 'alert',
+              author: c.buyer?.name || 'Verified Buyer',
+              role: 'buyer',
+              replies: 1,
+              upvotes: 2,
+              time: new Date(c.createdAt || Date.now()).toLocaleDateString(),
+            });
+          });
+        }
+
+        if (itemsRes.status === 'fulfilled' && Array.isArray(itemsRes.value.data?.items)) {
+          const recalled = itemsRes.value.data.items.filter((it: any) => it.status === 'recalled');
+          setRecalledItems(recalled.slice(0, 3));
+        }
+
+        setThreads(threadList);
+      } catch {
+        setThreads([]);
+        setRecalledItems([]);
+      }
     }
-  ]);
+    loadCommunityData();
+  }, []);
 
   const handleUpvote = (id: string) => {
     setThreads(prev => prev.map(t => t.id === id ? { ...t, upvotes: t.upvotes + 1 } : t));
@@ -191,7 +190,7 @@ export default function CommunityHome() {
 
             {filteredThreads.length === 0 && (
               <div style={{ textAlign: 'center', padding: 'var(--space-xl)', color: 'var(--vc-color-text-muted)' }}>
-                No threads found matching your filters.
+                No active community discussions reported.
               </div>
             )}
           </div>
@@ -204,34 +203,22 @@ export default function CommunityHome() {
               <ShieldAlert size={18} style={{ color: 'var(--vc-color-danger)' }} />
               Active Recalls
             </h3>
-            <ul style={{ padding: 0, margin: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
-              <li style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: 'var(--space-xs)' }}>
-                <span style={{ fontSize: '0.75rem', color: 'var(--vc-color-danger-text)', fontWeight: 'bold' }}>RECALL #4092</span>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>Leather Boots Batch E-92</div>
-              </li>
-              <li>
-                <span style={{ fontSize: '0.75rem', color: 'var(--vc-color-danger-text)', fontWeight: 'bold' }}>RECALL #4091</span>
-                <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>Wearable Smartwatch Gen‑2</div>
-              </li>
-            </ul>
-          </div>
-
-          <div className="glass-card" style={{ padding: 'var(--space-lg)' }}>
-            <h3 style={{ margin: '0 0 var(--space-md) 0', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Award size={18} style={{ color: 'var(--vc-color-primary)' }} />
-              Top Contributors
-            </h3>
-            <ol style={{ paddingLeft: 'var(--space-md)', margin: 0, display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', fontSize: '0.85rem' }}>
-              <li>
-                <strong>FactoryCorp_HQ</strong> <span style={{ color: 'var(--vc-color-text-muted)' }}>(524 XP)</span>
-              </li>
-              <li>
-                <strong>SecurityBuyer99</strong> <span style={{ color: 'var(--vc-color-text-muted)' }}>(312 XP)</span>
-              </li>
-              <li>
-                <strong>Alice_Verified</strong> <span style={{ color: 'var(--vc-color-text-muted)' }}>(198 XP)</span>
-              </li>
-            </ol>
+            {recalledItems.length === 0 ? (
+              <p style={{ fontSize: '0.85rem', color: 'var(--vc-color-text-muted)', margin: 0 }}>
+                No active product recalls reported.
+              </p>
+            ) : (
+              <ul style={{ padding: 0, margin: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)' }}>
+                {recalledItems.map(item => (
+                  <li key={item._id} style={{ borderBottom: '1px solid var(--border-subtle)', paddingBottom: 'var(--space-xs)' }}>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--vc-color-danger-text)', fontWeight: 'bold' }}>
+                      BATCH {item.serialNumber || item._id.slice(-6)}
+                    </span>
+                    <div style={{ fontSize: '0.85rem', fontWeight: 600 }}>{item.product?.name || 'Recalled Product'}</div>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         </aside>
       </div>
