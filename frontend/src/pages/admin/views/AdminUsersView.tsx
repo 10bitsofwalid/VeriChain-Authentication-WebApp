@@ -33,14 +33,17 @@ export default function AdminUsersView() {
 
   const fetchUsers = async () => {
     try {
-      const res = await client.get('/users');
-      if (Array.isArray(res.data)) {
-        const mapped: UserRecord[] = res.data.map((u: any) => ({
+      const res = await client.get('/admin/users').catch(async () => {
+        return await client.get('/users');
+      });
+      const list = Array.isArray(res.data) ? res.data : res.data?.users || [];
+      if (Array.isArray(list)) {
+        const mapped: UserRecord[] = list.map((u: any) => ({
           id: u._id,
           name: u.name || 'Anonymous User',
           email: u.email,
           role: u.role || 'buyer',
-          verified: Boolean(u.verifiedStatus === 'verified' || u.role === 'admin' || u.role === 'buyer'),
+          verified: Boolean(u.verified === true || u.verificationStatus === 'verified' || u.verifiedStatus === 'verified'),
           status: (u.accountStatus || 'active') as any,
           joinedDate: u.createdAt ? new Date(u.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
           productsRegistered: 0,
@@ -67,23 +70,35 @@ export default function AdminUsersView() {
   };
 
   const handleToggleVerify = async (id: string) => {
-    try {
-      const target = users.find(u => u.id === id);
-      if (target && !target.verified) {
-        await client.put(`/admin/factories/${id}/verify`).catch(() => {});
-      }
-    } catch {}
+    const target = users.find(u => u.id === id);
+    if (!target) return;
+    const nextState = !target.verified;
 
+    // Optimistically update UI immediately
     setUsers(prev => prev.map(u => {
       if (u.id === id) {
-        const nextState = !u.verified;
-        showToast(`User ${u.name} verification status set to ${nextState ? 'VERIFIED' : 'UNVERIFIED'}`);
         return { ...u, verified: nextState };
       }
       return u;
     }));
     if (selectedUserModal && selectedUserModal.id === id) {
-      setSelectedUserModal(prev => prev ? { ...prev, verified: !prev.verified } : null);
+      setSelectedUserModal(prev => prev ? { ...prev, verified: nextState } : null);
+    }
+
+    try {
+      const res = await client.patch(`/admin/users/${id}/verify`, { verified: nextState }).catch(async () => {
+        return await client.put(`/admin/users/${id}/verify`, { verified: nextState });
+      });
+
+      if (res.data?.success || res.status === 200) {
+        showToast(`User ${target.name} verification status set to ${nextState ? 'VERIFIED' : 'UNVERIFIED'}`);
+      } else {
+        setUsers(prev => prev.map(u => u.id === id ? { ...u, verified: target.verified } : u));
+        showToast('Failed to update verification status on server');
+      }
+    } catch (err: any) {
+      setUsers(prev => prev.map(u => u.id === id ? { ...u, verified: target.verified } : u));
+      showToast(err.response?.data?.message || 'Failed to update verification status');
     }
   };
 

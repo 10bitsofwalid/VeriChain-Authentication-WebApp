@@ -5,10 +5,12 @@ import { STORAGE_KEYS } from '../utils/constants';
 
 export interface User {
   id: string;
+  _id?: string;
   name: string;
   email: string;
   role: 'buyer' | 'seller' | 'factory' | 'moderator' | 'admin';
   verified: boolean;
+  isVerified?: boolean;
   trustScore?: number;
 }
 
@@ -20,6 +22,7 @@ interface AuthContextType {
   signup: (data: SignupData) => Promise<void>;
   acceptInvitation: (inviteToken: string, password: string) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<User | null>;
   error: string | null;
   clearError: () => void;
 }
@@ -42,7 +45,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Restore session on mount
+  const normalizeUser = (raw: any): User => {
+    const isVer = Boolean(raw.verified ?? raw.isVerified ?? false);
+    return {
+      id: raw.id || raw._id,
+      _id: raw._id || raw.id,
+      name: raw.name,
+      email: raw.email,
+      role: raw.role,
+      verified: isVer,
+      isVerified: isVer,
+      trustScore: raw.trustScore,
+    };
+  };
+
+  const refreshUser = async (): Promise<User | null> => {
+    try {
+      const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
+      if (!storedToken) return null;
+      const res = await client.get('/auth/me');
+      if (res.data?.user) {
+        const freshUser = normalizeUser(res.data.user);
+        setUser(freshUser);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(freshUser));
+        return freshUser;
+      }
+    } catch {
+      // Ignore network errors or unauthenticated state
+    }
+    return null;
+  };
+
+  // Restore session on mount and sync live status from DB
   useEffect(() => {
     const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
     const storedUser = localStorage.getItem(STORAGE_KEYS.USER);
@@ -50,13 +84,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (storedToken && storedUser) {
       try {
         setToken(storedToken);
-        setUser(JSON.parse(storedUser));
+        setUser(normalizeUser(JSON.parse(storedUser)));
       } catch {
         localStorage.removeItem(STORAGE_KEYS.TOKEN);
         localStorage.removeItem(STORAGE_KEYS.USER);
       }
     }
     setLoading(false);
+
+    if (storedToken) {
+      refreshUser();
+    }
+  }, []);
+
+  // Auto-sync user status when window/tab regains focus, visibility, or periodically
+  useEffect(() => {
+    const handleSync = () => {
+      if (localStorage.getItem(STORAGE_KEYS.TOKEN)) {
+        refreshUser();
+      }
+    };
+
+    window.addEventListener('focus', handleSync);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        handleSync();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Heartbeat sync every 15s to keep live status in sync without manual refresh
+    const intervalId = window.setInterval(handleSync, 15000);
+
+    return () => {
+      window.removeEventListener('focus', handleSync);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.clearInterval(intervalId);
+    };
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -64,11 +128,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
       const res = await client.post('/auth/login', { email, password });
       const { token: newToken, user: userData } = res.data;
+      const normalized = normalizeUser(userData);
 
       localStorage.setItem(STORAGE_KEYS.TOKEN, newToken);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(normalized));
       setToken(newToken);
-      setUser(userData);
+      setUser(normalized);
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Login failed. Please try again.';
       setError(msg);
@@ -81,11 +146,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
       const res = await client.post('/auth/signup', data);
       const { token: newToken, user: userData } = res.data;
+      const normalized = normalizeUser(userData);
 
       localStorage.setItem(STORAGE_KEYS.TOKEN, newToken);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(normalized));
       setToken(newToken);
-      setUser(userData);
+      setUser(normalized);
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Signup failed. Please try again.';
       setError(msg);
@@ -98,11 +164,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setError(null);
       const res = await client.post('/auth/accept-invite', { token: inviteToken, password });
       const { token: newToken, user: userData } = res.data;
+      const normalized = normalizeUser(userData);
 
       localStorage.setItem(STORAGE_KEYS.TOKEN, newToken);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(userData));
+      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(normalized));
       setToken(newToken);
-      setUser(userData);
+      setUser(normalized);
     } catch (err: any) {
       const msg = err.response?.data?.message || 'Accepting invitation failed.';
       setError(msg);
@@ -120,7 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const clearError = () => setError(null);
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, signup, acceptInvitation, logout, error, clearError }}>
+    <AuthContext.Provider value={{ user, token, loading, login, signup, acceptInvitation, logout, refreshUser, error, clearError }}>
       {children}
     </AuthContext.Provider>
   );

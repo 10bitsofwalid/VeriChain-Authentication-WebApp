@@ -44,13 +44,14 @@ export default function AdminModerationView() {
 
         const list: ModerationItem[] = [];
 
-        if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value.data)) {
-          prodRes.value.data.forEach((p: any) => {
+        const prodList = prodRes.status === 'fulfilled' ? (Array.isArray(prodRes.value.data) ? prodRes.value.data : prodRes.value.data?.products) : null;
+        if (Array.isArray(prodList)) {
+          prodList.forEach((p: any) => {
             list.push({
               id: p._id,
               itemType: 'Product Template',
               title: p.name,
-              submittedBy: p.manufacturer || 'Certified Factory',
+              submittedBy: p.factory?.name || p.manufacturer || 'Certified Factory',
               flagReason: p.verifiedStatus === 'pending' ? 'Pending initial certificate audit' : 'Routine compliance check',
               riskScore: p.verifiedStatus === 'rejected' ? 85 : 10,
               status: p.verifiedStatus === 'verified' ? 'approved' : p.verifiedStatus === 'rejected' ? 'rejected' : 'pending',
@@ -91,9 +92,13 @@ export default function AdminModerationView() {
   const handleAction = async (id: string, newStatus: 'approved' | 'rejected' | 'flagged') => {
     try {
       if (newStatus === 'approved') {
-        await client.put(`/moderator/products/${id}/approve`).catch(() => {});
+        await client.patch(`/admin/products/${id}/verify`, { verifiedStatus: 'verified' }).catch(async () => {
+          return await client.patch(`/moderator/products/${id}/verify`, { verifiedStatus: 'verified' });
+        });
       } else if (newStatus === 'rejected') {
-        await client.put(`/moderator/products/${id}/reject`, { reason: 'Compliance audit rejected' }).catch(() => {});
+        await client.patch(`/admin/products/${id}/verify`, { verifiedStatus: 'rejected' }).catch(async () => {
+          return await client.patch(`/moderator/products/${id}/verify`, { verifiedStatus: 'rejected' });
+        });
       }
     } catch {}
     setItems(prev => prev.map(item => item.id === id ? { ...item, status: newStatus } : item));

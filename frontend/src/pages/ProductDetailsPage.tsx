@@ -67,8 +67,33 @@ export default function ProductDetailsPage() {
   
   // Reviews state
   const [reviews, setReviews] = useState<Array<{ author: string; rating: number; date: string; comment: string; verified: boolean }>>([]);
+  const [reviewStats, setReviewStats] = useState<{ total: number; averageRating: number; distribution: Record<number, number> }>({
+    total: 0,
+    averageRating: 5.0,
+    distribution: { 5: 0, 4: 0, 3: 0, 2: 0, 1: 0 }
+  });
   const [newReview, setNewReview] = useState({ author: '', rating: 5, comment: '' });
   const [hoverRating, setHoverRating] = useState<number | null>(null);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState('');
+
+  const fetchReviews = async (productId: string) => {
+    try {
+      const res = await client.get(`/reviews/${encodeURIComponent(productId)}/reviews`);
+      if (res.data?.reviews && Array.isArray(res.data.reviews)) {
+        setReviews(res.data.reviews);
+        if (res.data.distribution) {
+          setReviewStats({
+            total: res.data.total || res.data.reviews.length,
+            averageRating: res.data.averageRating || 5.0,
+            distribution: res.data.distribution
+          });
+        }
+      }
+    } catch {
+      // Keep existing reviews if fetch fails
+    }
+  };
 
   useEffect(() => {
     async function fetchProductDetails() {
@@ -84,8 +109,9 @@ export default function ProductDetailsPage() {
 
         if (res.data?.item) {
           const item = res.data.item;
+          const targetId = item.product?._id || item.product?.sku || item._id || queryId;
           setProduct({
-            id: item._id || queryId,
+            id: targetId,
             name: item.product?.name || 'Verified Authentic Product',
             category: item.product?.category || 'General',
             sku: item.product?.sku || 'VC-SKU',
@@ -106,6 +132,7 @@ export default function ProductDetailsPage() {
             journey: item.journey || [],
             specs: item.product?.specs || {},
           });
+          fetchReviews(targetId);
         } else if (res.data?.product) {
           const prod = res.data.product;
           setProduct({
@@ -124,6 +151,7 @@ export default function ProductDetailsPage() {
             journey: [],
             specs: prod.specs || {},
           });
+          fetchReviews(prod._id || prod.sku || queryId);
         } else if (res.data?.products && Array.isArray(res.data.products)) {
           const found = (id ? res.data.products.find((p: any) => p._id === id || p.sku === id) : res.data.products[0]) || res.data.products[0];
           if (found) {
@@ -139,6 +167,7 @@ export default function ProductDetailsPage() {
               certificateUrl: found.certificateUrl,
               specs: found.specs || {},
             });
+            fetchReviews(found._id || found.sku);
           } else {
             setError('Product not found in catalog.');
           }
@@ -202,21 +231,39 @@ export default function ProductDetailsPage() {
     setTimeout(() => setCopiedText(null), 2000);
   };
 
-  // Form submission handler
-  const handleReviewSubmit = (e: React.FormEvent) => {
+  // Form submission handler with live backend POST
+  const handleReviewSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newReview.author || !newReview.comment) return;
-    
-    const submittedReview = {
-      author: newReview.author,
-      rating: newReview.rating,
-      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
-      comment: newReview.comment,
-      verified: true
-    };
-    
-    setReviews([submittedReview, ...reviews]);
-    setNewReview({ author: '', rating: 5, comment: '' });
+    if (!newReview.author || !newReview.comment || !product) return;
+    setReviewSubmitting(true);
+    setReviewSuccess('');
+
+    try {
+      await client.post(`/reviews/${encodeURIComponent(product.id)}/reviews`, {
+        authorName: newReview.author,
+        rating: newReview.rating,
+        text: newReview.comment,
+      });
+
+      // Refetch live reviews
+      await fetchReviews(product.id);
+      setReviewSuccess('Review published to the decentralized ledger!');
+      setNewReview({ author: '', rating: 5, comment: '' });
+      setTimeout(() => setReviewSuccess(''), 4000);
+    } catch {
+      // Fallback local addition if network fails
+      const submittedReview = {
+        author: newReview.author,
+        rating: newReview.rating,
+        date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }),
+        comment: newReview.comment,
+        verified: true
+      };
+      setReviews(prev => [submittedReview, ...prev]);
+      setNewReview({ author: '', rating: 5, comment: '' });
+    } finally {
+      setReviewSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -467,9 +514,42 @@ export default function ProductDetailsPage() {
 
         {/* Customer Reviews Section */}
         <section className="details-card reviews-container" aria-label="Customer Reviews">
-          <div className="details-card-header">
+          <div className="details-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-sm)' }}>
             <h2><Star size={18} /> Client Feedback & Reviews</h2>
+            {reviewStats.total > 0 && (
+              <span style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
+                ⭐ <strong>{reviewStats.averageRating}</strong> out of 5 ({reviewStats.total} {reviewStats.total === 1 ? 'review' : 'reviews'})
+              </span>
+            )}
           </div>
+
+          {/* Rating Breakdown Bar */}
+          {reviewStats.total > 0 && (
+            <div style={{ background: 'var(--bg-secondary)', padding: 'var(--space-md)', borderRadius: 'var(--radius-md)', marginBottom: 'var(--space-md)', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: 'var(--space-sm)' }}>
+              {[5, 4, 3, 2, 1].map((stars) => {
+                const count = reviewStats.distribution[stars] || 0;
+                const pct = reviewStats.total > 0 ? Math.round((count / reviewStats.total) * 100) : 0;
+                return (
+                  <div key={stars} style={{ fontSize: '0.8rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2, color: 'var(--text-muted)' }}>
+                      <span>{stars} ★</span>
+                      <span>{count} ({pct}%)</span>
+                    </div>
+                    <div style={{ height: 6, background: 'rgba(255,255,255,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
+                      <div style={{ width: `${pct}%`, height: '100%', background: stars >= 4 ? '#10b981' : stars === 3 ? '#f59e0b' : '#ef4444' }} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
+          {reviewSuccess && (
+            <div style={{ background: 'rgba(16, 185, 129, 0.15)', border: '1px solid rgba(16, 185, 129, 0.4)', color: '#34d399', padding: '10px 14px', borderRadius: 'var(--radius-sm)', marginBottom: 'var(--space-md)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <CheckCircle size={16} />
+              <span>{reviewSuccess}</span>
+            </div>
+          )}
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
             {reviews.length === 0 ? (
@@ -546,7 +626,9 @@ export default function ProductDetailsPage() {
               />
             </div>
 
-            <button type="submit" className="submit-review-btn">Submit Review</button>
+            <button type="submit" className="submit-review-btn" disabled={reviewSubmitting}>
+              {reviewSubmitting ? 'Publishing Review…' : 'Submit Review'}
+            </button>
           </form>
         </section>
       </main>

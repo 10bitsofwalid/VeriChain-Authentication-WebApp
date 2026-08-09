@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Package, Boxes, TrendingUp, Truck, Users, BarChart2 } from 'lucide-react';
 import InventoryView from './views/InventoryView';
 import ProductionView from './views/ProductionView';
@@ -6,6 +6,8 @@ import AllocationsView from './views/AllocationsView';
 import SellerRequestsView from './views/SellerRequestsView';
 import ShipmentsView from './views/ShipmentsView';
 import AnalyticsView from './views/AnalyticsView';
+import AlertBanner from '../../components/ui/AlertBanner';
+import { useAuth } from '../../context/AuthContext';
 import './FactoryDashboard.css';
 
 const TABS = [
@@ -20,7 +22,12 @@ const TABS = [
 type TabId = (typeof TABS)[number]['id'];
 
 export default function FactoryDashboard() {
+  const { user, refreshUser } = useAuth();
   const [activeTab, setActiveTab] = useState<TabId>('inventory');
+
+  useEffect(() => {
+    refreshUser?.();
+  }, []);
 
   return (
     <div className="fd-container">
@@ -31,6 +38,19 @@ export default function FactoryDashboard() {
           <p>Monitor production, manage inventory, and coordinate shipments</p>
         </div>
       </div>
+
+      {user && !(user.verified || user.isVerified) && (
+        <AlertBanner
+          type="error"
+          message={
+            <span>
+              <strong>Manufacturer Verification Pending:</strong> Your factory account is pending administrator verification. 
+              Certain manufacturing batches and dispatch actions may be restricted until verified.
+            </span>
+          }
+          style={{ marginBottom: 'var(--space-md)' }}
+        />
+      )}
 
       {/* Tabs Nav */}
       <nav className="fd-tabs-nav" aria-label="Factory Dashboard Sections">

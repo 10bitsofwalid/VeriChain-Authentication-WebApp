@@ -50,8 +50,11 @@ const TrustCenter: React.FC = () => {
           client.get('/complaints'),
         ]);
 
-        if (prodRes.status === 'fulfilled' && Array.isArray(prodRes.value.data)) {
-          setProducts(prodRes.value.data);
+        if (prodRes.status === 'fulfilled') {
+          const prodList = Array.isArray(prodRes.value.data) ? prodRes.value.data : prodRes.value.data?.products;
+          if (Array.isArray(prodList)) {
+            setProducts(prodList);
+          }
         }
         if (facRes.status === 'fulfilled' && Array.isArray(facRes.value.data)) {
           const topFactories = (facRes.value.data as Factory[])

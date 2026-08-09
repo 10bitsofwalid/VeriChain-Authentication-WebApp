@@ -33,11 +33,22 @@ export default function AdminMissionView() {
   const [lockdownMode, setLockdownMode] = useState(false);
   const [actionSuccess, setActionSuccess] = useState<string | null>(null);
 
+  const [liveStats, setLiveStats] = useState<{ totalItems: number; verifiedProducts: number; activeRecalls: number; verifiedPartners: number }>({
+    totalItems: 0,
+    verifiedProducts: 0,
+    activeRecalls: 0,
+    verifiedPartners: 0,
+  });
+
   const fetchLogs = async () => {
     try {
-      const res = await client.get('/admin/audit-logs');
-      if (res.data?.logs && Array.isArray(res.data.logs)) {
-        const mapped: MissionLog[] = res.data.logs.map((l: any) => ({
+      const [auditRes, statsRes] = await Promise.allSettled([
+        client.get('/admin/audit-logs'),
+        client.get('/products/stats'),
+      ]);
+
+      if (auditRes.status === 'fulfilled' && auditRes.value.data?.logs && Array.isArray(auditRes.value.data.logs)) {
+        const mapped: MissionLog[] = auditRes.value.data.logs.map((l: any) => ({
           id: l._id,
           timestamp: new Date(l.timestamp || Date.now()).toISOString().replace('T', ' ').substring(0, 19),
           source: l.actor?.name || 'System Gateway',
@@ -48,6 +59,10 @@ export default function AdminMissionView() {
         setLogs(mapped);
       } else {
         setLogs([]);
+      }
+
+      if (statsRes.status === 'fulfilled' && statsRes.value.data?.stats) {
+        setLiveStats(statsRes.value.data.stats);
       }
     } catch {
       setLogs([]);
@@ -147,22 +162,25 @@ export default function AdminMissionView() {
         <MetricCard
           label="System Health Status"
           value="Operational"
+          trend={`${logs.length} Logged Events`}
           icon={<Activity size={20} color="#10b981" />}
         />
         <MetricCard
-          label="Network Protocol"
-          value="VRC-721"
+          label="Decentralized Ledger Items"
+          value={liveStats.totalItems.toString()}
+          trend="Live Serialized Units"
           icon={<Zap size={20} color="#06b6d4" />}
         />
         <MetricCard
-          label="Decentralized Ledger"
-          value="Synchronized"
+          label="Verified Products"
+          value={liveStats.verifiedProducts.toString()}
+          trend={`${liveStats.verifiedPartners} Verified Partners`}
           icon={<Server size={20} color="#8b5cf6" />}
         />
         <MetricCard
-          label="Fraud Threat Level"
-          value={lockdownMode ? "HIGH (LOCK)" : "LOW (SAFE)"}
-          icon={<AlertTriangle size={20} color={lockdownMode ? "#ef4444" : "#f59e0b"} />}
+          label="Fraud & Recall Status"
+          value={lockdownMode ? "HIGH (LOCK)" : liveStats.activeRecalls > 0 ? `${liveStats.activeRecalls} Active Recalls` : "SECURE"}
+          icon={<AlertTriangle size={20} color={lockdownMode ? "#ef4444" : liveStats.activeRecalls > 0 ? "#f59e0b" : "#10b981"} />}
         />
       </div>
 

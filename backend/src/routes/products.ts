@@ -1,8 +1,9 @@
-import { Router, Response } from 'express';
+import { Router, Request, Response } from 'express';
 import { Product } from '../models/Product';
 import { ItemInstance } from '../models/ItemInstance';
 import { User } from '../models/User';
 import { AuditLog } from '../models/AuditLog';
+import { Complaint } from '../models/Complaint';
 import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
 import { batchLimiter } from '../middleware/rateLimiter';
@@ -48,6 +49,118 @@ const recallSchema = z.object({
   }),
 });
 
+// @route   GET /api/products/stats
+// @desc    Get live platform-wide summary metrics
+router.get('/stats', async (_req: Request, res: Response, next) => {
+  try {
+    const [
+      totalProducts,
+      verifiedProducts,
+      totalItems,
+      activeRecalls,
+      verifiedFactories,
+      verifiedSellers,
+      totalComplaints,
+    ] = await Promise.all([
+      Product.countDocuments(),
+      Product.countDocuments({ verifiedStatus: 'verified' }),
+      ItemInstance.countDocuments(),
+      ItemInstance.countDocuments({ status: 'recalled' }),
+      User.countDocuments({ role: 'factory', verified: true }),
+      User.countDocuments({ role: 'seller', verified: true }),
+      Complaint.countDocuments(),
+    ]);
+
+    res.json({
+      success: true,
+      stats: {
+        totalProducts,
+        verifiedProducts,
+        totalItems,
+        activeRecalls,
+        verifiedPartners: verifiedFactories + verifiedSellers,
+        totalFactories: verifiedFactories,
+        totalSellers: verifiedSellers,
+        totalComplaints,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   GET /api/products
+// @desc    Get all public product templates (supports filters & search)
+router.get('/', async (req: Request, res: Response, next) => {
+  try {
+    const { category, search, verifiedStatus, factoryId } = req.query;
+    const filter: any = {};
+
+    if (category && category !== 'All') {
+      filter.category = category;
+    }
+
+    if (verifiedStatus) {
+      filter.verifiedStatus = verifiedStatus;
+    }
+
+    if (factoryId && Types.ObjectId.isValid(factoryId as string)) {
+      filter.factory = new Types.ObjectId(factoryId as string);
+    }
+
+    if (search) {
+      const searchRegex = new RegExp(search as string, 'i');
+      filter.$or = [
+        { name: searchRegex },
+        { sku: searchRegex },
+        { description: searchRegex },
+        { category: searchRegex },
+      ];
+    }
+
+    const products = await Product.find(filter)
+      .populate('factory', 'name email role trustScore factoryDetails logoUrl verified')
+      .sort({ createdAt: -1 });
+
+    // Format products with compatibility fields
+    const formatted = products.map((p: any) => ({
+      _id: p._id,
+      id: p._id.toString(),
+      name: p.name,
+      description: p.description,
+      category: p.category,
+      sku: p.sku,
+      imageUrl: p.imageUrl,
+      certificateUrl: p.certificateUrl,
+      specs: p.specs || {},
+      verifiedStatus: p.verifiedStatus,
+      verified: p.verifiedStatus === 'verified',
+      factory: p.factory,
+      batchId: p.sku,
+      availableQty: 50,
+      wholesalePrice: 150.0,
+      authenticityStatus: p.verifiedStatus === 'verified' ? 'Verified Authentic' : 'Pending Verification',
+      manufacturingDate: p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+    }));
+
+    // If query string asks for standard array (e.g. TrustCenter or Sourcing), support returning formatted directly as well
+    if (req.headers['accept']?.includes('application/json')) {
+      // res.json returns formatted object containing array
+      const responseData: any = formatted;
+      responseData.products = formatted;
+      responseData.success = true;
+      responseData.total = formatted.length;
+      return res.json(responseData);
+    }
+
+    res.json({ success: true, products: formatted, total: formatted.length });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // @route   POST /api/products/register
 // @desc    Register a new product template (Factory only)
 router.post('/register', protect, authorize('factory'), ensureVerified, validateRequest(registerProductSchema), async (req: AuthRequest, res: Response, next) => {
@@ -87,11 +200,93 @@ router.post('/register', protect, authorize('factory'), ensureVerified, validate
 });
 
 // @route   GET /api/products/factory
-// @desc    Get all registered products for current factory
-router.get('/factory', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+// @desc    Get all registered products for a factory
+router.get('/factory', protect, authorize('factory', 'seller', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
   try {
-    const products = await Product.find({ factory: req.user?.id });
-    res.json({ success: true, products });
+    const targetFactoryId = (req.query.factoryId as string) || req.user?.id;
+    const filter = targetFactoryId ? { factory: targetFactoryId } : {};
+    const products = await Product.find(filter)
+      .populate('factory', 'name email role trustScore factoryDetails logoUrl verified')
+      .sort({ createdAt: -1 });
+
+    const formatted = products.map((p: any) => ({
+      _id: p._id,
+      id: p._id.toString(),
+      name: p.name,
+      description: p.description,
+      category: p.category,
+      sku: p.sku,
+      imageUrl: p.imageUrl,
+      certificateUrl: p.certificateUrl,
+      specs: p.specs || {},
+      verifiedStatus: p.verifiedStatus,
+      verified: p.verifiedStatus === 'verified',
+      factory: p.factory,
+      batchId: p.sku,
+      availableQty: 50,
+      wholesalePrice: 150.0,
+      stock: 50,
+      location: p.factory?.factoryDetails?.location || 'Factory Main Warehouse',
+      authenticityStatus: p.verifiedStatus === 'verified' ? 'Verified Authentic' : 'Pending Verification',
+      manufacturingDate: p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt,
+    }));
+
+    res.json({ success: true, products: formatted });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   GET /api/products/analytics
+// @desc    Get manufacturing analytics (Factory only)
+router.get('/analytics', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+  try {
+    const productsCount = await Product.countDocuments({ factory: req.user?.id });
+    const userProducts = await Product.find({ factory: req.user?.id });
+    const productIds = userProducts.map(p => p._id);
+
+    const totalManufactured = await ItemInstance.countDocuments({ product: { $in: productIds } });
+    const activeRecalls = await ItemInstance.countDocuments({ product: { $in: productIds }, status: 'recalled' });
+    const transitCount = await ItemInstance.countDocuments({ product: { $in: productIds }, status: 'in_transit' });
+    const soldCount = await ItemInstance.countDocuments({ product: { $in: productIds }, status: 'sold' });
+
+    res.json({
+      success: true,
+      analytics: {
+        totalTemplates: productsCount,
+        totalManufactured,
+        activeRecalls,
+        inTransit: transitCount,
+        sold: soldCount,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   GET /api/products/:id
+// @desc    Get single product details by Mongo ID or SKU (Public)
+router.get('/:id', async (req: Request, res: Response, next) => {
+  try {
+    const { id } = req.params;
+    let product = null;
+
+    if (Types.ObjectId.isValid(id)) {
+      product = await Product.findById(id).populate('factory', 'name email role trustScore factoryDetails logoUrl verified');
+    }
+
+    if (!product) {
+      product = await Product.findOne({ sku: id }).populate('factory', 'name email role trustScore factoryDetails logoUrl verified');
+    }
+
+    if (!product) {
+      return sendError(res, 404, 'Product not found');
+    }
+
+    res.json({ success: true, product });
   } catch (error) {
     next(error);
   }
@@ -213,34 +408,6 @@ router.post('/:id/recall', protect, authorize('factory', 'admin'), ensureVerifie
     res.json({
       success: true,
       message: `Successfully recalled all active items (${items.length} units). Status updated to Recalled.`,
-    });
-  } catch (error) {
-    next(error);
-  }
-});
-
-// @route   GET /api/products/analytics
-// @desc    Get manufacturing analytics (Factory only)
-router.get('/analytics', protect, authorize('factory'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
-  try {
-    const productsCount = await Product.countDocuments({ factory: req.user?.id });
-    const userProducts = await Product.find({ factory: req.user?.id });
-    const productIds = userProducts.map(p => p._id);
-
-    const totalManufactured = await ItemInstance.countDocuments({ product: { $in: productIds } });
-    const activeRecalls = await ItemInstance.countDocuments({ product: { $in: productIds }, status: 'recalled' });
-    const transitCount = await ItemInstance.countDocuments({ product: { $in: productIds }, status: 'in_transit' });
-    const soldCount = await ItemInstance.countDocuments({ product: { $in: productIds }, status: 'sold' });
-
-    res.json({
-      success: true,
-      analytics: {
-        totalTemplates: productsCount,
-        totalManufactured,
-        activeRecalls,
-        inTransit: transitCount,
-        sold: soldCount,
-      },
     });
   } catch (error) {
     next(error);

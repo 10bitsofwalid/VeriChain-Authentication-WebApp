@@ -54,8 +54,11 @@ export default function AdminStatisticsView() {
           setFactories(facList);
         }
 
-        if (prodsRes.status === 'fulfilled' && Array.isArray(prodsRes.value.data)) {
-          setProductCount(prodsRes.value.data.length);
+        if (prodsRes.status === 'fulfilled') {
+          const pList = Array.isArray(prodsRes.value.data) ? prodsRes.value.data : prodsRes.value.data?.products;
+          if (Array.isArray(pList)) {
+            setProductCount(pList.length);
+          }
         }
 
         if (compRes.status === 'fulfilled' && compRes.value.data?.complaints) {

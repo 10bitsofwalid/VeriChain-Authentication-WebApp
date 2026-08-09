@@ -1,8 +1,9 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import MetricCard from '../../components/ui/MetricCard';
 import ActionButton from '../../components/ui/ActionButton';
 import StatusChip from '../../components/ui/StatusChip';
 import PageContainer from '../../components/layout/PageContainer';
+import client from '../../api/client';
 import {
   AlertTriangle,
   ShieldAlert,
@@ -60,6 +61,46 @@ export default function RecallManagementView() {
   const [newRecallBatch, setNewRecallBatch] = useState('');
   const [newRecallSeverity, setNewRecallSeverity] = useState<RecallSeverity>('High');
   const [newRecallReason, setNewRecallReason] = useState('');
+
+  useEffect(() => {
+    async function loadLiveRecalls() {
+      try {
+        const res = await client.get('/items/recalls').catch(async () => {
+          return await client.get('/items/marketplace');
+        });
+        if (res.data?.items && Array.isArray(res.data.items)) {
+          const mappedRecalls: RecallItem[] = res.data.items
+            .filter((it: any) => it.status === 'recalled' || res.config?.url?.includes('recalls'))
+            .map((it: any, idx: number) => ({
+              id: it._id,
+              recallCode: `REC-${new Date().getFullYear()}-${100 + idx}`,
+              title: `Recall Protocol: ${it.product?.name || 'Recalled Batch'}`,
+              productName: it.product?.name || 'Recalled Product',
+              sku: it.product?.sku || 'SKU-RECALL',
+              batchId: it.serialNumber || it._id.slice(-6).toUpperCase(),
+              severity: 'High' as RecallSeverity,
+              status: 'Active' as RecallStatus,
+              reason: (it.journey && it.journey.find((j: any) => j.action === 'recalled')?.location) || 'Quality assurance quarantine protocol triggered.',
+              rootCause: 'Investigation by compliance and QA team.',
+              riskLevel: 'Precautionary isolation',
+              affectedUnitsCount: 1,
+              quarantinedCount: 1,
+              quarantineDirectives: 'Isolate batch from main sales distribution channels.',
+              initiatedDate: it.updatedAt ? new Date(it.updatedAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
+              owner: 'Quality Officer',
+              regulatoryNotified: true,
+            }));
+          setRecalls(mappedRecalls);
+          if (mappedRecalls.length > 0) {
+            setSelectedRecallId(mappedRecalls[0].id);
+          }
+        }
+      } catch {
+        setRecalls([]);
+      }
+    }
+    loadLiveRecalls();
+  }, []);
 
   // Selected Recall Object
   const selectedRecall = useMemo(() => {

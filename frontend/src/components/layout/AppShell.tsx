@@ -1,15 +1,21 @@
-import { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import Sidebar from './Sidebar';
 import TopNavbar from './TopNavbar';
 import './layout.css';
 
 export default function AppShell() {
-  const { user, logout } = useAuth();
+  const { user, logout, refreshUser } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
+
+  // Sync fresh verification status on route navigation
+  useEffect(() => {
+    refreshUser();
+  }, [location.pathname]);
 
   const handleLogout = () => {
     logout();

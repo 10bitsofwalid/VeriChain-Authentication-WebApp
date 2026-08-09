@@ -77,33 +77,56 @@ router.get('/users', async (req: AuthRequest, res: Response, next) => {
   }
 });
 
-// @route   PATCH /api/admin/users/:id/verify
+// @route   PATCH /api/admin/users/:id/verify or PUT /api/admin/users/:id/verify or /api/admin/factories/:id/verify
 // @desc    Verify or reject a seller/factory account
-router.patch('/users/:id/verify', validateRequest(verifyUserSchema), async (req: AuthRequest, res: Response, next) => {
+const verifyUserHandler = async (req: AuthRequest, res: Response, next: any) => {
   try {
-    const { verified } = req.body;
+    const verifiedVal = req.body?.verified !== undefined ? Boolean(req.body.verified) : true;
 
     const user = await User.findById(req.params.id).select('-passwordHash');
     if (!user) {
       return sendError(res, 404, 'User not found');
     }
 
-    user.verified = verified;
+    user.verified = verifiedVal;
     await user.save();
 
     await AuditLog.create({
-      action: verified ? 'USER_VERIFIED' : 'USER_REJECTED',
+      action: verifiedVal ? 'USER_VERIFIED' : 'USER_REJECTED',
       actor: new Types.ObjectId(req.user!.id),
       targetType: 'user',
       targetId: user._id.toString(),
-      details: `${user.role} account "${user.name}" ${verified ? 'verified' : 'rejected'} by admin`,
+      details: `${user.role} account "${user.name}" ${verifiedVal ? 'verified' : 'rejected'} by admin`,
     });
 
-    res.json({ success: true, user });
+    res.json({
+      success: true,
+      message: verifiedVal ? 'User verified successfully' : 'User verification revoked',
+      user: {
+        id: user._id.toString(),
+        _id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        verified: user.verified,
+        isVerified: user.verified,
+        trustScore: user.trustScore ?? 0,
+        factoryDetails: user.factoryDetails,
+        logoUrl: user.logoUrl,
+        certificateUrl: user.certificateUrl,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+      },
+    });
   } catch (error) {
     next(error);
   }
-});
+};
+
+router.patch('/users/:id/verify', verifyUserHandler);
+router.put('/users/:id/verify', verifyUserHandler);
+router.patch('/factories/:id/verify', verifyUserHandler);
+router.put('/factories/:id/verify', verifyUserHandler);
 
 // @route   GET /api/admin/audit-logs
 // @desc    View audit trail

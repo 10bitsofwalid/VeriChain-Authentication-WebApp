@@ -28,13 +28,19 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as {
-      id: string;
-      role: 'buyer' | 'seller' | 'factory' | 'moderator' | 'admin';
-      verified: boolean;
+      id?: string;
+      userId?: string;
+      role?: 'buyer' | 'seller' | 'factory' | 'moderator' | 'admin';
+      verified?: boolean;
     };
 
+    const targetUserId = decoded.id || decoded.userId;
+    if (!targetUserId) {
+      return res.status(401).json({ success: false, message: 'Not authorized, invalid token payload' });
+    }
+
     // Look up user from database to ensure they still exist and check fresh verification status
-    const dbUser = await User.findById(decoded.id);
+    const dbUser = await User.findById(targetUserId);
     if (!dbUser) {
       return res.status(401).json({ success: false, message: 'User belonging to this token no longer exists' });
     }
@@ -42,7 +48,7 @@ export const protect = async (req: AuthRequest, res: Response, next: NextFunctio
     req.user = {
       id: dbUser._id.toString(),
       role: dbUser.role,
-      verified: dbUser.verified,
+      verified: Boolean(dbUser.verified),
     };
     next();
   } catch (error) {
@@ -66,6 +72,7 @@ export const ensureVerified = (req: AuthRequest, res: Response, next: NextFuncti
   if (!req.user || !req.user.verified) {
     return res.status(403).json({
       success: false,
+      code: 'ACCOUNT_NOT_VERIFIED',
       message: 'Access denied. Your account is pending verification approval by an administrator.',
     });
   }

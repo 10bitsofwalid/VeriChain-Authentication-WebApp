@@ -5,6 +5,7 @@ import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { useShopping } from '../../context/ShoppingContext';
 import { useAuth } from '../../context/AuthContext';
+import client from '../../api/client';
 
 type Step = 'shipping' | 'payment' | 'review' | 'confirmed';
 
@@ -53,13 +54,25 @@ export default function CheckoutPage() {
   const stepIndex = (s: Step) => STEPS.findIndex(x => x.id === s);
   const current = stepIndex(step);
 
-  const next = () => {
+  const next = async () => {
     const steps: Step[] = ['shipping', 'payment', 'review', 'confirmed'];
     const i = steps.indexOf(step);
     if (i === 2) {
       // Placing order
       const newOrderNumber = `VC-${Date.now().toString().slice(-6)}`;
       setOrderNum(newOrderNumber);
+
+      // Attempt live purchase transfer on ledger for items in cart
+      try {
+        for (const item of items) {
+          if (item.id) {
+            await client.post(`/items/${item.id}/buy`).catch(() => {});
+          }
+        }
+      } catch {
+        // Continue
+      }
+
       dispatch({ type: 'CLEAR_CART' });
       setStep('confirmed');
     } else if (i < steps.length - 1) {

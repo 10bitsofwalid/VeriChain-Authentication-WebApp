@@ -376,23 +376,138 @@ describe('VeriChain Backend Integration Tests', () => {
     });
   });
 
-  describe('6. Rate Limiting Tests', () => {
-    it('should rate limit auth requests after 20 attempts', async () => {
-      // Make 20 auth requests (should return normal validation/auth errors, not 429)
-      for (let i = 0; i < 20; i++) {
-        await request(app)
-          .post('/api/auth/login')
-          .send({ email: 'rate-limit-test@verichain.io', password: 'wrong' });
-      }
+  describe('6. Verification State Synchronization Tests (Live Without Logout)', () => {
+    let unverifiedFactoryToken: string;
+    let unverifiedFactoryId: string;
+    let unverifiedSellerToken: string;
+    let unverifiedSellerId: string;
 
-      // The 21st request should be rate-limited and return 429
-      const limitRes = await request(app)
-        .post('/api/auth/login')
-        .send({ email: 'rate-limit-test@verichain.io', password: 'wrong' });
+    it('should register factory walidnewfactory as initially unverified', async () => {
+      const res = await request(app)
+        .post('/api/auth/signup')
+        .send({
+          name: 'Walid New Factory',
+          email: 'test-walidnewfactory@verichain.io',
+          password: 'password123',
+          role: 'factory',
+          factoryLocation: 'Berlin, Germany',
+          factoryCapacity: '20000 units/mo',
+          factoryCertificateNo: 'ISO-BER-9001',
+        });
 
-      expect(limitRes.status).toBe(429);
-      expect(limitRes.body.success).toBe(false);
-      expect(limitRes.body.message).toContain('Too many login or signup attempts');
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.user.verified).toBe(false);
+      expect(res.body.user.isVerified).toBe(false);
+
+      unverifiedFactoryToken = res.body.token;
+      unverifiedFactoryId = res.body.user.id;
+    });
+
+    it('should reject product registration before admin approval (ACCOUNT_NOT_VERIFIED)', async () => {
+      // /api/auth/me confirms unverified state
+      const meRes = await request(app)
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${unverifiedFactoryToken}`);
+      expect(meRes.status).toBe(200);
+      expect(meRes.body.user.verified).toBe(false);
+      expect(meRes.body.user.isVerified).toBe(false);
+
+      // Attempt protected product registration
+      const regRes = await request(app)
+        .post('/api/products/register')
+        .set('Authorization', `Bearer ${unverifiedFactoryToken}`)
+        .send({
+          name: 'Restricted Factory Product',
+          description: 'Should not succeed unverified',
+          category: 'Hardware',
+          sku: 'TEST-SKU-UNVERIFIED-01',
+          imageUrl: 'https://verichain.io/prod.png',
+        });
+
+      expect(regRes.status).toBe(403);
+      expect(regRes.body.code).toBe('ACCOUNT_NOT_VERIFIED');
+    });
+
+    it('should allow admin to verify walidnewfactory in MongoDB', async () => {
+      const verifyRes = await request(app)
+        .patch(`/api/admin/users/${unverifiedFactoryId}/verify`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ verified: true });
+
+      expect(verifyRes.status).toBe(200);
+      expect(verifyRes.body.success).toBe(true);
+      expect(verifyRes.body.user.verified).toBe(true);
+      expect(verifyRes.body.user.isVerified).toBe(true);
+
+      // Verify MongoDB document directly
+      const dbUser = await User.findById(unverifiedFactoryId);
+      expect(dbUser).toBeDefined();
+      expect(dbUser?.verified).toBe(true);
+    });
+
+    it('should reflect verified=true on /api/auth/me with original factory token without logging out', async () => {
+      const meRes = await request(app)
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${unverifiedFactoryToken}`);
+
+      expect(meRes.status).toBe(200);
+      expect(meRes.body.success).toBe(true);
+      expect(meRes.body.user.verified).toBe(true);
+      expect(meRes.body.user.isVerified).toBe(true);
+      expect(meRes.body.user.name).toBe('Walid New Factory');
+    });
+
+    it('should allow product registration with original factory token after verification', async () => {
+      const regRes = await request(app)
+        .post('/api/products/register')
+        .set('Authorization', `Bearer ${unverifiedFactoryToken}`)
+        .send({
+          name: 'Live Verified Factory Product',
+          description: 'Registered with original session token',
+          category: 'Hardware',
+          sku: 'TEST-SKU-LIVE-01',
+          imageUrl: 'https://verichain.io/live-prod.png',
+        });
+
+      expect(regRes.status).toBe(201);
+      expect(regRes.body.success).toBe(true);
+      expect(regRes.body.product.name).toBe('Live Verified Factory Product');
+    });
+
+    it('should perform live verification synchronization for seller walidnewseller', async () => {
+      // 1. Register seller
+      const signupRes = await request(app)
+        .post('/api/auth/signup')
+        .send({
+          name: 'Walid New Seller',
+          email: 'test-walidnewseller@verichain.io',
+          password: 'password123',
+          role: 'seller',
+        });
+
+      expect(signupRes.status).toBe(201);
+      expect(signupRes.body.user.verified).toBe(false);
+      unverifiedSellerToken = signupRes.body.token;
+      unverifiedSellerId = signupRes.body.user.id;
+
+      // 2. Admin verifies seller
+      const verifyRes = await request(app)
+        .patch(`/api/admin/users/${unverifiedSellerId}/verify`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ verified: true });
+
+      expect(verifyRes.status).toBe(200);
+      expect(verifyRes.body.user.verified).toBe(true);
+
+      // 3. Seller checks /api/auth/me with original token
+      const meRes = await request(app)
+        .get('/api/auth/me')
+        .set('Authorization', `Bearer ${unverifiedSellerToken}`);
+
+      expect(meRes.status).toBe(200);
+      expect(meRes.body.user.verified).toBe(true);
+      expect(meRes.body.user.isVerified).toBe(true);
     });
   });
 
@@ -429,6 +544,26 @@ describe('VeriChain Backend Integration Tests', () => {
         process.env.NODE_ENV = originalEnv;
         process.env.ALLOWED_ORIGINS = originalOrigins;
       }
+    });
+  });
+
+  describe('8. Rate Limiting Tests', () => {
+    it('should rate limit auth requests after 20 attempts', async () => {
+      // Make 20 auth requests (should return normal validation/auth errors, not 429)
+      for (let i = 0; i < 20; i++) {
+        await request(app)
+          .post('/api/auth/login')
+          .send({ email: 'rate-limit-test@verichain.io', password: 'wrong' });
+      }
+
+      // The 21st request should be rate-limited and return 429
+      const limitRes = await request(app)
+        .post('/api/auth/login')
+        .send({ email: 'rate-limit-test@verichain.io', password: 'wrong' });
+
+      expect(limitRes.status).toBe(429);
+      expect(limitRes.body.success).toBe(false);
+      expect(limitRes.body.message).toContain('Too many login or signup attempts');
     });
   });
 });

@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from 'react';
+import { useState, useEffect, type FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
@@ -8,7 +8,12 @@ import FileUpload from '../../components/FileUpload';
 
 export default function RegisterProduct() {
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, refreshUser } = useAuth();
+
+  useEffect(() => {
+    refreshUser?.();
+  }, []);
+
   const [form, setForm] = useState({
     name: '',
     description: '',
@@ -77,7 +82,7 @@ export default function RegisterProduct() {
       {error && <AlertBanner type="error" message={error} onDismiss={() => setError('')} style={{ marginBottom: 'var(--space-md)' }} />}
       {success && <AlertBanner type="success" message={success} onDismiss={() => setSuccess('')} style={{ marginBottom: 'var(--space-md)' }} />}
 
-      {user && !user.verified && (
+      {user && !(user.verified || user.isVerified) && (
         <AlertBanner
           type="error"
           message={
@@ -153,10 +158,10 @@ export default function RegisterProduct() {
         <button 
           type="submit" 
           className="btn btn-primary btn-lg" 
-          disabled={submitting || !user?.verified} 
+          disabled={submitting || !(user?.verified || user?.isVerified)} 
           style={{ marginTop: 'var(--space-sm)' }}
         >
-          {submitting ? <Loader size={18} className="spin" /> : user?.verified ? 'Register Product' : 'Register Product (Unverified)'}
+          {submitting ? <Loader size={18} className="spin" /> : (user?.verified || user?.isVerified) ? 'Register Product' : 'Register Product (Unverified)'}
         </button>
       </form>
     </div>

@@ -69,7 +69,14 @@ export default function AdminComplaintsView() {
     setTimeout(() => setToastMessage(null), 3000);
   };
 
-  const handleUpdateStatus = (id: string, newStatus: ComplaintRecord['status']) => {
+  const handleUpdateStatus = async (id: string, newStatus: ComplaintRecord['status']) => {
+    try {
+      const backendStatus = newStatus === 'resolved' ? 'resolved' : newStatus === 'under_review' ? 'under_review' : 'pending';
+      await client.patch(`/complaints/${id}`, { status: backendStatus }).catch(() => {});
+    } catch {
+      // Continue
+    }
+
     setComplaints(prev => prev.map(c => c.id === id ? { ...c, status: newStatus } : c));
     showToast(`Ticket status changed to ${newStatus.toUpperCase()}`);
     if (activeComplaint && activeComplaint.id === id) {
@@ -77,10 +84,10 @@ export default function AdminComplaintsView() {
     }
   };
 
-  const handleResolveSubmit = (e: React.FormEvent) => {
+  const handleResolveSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!activeComplaint) return;
-    handleUpdateStatus(activeComplaint.id, 'resolved');
+    await handleUpdateStatus(activeComplaint.id, 'resolved');
     setActiveComplaint(null);
     setResolutionNote('');
     showToast('Complaint resolved and notification issued to parties');

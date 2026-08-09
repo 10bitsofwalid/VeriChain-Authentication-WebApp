@@ -45,32 +45,25 @@ async function seed() {
     process.exit(1);
   }
 
-  // 2. Check if an admin already exists (idempotent — safe to run multiple times)
-  const existing = await User.findOne({ email: ADMIN_EMAIL });
-  if (existing) {
-    console.log(`\n${YELLOW}⚠  Admin account already exists.${RESET}`);
-    console.log(`   Email : ${existing.email}`);
-    console.log(`   Role  : ${existing.role}`);
-    console.log(`\n${YELLOW}No changes made. To reset, delete the user from MongoDB first.${RESET}\n`);
-    await mongoose.disconnect();
-    process.exit(0);
-  }
-
   // 3. Hash password
   const salt         = await bcrypt.genSalt(12);
   const passwordHash = await bcrypt.hash(ADMIN_PASSWORD, salt);
 
-  // 4. Create the admin user
+  // 4. Create or Update the admin user (upsert)
   try {
-    const admin = await User.create({
-      name:         ADMIN_NAME,
-      email:        ADMIN_EMAIL,
-      passwordHash,
-      role:         'admin',
-      verified:     true,           // Admins are pre-verified
-    });
+    const admin = await User.findOneAndUpdate(
+      { email: ADMIN_EMAIL },
+      {
+        name: ADMIN_NAME,
+        email: ADMIN_EMAIL,
+        passwordHash,
+        role: 'admin',
+        verified: true,
+      },
+      { upsert: true, new: true }
+    );
 
-    console.log(`\n${GREEN}${BOLD}✔ Admin account created successfully!${RESET}`);
+    console.log(`\n${GREEN}${BOLD}✔ Admin account provisioned successfully!${RESET}`);
     console.log(`\n${BOLD}┌──────────────────────────────────────────┐${RESET}`);
     console.log(`${BOLD}│          Admin Login Credentials          │${RESET}`);
     console.log(`${BOLD}├──────────────────────────────────────────┤${RESET}`);
@@ -81,9 +74,9 @@ async function seed() {
     console.log(`${BOLD}│${RESET}  Verified : ${GREEN}${BOLD}true${RESET}`);
     console.log(`${BOLD}│${RESET}  ID       : ${admin._id}`);
     console.log(`${BOLD}└──────────────────────────────────────────┘${RESET}`);
-    console.log(`\n${YELLOW}⚠  Store these credentials securely. Change the password after first login.${RESET}\n`);
+    console.log(`\n${YELLOW}⚠  Store these credentials securely.${RESET}\n`);
   } catch (err) {
-    console.error(`${RED}✖ Failed to create admin user:${RESET}`, err);
+    console.error(`${RED}✖ Failed to create/update admin user:${RESET}`, err);
     await mongoose.disconnect();
     process.exit(1);
   }

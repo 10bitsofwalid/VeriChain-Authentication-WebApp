@@ -17,15 +17,17 @@ const RecallAlerts: React.FC = () => {
   useEffect(() => {
     async function loadRecalls() {
       try {
-        const res = await client.get('/items/marketplace');
+        const res = await client.get('/items/recalls').catch(async () => {
+          return await client.get('/items/marketplace');
+        });
         if (res.data?.items && Array.isArray(res.data.items)) {
           const recalled = res.data.items
-            .filter((it: any) => it.status === 'recalled')
+            .filter((it: any) => it.status === 'recalled' || res.config?.url?.includes('recalls'))
             .map((it: any) => ({
               id: it._id,
               productName: it.product?.name || 'Recalled Product',
               batchId: it.serialNumber || it._id.slice(-6).toUpperCase(),
-              reason: 'Quality assurance protocol triggered',
+              reason: (it.journey && it.journey.find((j: any) => j.action === 'recalled')?.location) || 'Quality assurance protocol triggered',
               severity: 'High',
               date: it.updatedAt || it.createdAt || new Date().toISOString(),
               status: 'Active Recall',

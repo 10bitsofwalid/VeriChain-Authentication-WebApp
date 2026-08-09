@@ -43,7 +43,7 @@ export default function AdminReportsView() {
         ]);
 
         const auditCount = auditRes.status === 'fulfilled' && auditRes.value.data?.logs ? auditRes.value.data.logs.length : 0;
-        const prodCount = prodRes.status === 'fulfilled' && Array.isArray(prodRes.value.data) ? prodRes.value.data.length : 0;
+        const prodCount = prodRes.status === 'fulfilled' ? (Array.isArray(prodRes.value.data) ? prodRes.value.data.length : (prodRes.value.data?.products?.length || 0)) : 0;
         const compCount = compRes.status === 'fulfilled' && compRes.value.data?.complaints ? compRes.value.data.complaints.length : 0;
 
         setReports([

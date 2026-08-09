@@ -413,4 +413,35 @@ describe('VeriChain Comprehensive Application Test Suite', () => {
       });
     });
   });
+
+  // ==========================================
+  // 12. VERIFICATION STATE SYNCHRONIZATION TESTS
+  // ==========================================
+  describe('12. Verification State Synchronization Module', () => {
+    it('should display Account Verification Pending for unverified factory', () => {
+      renderWithProviders(<RegisterProduct />, {
+        user: { id: 'f1', name: 'Unverified Factory', email: 'f1@test.com', role: 'factory', verified: false, isVerified: false },
+      });
+      expect(screen.getByText(/Account Verification Pending/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Register Product \(Unverified\)/i })).toBeDisabled();
+    });
+
+    it('should NOT display Account Verification Pending for verified factory', () => {
+      renderWithProviders(<RegisterProduct />, {
+        user: { id: 'f1', name: 'Verified Factory', email: 'f1@test.com', role: 'factory', verified: true, isVerified: true },
+      });
+      expect(screen.queryByText(/Account Verification Pending/i)).not.toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /^Register Product$/i })).not.toBeDisabled();
+    });
+
+    it('should display Seller Verification Pending for unverified seller', async () => {
+      (client.get as any).mockResolvedValue({ data: [] });
+      renderWithProviders(<SellerDashboard />, {
+        user: { id: 's1', name: 'Unverified Seller', email: 's1@test.com', role: 'seller', verified: false, isVerified: false },
+      });
+      await waitFor(() => {
+        expect(screen.getByText(/Seller Verification Pending/i)).toBeInTheDocument();
+      });
+    });
+  });
 });

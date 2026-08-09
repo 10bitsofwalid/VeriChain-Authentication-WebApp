@@ -51,12 +51,14 @@ router.post('/signup', validateRequest(signupSchema), async (req, res, next) => 
       success: true,
       token,
       user: {
-        id: user._id,
+        id: user._id.toString(),
+        _id: user._id.toString(),
         name: user.name,
         email: user.email,
         role: user.role,
-        verified: user.verified,
-        trustScore: user.trustScore,
+        verified: Boolean(user.verified),
+        isVerified: Boolean(user.verified),
+        trustScore: user.trustScore ?? 0,
       },
     });
   } catch (error) {
@@ -86,12 +88,14 @@ router.post('/login', validateRequest(loginSchema), async (req, res, next) => {
       success: true,
       token,
       user: {
-        id: user._id,
+        id: user._id.toString(),
+        _id: user._id.toString(),
         name: user.name,
         email: user.email,
         role: user.role,
-        verified: user.verified,
-        trustScore: user.trustScore,
+        verified: Boolean(user.verified),
+        isVerified: Boolean(user.verified),
+        trustScore: user.trustScore ?? 0,
       },
     });
   } catch (error) {
@@ -108,7 +112,22 @@ router.get('/me', protect, async (req: AuthRequest, res: Response, next) => {
       return sendError(res, 404, 'User not found');
     }
 
-    res.json({ success: true, user });
+    res.json({
+      success: true,
+      user: {
+        id: user._id.toString(),
+        _id: user._id.toString(),
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        verified: Boolean(user.verified),
+        isVerified: Boolean(user.verified),
+        trustScore: user.trustScore ?? 0,
+        factoryDetails: user.factoryDetails,
+        logoUrl: user.logoUrl,
+        certificateUrl: user.certificateUrl,
+      },
+    });
   } catch (error) {
     next(error);
   }
@@ -151,11 +170,13 @@ router.post('/invite', protect, async (req: AuthRequest, res: Response, next) =>
       success: true,
       message: `${role} account created successfully.`,
       user: {
-        id: user._id,
+        id: user._id.toString(),
+        _id: user._id.toString(),
         name: user.name,
         email: user.email,
         role: user.role,
-        verified: user.verified,
+        verified: Boolean(user.verified),
+        isVerified: Boolean(user.verified),
       },
     });
   } catch (error) {
@@ -214,11 +235,13 @@ router.post('/accept-invite', validateRequest(acceptInviteSchema), async (req, r
       message: 'Account activated successfully',
       token: jwtToken,
       user: {
-        id: user._id,
+        id: user._id.toString(),
+        _id: user._id.toString(),
         name: user.name,
         email: user.email,
         role: user.role,
-        verified: user.verified,
+        verified: Boolean(user.verified),
+        isVerified: Boolean(user.verified),
       },
     });
   } catch (error) {

@@ -1,10 +1,11 @@
-import { Router, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { Complaint } from '../models/Complaint';
 import { AuditLog } from '../models/AuditLog';
 import { ItemInstance } from '../models/ItemInstance';
 import { Product } from '../models/Product';
 import { protect, authorize, ensureVerified, AuthRequest } from '../middleware/auth';
 import { Types } from 'mongoose';
+import jwt from 'jsonwebtoken';
 import { z } from 'zod';
 import { validateRequest } from '../utils/validation';
 import { sendError } from '../utils/errorResponse';
@@ -111,18 +112,41 @@ router.post('/', protect, authorize('buyer'), ensureVerified, validateRequest(cr
   }
 });
 
-// @route   GET /api/complaints
-// @desc    List complaints — buyers see own, moderators/admins see all
-router.get('/', protect, async (req: AuthRequest, res: Response, next) => {
+// Helper to optionally extract user token for complaints route
+const getComplaintsUser = async (req: Request) => {
   try {
+    const authHeader = req.headers.authorization;
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret';
+      const decoded = jwt.verify(token, JWT_SECRET) as { id: string; role: string };
+      return decoded;
+    }
+  } catch {
+    // Guest
+  }
+  return null;
+};
+
+// @route   GET /api/complaints
+// @desc    List complaints — role-scoped when authenticated, public disputes when requested by community
+router.get('/', async (req: Request, res: Response, next) => {
+  try {
+    const user = await getComplaintsUser(req);
     let filter: any = {};
 
-    if (req.user?.role === 'buyer') {
-      filter.buyer = req.user.id;
-    } else if (req.user?.role === 'seller') {
-      filter.seller = req.user.id;
-    } else if (!['moderator', 'admin'].includes(req.user?.role || '')) {
-      return sendError(res, 403, 'Not authorized to view complaints');
+    if (user) {
+      if (user.role === 'buyer') {
+        filter.buyer = user.id;
+      } else if (user.role === 'seller') {
+        filter.seller = user.id;
+      } else if (user.role === 'factory') {
+        // Factory sees complaints for items of their products
+        const products = await Product.find({ factory: user.id }).select('_id');
+        const items = await ItemInstance.find({ product: { $in: products.map(p => p._id) } }).select('_id');
+        filter.productInstance = { $in: items.map(it => it._id) };
+      }
+      // moderator and admin see all
     }
 
     const complaints = await Complaint.find(filter)

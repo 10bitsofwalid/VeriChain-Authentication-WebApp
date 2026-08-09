@@ -47,6 +47,37 @@ const buyItemSchema = z.object({
   }),
 });
 
+// @route   GET /api/items/recently-verified
+// @desc    Get recently verified and updated items across the network
+router.get('/recently-verified', async (_req: Request, res: Response, next) => {
+  try {
+    const items = await ItemInstance.find()
+      .populate('product', 'name sku category verifiedStatus imageUrl')
+      .populate('currentOwner', 'name role')
+      .sort({ updatedAt: -1 })
+      .limit(12);
+
+    res.json({ success: true, items });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   GET /api/items/recalls
+// @desc    Get all recalled items across the network
+router.get('/recalls', async (_req: Request, res: Response, next) => {
+  try {
+    const items = await ItemInstance.find({ status: 'recalled' })
+      .populate('product', 'name sku category verifiedStatus imageUrl')
+      .populate('currentOwner', 'name email role')
+      .sort({ updatedAt: -1 });
+
+    res.json({ success: true, items });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // @route   GET /api/items/verify/:serialNumber
 // @desc    Public endpoint — verify item authenticity by serial number
 router.get('/verify/:serialNumber', lookupLimiter, async (req: Request, res: Response, next) => {
@@ -61,6 +92,15 @@ router.get('/verify/:serialNumber', lookupLimiter, async (req: Request, res: Res
     }
 
     const product = item.product as any;
+
+    // Log live verification query
+    AuditLog.create({
+      action: 'ITEM_VERIFIED',
+      actor: item.currentOwner ? new Types.ObjectId((item.currentOwner as any)._id || item.currentOwner) : undefined,
+      targetType: 'item',
+      targetId: item._id.toString(),
+      details: `Serial verification lookup for ${item.serialNumber} (Status: ${item.status}, Risk: ${item.counterfeitRisk})`,
+    }).catch(() => {});
 
     res.json({
       success: true,

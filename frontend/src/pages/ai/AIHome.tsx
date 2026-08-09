@@ -79,23 +79,16 @@ export default function AIHome() {
     setSimResult(null);
     try {
       const res = await client.get('/products');
-      if (Array.isArray(res.data)) {
-        const matches = res.data.filter((p: any) => 
-          p.sku?.toLowerCase() === skuInput.trim().toLowerCase() ||
-          p.name?.toLowerCase().includes(skuInput.trim().toLowerCase())
-        );
-        setSimResult({
-          similarityScore: matches.length > 0 ? 1.0 : 0.0,
-          possibleDuplicatesCount: matches.length,
-          verdict: matches.length > 0 ? `${matches.length} matching product(s) registered in catalog` : 'Unique product SKU — no duplicates found'
-        });
-      } else {
-        setSimResult({
-          similarityScore: 0.0,
-          possibleDuplicatesCount: 0,
-          verdict: 'Unique product listing'
-        });
-      }
+      const prods = Array.isArray(res.data) ? res.data : res.data?.products || [];
+      const matches = prods.filter((p: any) => 
+        p.sku?.toLowerCase() === skuInput.trim().toLowerCase() ||
+        p.name?.toLowerCase().includes(skuInput.trim().toLowerCase())
+      );
+      setSimResult({
+        similarityScore: matches.length > 0 ? 1.0 : 0.0,
+        possibleDuplicatesCount: matches.length,
+        verdict: matches.length > 0 ? `${matches.length} matching product(s) registered in catalog` : 'Unique product SKU — no duplicates found'
+      });
     } catch {
       setSimResult({
         similarityScore: 0.0,
