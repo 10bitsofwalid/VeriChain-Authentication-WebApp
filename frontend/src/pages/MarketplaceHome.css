@@ -76,14 +76,17 @@
   margin-left: 0.7rem;
 }
 
-.marketplace-hero-search input {
-  background: transparent;
-  border: 0;
+.marketplace-hero-search input,
+.marketplace-hero-search input:focus,
+.marketplace-hero-search input:focus-visible {
+  background: transparent !important;
+  border: 0 !important;
   color: var(--text-primary);
   flex: 1;
   font: inherit;
   min-width: 0;
-  outline: none;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .marketplace-hero-actions,

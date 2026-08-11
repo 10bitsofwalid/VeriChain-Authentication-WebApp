@@ -11,11 +11,17 @@
   color: var(--vc-color-muted);
 }
 
-.form-input {
+.form-input,
+.form-input:focus,
+.form-input:focus-visible,
+.search-bar input,
+.search-bar input:focus,
+.search-bar input:focus-visible {
   flex: 1;
-  border: none;
-  outline: none;
-  background: transparent;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
   font-size: 1rem;
   color: var(--vc-color-text);
 }

@@ -153,11 +153,14 @@
   flex-shrink: 0;
 }
 
-.verify-search-input {
+.verify-search-input,
+.verify-search-input:focus,
+.verify-search-input:focus-visible {
   flex: 1;
-  background: none;
-  border: none;
-  outline: none;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 1rem;
@@ -1100,8 +1103,7 @@
 /* Interactive Element Focus Visible */
 .back-link:focus-visible,
 .verify-page button:focus-visible,
-.verify-tab-btn:focus-visible,
-.verify-input-row input:focus-visible {
+.verify-tab-btn:focus-visible {
   outline: 2px solid var(--accent-cyan);
   outline-offset: 2px;
 }

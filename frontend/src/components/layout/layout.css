@@ -456,15 +456,18 @@
   padding: var(--space-md);
 }
 
-.vc-search-input-row input {
-  background: transparent;
-  border: 0;
+.vc-search-input-row input,
+.vc-search-input-row input:focus,
+.vc-search-input-row input:focus-visible {
+  background: transparent !important;
+  border: 0 !important;
   color: var(--text-primary);
   flex: 1;
   font: inherit;
   font-size: 1rem;
   min-width: 0;
-  outline: none;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .vc-search-meta {

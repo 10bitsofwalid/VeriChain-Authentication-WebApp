@@ -8,6 +8,7 @@ if (!process.env.JWT_SECRET) {
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
+import mongoose from 'mongoose';
 import { connectDB } from './config/db';
 import { errorHandler } from './middleware/error';
 
@@ -66,7 +67,23 @@ app.use('/api/users', usersRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  const dbState = mongoose.connection.readyState;
+  const dbStateMap: Record<number, string> = {
+    0: 'disconnected',
+    1: 'connected',
+    2: 'connecting',
+    3: 'disconnecting',
+  };
+
+  res.json({
+    status: dbState === 1 ? 'ok' : 'degraded',
+    database: {
+      status: dbStateMap[dbState] || 'unknown',
+      name: mongoose.connection.name || null,
+      host: mongoose.connection.host || null,
+    },
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Error handler (must be last)

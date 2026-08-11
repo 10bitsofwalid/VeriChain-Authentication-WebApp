@@ -850,11 +850,41 @@ img {
 /* --- Keyboard Accessibility Focus Outline --- */
 a:focus-visible,
 button:focus-visible,
-input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
   outline: none;
   box-shadow: var(--vc-focus-ring) !important;
+}
+
+/* Ensure all search and embedded inputs have no inner red box, focus ring or outline */
+.navbar-search input,
+.navbar-search input:focus,
+.navbar-search input:focus-visible,
+.marketplace-hero-search input,
+.marketplace-hero-search input:focus,
+.marketplace-hero-search input:focus-visible,
+.verify-search-input,
+.verify-search-input:focus,
+.verify-search-input:focus-visible,
+.verify-search-wrapper input,
+.verify-search-wrapper input:focus,
+.verify-search-wrapper input:focus-visible,
+.vc-search-input-row input,
+.vc-search-input-row input:focus,
+.vc-search-input-row input:focus-visible,
+.search-bar input,
+.search-bar input:focus,
+.search-bar input:focus-visible,
+.search-input-wrapper input,
+.search-input-wrapper input:focus,
+.search-input-wrapper input:focus-visible,
+.input-with-icon,
+.input-with-icon:focus,
+.input-with-icon:focus-visible,
+input[type="search"] {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
 }
 
 /* --- Utility --- */
@@ -942,14 +972,10 @@ textarea:focus-visible {
   margin-top: var(--space-lg);
 }
 
-
-
 /* --------------------------------------------------- */
-/* Focus-visible outline for accessibility */
-:focus-visible,
+/* Focus-visible outline for accessibility (buttons, links, interactives) */
 a:focus-visible,
 button:focus-visible,
-input:focus-visible,
 select:focus-visible,
 textarea:focus-visible,
 [role="button"]:focus-visible,

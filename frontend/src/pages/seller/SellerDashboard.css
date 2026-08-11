@@ -93,6 +93,11 @@
   padding-left: 40px;
 }
 
+.search-input-wrapper input:focus,
+.search-input-wrapper input:focus-visible {
+  outline: none !important;
+}
+
 /* Dashboard Analytics Tab Styles */
 .analytics-grid {
   display: grid;
