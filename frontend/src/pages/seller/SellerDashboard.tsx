@@ -202,7 +202,7 @@ export default function SellerDashboard() {
       }
     }
     loadSellerData();
-  }, []);
+  }, [refreshUser]);
 
   const handleTabChange = (tab: string) => {
     setSearchParams({ tab });
@@ -220,31 +220,46 @@ export default function SellerDashboard() {
       return;
     }
 
+    let created: Product;
     try {
-      await client.post('/products/register', {
+      const res = await client.post('/products/register', {
         name: newProduct.name,
         description: newProduct.description || 'Verified luxury merchandise on the VeriChain network.',
         category: newProduct.category,
         sku: newProduct.sku,
+        price: Number(newProduct.price),
         imageUrl: newProduct.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=300',
-      }).catch(() => {});
-    } catch {
-      // Continue
-    }
+      });
 
-    const created: Product = {
-      _id: `prod-${Date.now()}`,
-      name: newProduct.name,
-      sku: newProduct.sku,
-      category: newProduct.category,
-      price: Number(newProduct.price),
-      stock: Number(newProduct.stock),
-      status: Number(newProduct.stock) > 0 ? 'listed' : 'out_of_stock',
-      imageUrl: newProduct.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=300',
-      authenticityRating: 100.0,
-      verifiedCount: 0,
-      description: newProduct.description || 'No description provided.'
-    };
+      const serverProd = res.data?.product;
+      created = {
+        _id: serverProd?._id || `prod-${Date.now()}`,
+        name: serverProd?.name || newProduct.name,
+        sku: serverProd?.sku || newProduct.sku,
+        category: serverProd?.category || newProduct.category,
+        price: Number(serverProd?.price ?? newProduct.price),
+        stock: Number(newProduct.stock),
+        status: serverProd?.verifiedStatus === 'verified' ? 'listed' : 'draft',
+        imageUrl: serverProd?.imageUrl || newProduct.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=300',
+        authenticityRating: 100.0,
+        verifiedCount: 0,
+        description: serverProd?.description || newProduct.description || 'No description provided.',
+      };
+    } catch {
+      created = {
+        _id: `prod-${Date.now()}`,
+        name: newProduct.name,
+        sku: newProduct.sku,
+        category: newProduct.category,
+        price: Number(newProduct.price),
+        stock: Number(newProduct.stock),
+        status: Number(newProduct.stock) > 0 ? 'listed' : 'out_of_stock',
+        imageUrl: newProduct.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&q=80&w=300',
+        authenticityRating: 100.0,
+        verifiedCount: 0,
+        description: newProduct.description || 'No description provided.',
+      };
+    }
 
     setProducts(prev => [created, ...prev]);
     setShowAddProductModal(false);
@@ -258,7 +273,7 @@ export default function SellerDashboard() {
       price: 0,
       stock: 10,
       imageUrl: '',
-      description: ''
+      description: '',
     });
   };
 

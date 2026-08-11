@@ -15,6 +15,30 @@ export default function PurchaseHistoryPage() {
   useEffect(() => {
     async function fetchPurchases() {
       try {
+        const orderRes = await client.get('/orders/my').catch(() => null);
+        if (orderRes?.data?.orders && Array.isArray(orderRes.data.orders) && orderRes.data.orders.length > 0) {
+          const records: PurchaseRecord[] = [];
+          orderRes.data.orders.forEach((ord: any) => {
+            (ord.items || []).forEach((it: any, itIdx: number) => {
+              records.push({
+                id: `${ord._id}-${itIdx}`,
+                orderNumber: ord.orderNumber,
+                date: ord.createdAt || new Date().toISOString(),
+                product: it.name || it.product?.name || 'Verified Item',
+                brand: it.sku || it.product?.sku || 'VeriChain',
+                category: it.product?.category || 'General',
+                price: Number(it.price) || 0,
+                status: ord.status === 'cancelled' ? 'disputed' : ord.status === 'returned' ? 'refunded' : 'completed',
+                verified: it.product?.verifiedStatus === 'verified' || true,
+                serialNumber: it.serialNumber || (it.itemInstance ? it.itemInstance.serialNumber : undefined),
+                image: it.image || it.product?.imageUrl || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
+              });
+            });
+          });
+          setPurchases(records);
+          return;
+        }
+
         const res = await client.get('/items/my');
         if (res.data?.items && Array.isArray(res.data.items) && res.data.items.length > 0) {
           const records: PurchaseRecord[] = res.data.items.map((item: any) => ({

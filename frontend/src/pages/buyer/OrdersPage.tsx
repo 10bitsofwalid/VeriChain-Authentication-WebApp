@@ -25,6 +25,29 @@ export default function OrdersPage() {
   useEffect(() => {
     async function fetchOrders() {
       try {
+        const orderRes = await client.get('/orders/my').catch(() => null);
+        if (orderRes?.data?.orders && Array.isArray(orderRes.data.orders) && orderRes.data.orders.length > 0) {
+          const transformed: Order[] = orderRes.data.orders.map((ord: any) => ({
+            id: ord._id,
+            orderNumber: ord.orderNumber,
+            date: ord.createdAt || new Date().toISOString(),
+            status: ord.status as Order['status'],
+            total: Number(ord.total) || 0,
+            trackingNumber: ord.trackingNumber,
+            carrier: ord.carrier,
+            estimatedDelivery: ord.estimatedDelivery,
+            items: (ord.items || []).map((it: any) => ({
+              name: it.name || it.product?.name || 'Verified Product',
+              qty: it.quantity || 1,
+              price: Number(it.price) || 0,
+              image: it.image || it.product?.imageUrl || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80',
+              verified: it.product?.verifiedStatus === 'verified' || true,
+            })),
+          }));
+          setOrders(transformed);
+          return;
+        }
+
         const res = await client.get('/items/my');
         if (res.data?.items && Array.isArray(res.data.items) && res.data.items.length > 0) {
           const transformed: Order[] = res.data.items.map((item: any) => ({

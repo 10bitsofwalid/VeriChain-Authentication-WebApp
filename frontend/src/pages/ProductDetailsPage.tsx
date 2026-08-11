@@ -28,6 +28,7 @@ interface VerifiedProductDetail {
   name: string;
   category: string;
   sku: string;
+  price?: number;
   serialNumber?: string;
   description: string;
   imageUrl: string;
@@ -115,6 +116,7 @@ export default function ProductDetailsPage() {
             name: item.product?.name || 'Verified Authentic Product',
             category: item.product?.category || 'General',
             sku: item.product?.sku || 'VC-SKU',
+            price: Number(item.product?.price) || 120,
             serialNumber: item.serialNumber || queryId,
             description: item.product?.description || 'Authentic product verified on the VeriChain decentralized ledger.',
             imageUrl: item.product?.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800',
@@ -140,6 +142,7 @@ export default function ProductDetailsPage() {
             name: prod.name,
             category: prod.category || 'General',
             sku: prod.sku || 'SKU-001',
+            price: Number(prod.price) || 120,
             serialNumber: queryId,
             description: prod.description || 'Authentic product verified on the VeriChain decentralized ledger.',
             imageUrl: prod.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=800',
@@ -160,6 +163,7 @@ export default function ProductDetailsPage() {
               name: found.name,
               category: found.category,
               sku: found.sku,
+              price: Number(found.price) || 120,
               description: found.description,
               imageUrl: found.imageUrl,
               verifiedStatus: found.verifiedStatus,
@@ -196,7 +200,7 @@ export default function ProductDetailsPage() {
         payload: {
           id: product.id,
           name: product.name,
-          price: 0,
+          price: Number(product.price) || 120,
           imageUrl: product.imageUrl,
         },
       });
@@ -210,7 +214,7 @@ export default function ProductDetailsPage() {
       payload: {
         id: product.id,
         name: product.name,
-        price: 0,
+        price: Number(product.price) || 120,
         imageUrl: product.imageUrl,
       },
     });

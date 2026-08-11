@@ -9,6 +9,7 @@ export interface IProduct extends Document {
   imageUrl: string;
   certificateUrl?: string;
   specs: Map<string, string>;
+  price: number;
   verifiedStatus: 'pending' | 'verified' | 'rejected';
   createdAt: Date;
   updatedAt: Date;
@@ -20,6 +21,7 @@ const ProductSchema = new Schema<IProduct>(
     description: { type: String, required: true },
     category: { type: String, required: true },
     sku: { type: String, required: true, unique: true },
+    price: { type: Number, required: true, default: 0, min: 0 },
     factory: { type: Schema.Types.ObjectId, ref: 'User', required: true },
     imageUrl: { type: String, required: true },
     certificateUrl: { type: String },

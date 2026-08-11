@@ -90,17 +90,35 @@ export default function AdminModerationView() {
   };
 
   const handleAction = async (id: string, newStatus: 'approved' | 'rejected' | 'flagged') => {
+    const target = items.find(i => i.id === id);
     try {
-      if (newStatus === 'approved') {
-        await client.patch(`/admin/products/${id}/verify`, { verifiedStatus: 'verified' }).catch(async () => {
-          return await client.patch(`/moderator/products/${id}/verify`, { verifiedStatus: 'verified' });
+      if (target?.itemType === 'Seller Listing') {
+        // Complaint / dispute moderation
+        const complaintStatus =
+          newStatus === 'approved'
+            ? 'resolved'
+            : newStatus === 'rejected'
+            ? 'dismissed'
+            : 'under_review';
+        await client.patch(`/complaints/${id}`, {
+          status: complaintStatus,
+          moderatorNotes: `Moderation action: marked as ${newStatus}`,
         });
-      } else if (newStatus === 'rejected') {
-        await client.patch(`/admin/products/${id}/verify`, { verifiedStatus: 'rejected' }).catch(async () => {
-          return await client.patch(`/moderator/products/${id}/verify`, { verifiedStatus: 'rejected' });
+      } else {
+        // Product template verification
+        const prodStatus =
+          newStatus === 'approved'
+            ? 'verified'
+            : newStatus === 'rejected'
+            ? 'rejected'
+            : 'pending';
+        await client.patch(`/admin/products/${id}/verify`, { verifiedStatus: prodStatus }).catch(async () => {
+          return await client.patch(`/moderator/products/${id}/verify`, { verifiedStatus: prodStatus });
         });
       }
-    } catch {}
+    } catch (err) {
+      console.warn('Moderation action error / offline:', err);
+    }
     setItems(prev => prev.map(item => item.id === id ? { ...item, status: newStatus } : item));
     showToast(`Moderation item marked as ${newStatus.toUpperCase()}`);
     if (selectedItem && selectedItem.id === id) {

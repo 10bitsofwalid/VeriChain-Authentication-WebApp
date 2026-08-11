@@ -282,41 +282,51 @@ router.get('/marketplace', protect, async (req: AuthRequest, res: Response, next
 // @desc    Purchase a listed item from the marketplace (buyer only)
 router.post('/:id/buy', protect, authorize('buyer'), ensureVerified, validateRequest(buyItemSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    const item = await ItemInstance.findById(req.params.id);
-    if (!item) {
-      return sendError(res, 404, 'Item not found');
-    }
-
-    if (item.status !== 'listed') {
-      return sendError(res, 400, 'This item is not listed for sale');
-    }
-
-    if (item.currentOwner.toString() === req.user?.id) {
-      return sendError(res, 400, 'You already own this item');
-    }
-
+    const buyerId = req.user!.id;
     const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
 
-    const oldOwnerId = item.currentOwner;
-    item.currentOwner = new Types.ObjectId(req.user!.id);
-    item.status = 'sold';
-    item.journey.push({
-      location: 'VeriChain Marketplace',
-      action: 'purchased',
-      actor: new Types.ObjectId(req.user!.id),
-      timestamp: new Date(),
-      txHash,
-    });
+    const item = await ItemInstance.findOneAndUpdate(
+      {
+        _id: req.params.id,
+        status: 'listed',
+        currentOwner: { $ne: new Types.ObjectId(buyerId) },
+      },
+      {
+        $set: {
+          currentOwner: new Types.ObjectId(buyerId),
+          status: 'sold',
+        },
+        $push: {
+          journey: {
+            location: 'VeriChain Marketplace',
+            action: 'purchased',
+            actor: new Types.ObjectId(buyerId),
+            timestamp: new Date(),
+            txHash,
+          },
+        },
+      },
+      { new: true }
+    );
 
-    await item.save();
+    if (!item) {
+      const existing = await ItemInstance.findById(req.params.id);
+      if (!existing) {
+        return sendError(res, 404, 'Item not found');
+      }
+      if (existing.currentOwner.toString() === buyerId) {
+        return sendError(res, 400, 'You already own this item');
+      }
+      return sendError(res, 400, 'This item is no longer available for purchase');
+    }
 
     // Create Audit Log
     await AuditLog.create({
       action: 'ITEM_PURCHASED',
-      actor: new Types.ObjectId(req.user!.id),
+      actor: new Types.ObjectId(buyerId),
       targetType: 'item',
       targetId: item._id.toString(),
-      details: `Item ${item.serialNumber} purchased by buyer ${req.user!.id} from seller ${oldOwnerId}`,
+      details: `Item ${item.serialNumber} purchased by buyer ${buyerId}`,
     });
 
     res.json({ success: true, message: 'Item purchased successfully', item });

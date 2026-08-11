@@ -19,6 +19,7 @@ const registerProductSchema = z.object({
     description: z.string().min(1, 'Description is required'),
     category: z.string().min(1, 'Category is required'),
     sku: z.string().min(1, 'SKU is required'),
+    price: z.union([z.number(), z.string()]).transform((val) => Number(val)).optional(),
     imageUrl: z.string().min(1, 'Image URL is required'),
     certificateUrl: z.string().optional(),
     specs: z.record(z.string(), z.string()).optional(),
@@ -138,7 +139,8 @@ router.get('/', async (req: Request, res: Response, next) => {
       factory: p.factory,
       batchId: p.sku,
       availableQty: 50,
-      wholesalePrice: 150.0,
+      price: p.price ?? 100.0,
+      wholesalePrice: p.price ? p.price * 0.75 : 150.0,
       authenticityStatus: p.verifiedStatus === 'verified' ? 'Verified Authentic' : 'Pending Verification',
       manufacturingDate: p.createdAt ? new Date(p.createdAt).toISOString().split('T')[0] : new Date().toISOString().split('T')[0],
       createdAt: p.createdAt,
@@ -162,10 +164,10 @@ router.get('/', async (req: Request, res: Response, next) => {
 });
 
 // @route   POST /api/products/register
-// @desc    Register a new product template (Factory only)
-router.post('/register', protect, authorize('factory'), ensureVerified, validateRequest(registerProductSchema), async (req: AuthRequest, res: Response, next) => {
+// @desc    Register a new product template (Factory, Seller, Admin)
+router.post('/register', protect, authorize('factory', 'seller', 'admin'), ensureVerified, validateRequest(registerProductSchema), async (req: AuthRequest, res: Response, next) => {
   try {
-    const { name, description, category, sku, imageUrl, certificateUrl, specs } = req.body;
+    const { name, description, category, sku, price, imageUrl, certificateUrl, specs } = req.body;
 
     const skuExists = await Product.findOne({ sku });
     if (skuExists) {
@@ -177,6 +179,7 @@ router.post('/register', protect, authorize('factory'), ensureVerified, validate
       description,
       category,
       sku,
+      price: Number(price) || 0,
       factory: new Types.ObjectId(req.user?.id),
       imageUrl,
       certificateUrl: certificateUrl || `https://ipfs.io/ipfs/QmSignatureCertificateHashStub_${sku}`,
@@ -224,7 +227,8 @@ router.get('/factory', protect, authorize('factory', 'seller', 'admin'), ensureV
       factory: p.factory,
       batchId: p.sku,
       availableQty: 50,
-      wholesalePrice: 150.0,
+      price: p.price ?? 100.0,
+      wholesalePrice: p.price ? p.price * 0.75 : 150.0,
       stock: 50,
       location: p.factory?.factoryDetails?.location || 'Factory Main Warehouse',
       authenticityStatus: p.verifiedStatus === 'verified' ? 'Verified Authentic' : 'Pending Verification',

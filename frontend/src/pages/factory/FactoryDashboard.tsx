@@ -27,7 +27,7 @@ export default function FactoryDashboard() {
 
   useEffect(() => {
     refreshUser?.();
-  }, []);
+  }, [refreshUser]);
 
   return (
     <div className="fd-container">

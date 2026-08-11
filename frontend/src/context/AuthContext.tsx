@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import client from '../api/client';
 import { STORAGE_KEYS } from '../utils/constants';
@@ -59,7 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   };
 
-  const refreshUser = async (): Promise<User | null> => {
+  const refreshUser = useCallback(async (): Promise<User | null> => {
     try {
       const storedToken = localStorage.getItem(STORAGE_KEYS.TOKEN);
       if (!storedToken) return null;
@@ -74,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Ignore network errors or unauthenticated state
     }
     return null;
-  };
+  }, []);
 
   // Restore session on mount and sync live status from DB
   useEffect(() => {
@@ -95,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (storedToken) {
       refreshUser();
     }
-  }, []);
+  }, [refreshUser]);
 
   // Auto-sync user status when window/tab regains focus, visibility, or periodically
   useEffect(() => {
@@ -121,7 +121,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       window.clearInterval(intervalId);
     };
-  }, []);
+  }, [refreshUser]);
 
   const login = async (email: string, password: string) => {
     try {

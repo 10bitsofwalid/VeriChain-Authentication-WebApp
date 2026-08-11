@@ -10,7 +10,11 @@ export interface Product {
   price: number;
   imageUrl?: string;
   quantity?: number; // optional quantity for cart handling
-  // Extend as needed
+  productId?: string;
+  itemInstanceId?: string;
+  serialNumber?: string;
+  sku?: string;
+  verified?: boolean;
 }
 
 export interface ShoppingState {

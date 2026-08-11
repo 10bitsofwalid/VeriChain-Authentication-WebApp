@@ -22,6 +22,7 @@ import moderatorRoutes from './routes/moderator';
 import profileRoutes from './routes/profiles';
 import reviewsRoutes from './routes/reviews';
 import usersRoutes from './routes/users';
+import orderRoutes from './routes/orders';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -55,6 +56,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/reviews', reviewsRoutes);
 app.use('/api/items', itemRoutes);
+app.use('/api/orders', orderRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/uploads', uploadRoutes);

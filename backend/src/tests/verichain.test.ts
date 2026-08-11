@@ -6,6 +6,7 @@ import { Product } from '../models/Product';
 import { ItemInstance } from '../models/ItemInstance';
 import { Complaint } from '../models/Complaint';
 import { Invitation } from '../models/Invitation';
+import { Order } from '../models/Order';
 
 describe('VeriChain Backend Integration Tests', () => {
   // Test globals
@@ -64,6 +65,7 @@ describe('VeriChain Backend Integration Tests', () => {
     if (testComplaint) {
       await Complaint.deleteOne({ _id: testComplaint._id });
     }
+    await Order.deleteMany({ buyer: buyerId });
     await mongoose.connection.close();
   });
 
@@ -564,6 +566,98 @@ describe('VeriChain Backend Integration Tests', () => {
       expect(limitRes.status).toBe(429);
       expect(limitRes.body.success).toBe(false);
       expect(limitRes.body.message).toContain('Too many login or signup attempts');
+    });
+  });
+
+  describe('9. Order Management & Ledger Persistence Tests', () => {
+    let createdOrderId: string;
+    let createdOrderNumber: string;
+
+    it('should allow a buyer to create and persist an order', async () => {
+      const orderPayload = {
+        items: [
+          {
+            productId: testProduct._id.toString(),
+            name: testProduct.name,
+            sku: testProduct.sku,
+            quantity: 1,
+            price: 250,
+          },
+        ],
+        shippingAddress: {
+          firstName: 'Alice',
+          lastName: 'Buyer',
+          street: '100 Ledger Way',
+          city: 'Seoul',
+          postalCode: '04524',
+          country: 'South Korea',
+        },
+        payment: {
+          method: 'Credit Card (Escrow Secured)',
+          cardLast4: '4242',
+          status: 'paid',
+        },
+        subtotal: 250,
+        shipping: 0,
+        total: 250,
+      };
+
+      const res = await request(app)
+        .post('/api/orders')
+        .set('Authorization', `Bearer ${buyerToken}`)
+        .send(orderPayload);
+
+      expect(res.status).toBe(201);
+      expect(res.body.success).toBe(true);
+      expect(res.body.order).toBeDefined();
+      expect(res.body.order.orderNumber).toMatch(/^VC-ORD-/);
+      expect(res.body.order.status).toBe('processing');
+      expect(res.body.order.total).toBe(250);
+
+      createdOrderId = res.body.order._id;
+      createdOrderNumber = res.body.order.orderNumber;
+    });
+
+    it('should retrieve persisted orders for authenticated buyer', async () => {
+      const res = await request(app)
+        .get('/api/orders/my')
+        .set('Authorization', `Bearer ${buyerToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(Array.isArray(res.body.orders)).toBe(true);
+      expect(res.body.orders.length).toBeGreaterThanOrEqual(1);
+
+      const found = res.body.orders.find((o: any) => o._id === createdOrderId);
+      expect(found).toBeDefined();
+      expect(found.orderNumber).toBe(createdOrderNumber);
+    });
+
+    it('should allow fetching order by orderNumber or ID', async () => {
+      const res = await request(app)
+        .get(`/api/orders/${createdOrderNumber}`)
+        .set('Authorization', `Bearer ${buyerToken}`);
+
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
+      expect(res.body.order._id).toBe(createdOrderId);
+    });
+
+    it('should allow admin/moderator to update order status and tracking', async () => {
+      const updateRes = await request(app)
+        .patch(`/api/orders/${createdOrderId}/status`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({
+          status: 'shipped',
+          trackingNumber: 'TRK-987654321',
+          carrier: 'VeriExpress Prime',
+        });
+
+      expect(updateRes.status).toBe(200);
+      expect(updateRes.body.success).toBe(true);
+      expect(updateRes.body.order.status).toBe('shipped');
+      expect(updateRes.body.order.trackingNumber).toBe('TRK-987654321');
+      expect(updateRes.body.order.timeline.length).toBeGreaterThanOrEqual(2);
     });
   });
 });

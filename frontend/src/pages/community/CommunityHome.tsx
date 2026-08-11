@@ -24,7 +24,7 @@ export default function CommunityHome() {
       try {
         const [complaintsRes, itemsRes] = await Promise.allSettled([
           client.get('/complaints'),
-          client.get('/items/marketplace'),
+          client.get('/items/recalls'),
         ]);
 
         const threadList: Thread[] = [];
@@ -45,8 +45,7 @@ export default function CommunityHome() {
         }
 
         if (itemsRes.status === 'fulfilled' && Array.isArray(itemsRes.value.data?.items)) {
-          const recalled = itemsRes.value.data.items.filter((it: any) => it.status === 'recalled');
-          setRecalledItems(recalled.slice(0, 3));
+          setRecalledItems(itemsRes.value.data.items.slice(0, 5));
         }
 
         setThreads(threadList);

@@ -19,11 +19,12 @@ function toneFromBadge(className: string) {
 
 export const ProductCard = ({ item }: ProductCardProps) => {
   const { dispatch, wishlist, compare } = useShopping();
+  const itemInstanceId = item._id;
   const productId = item.product?._id || item.product?.id || item._id;
   const placeholder = useProductPlaceholder(item);
 
-  const inWishlist = wishlist.some((p) => p.id === productId);
-  const inCompare = compare.some((p) => p.id === productId);
+  const inWishlist = wishlist.some((p) => p.id === itemInstanceId || p.id === productId);
+  const inCompare = compare.some((p) => p.id === itemInstanceId || p.id === productId);
   const riskTone = toneFromBadge(riskBadge(item.counterfeitRisk));
   const verificationTone = toneFromBadge(verificationBadge(item.product?.verifiedStatus));
 
@@ -31,26 +32,37 @@ export const ProductCard = ({ item }: ProductCardProps) => {
     dispatch({
       type: 'ADD_TO_CART',
       payload: {
-        id: productId,
+        id: itemInstanceId,
+        productId,
+        itemInstanceId: item._id,
+        serialNumber: item.serialNumber,
+        sku: item.product?.sku,
         name: item.product?.name || 'Authenticated product',
-        price: Number(placeholder.price),
+        price: Number(item.product?.price || placeholder.price) || 100,
         imageUrl: item.product?.imageUrl || '',
         quantity: 1,
+        verified: item.product?.verifiedStatus === 'verified',
       },
     });
   };
 
   const handleToggleWishlist = () => {
     if (inWishlist) {
+      dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: itemInstanceId });
       dispatch({ type: 'REMOVE_FROM_WISHLIST', payload: productId });
     } else {
       dispatch({
         type: 'ADD_TO_WISHLIST',
         payload: {
-          id: productId,
+          id: itemInstanceId,
+          productId,
+          itemInstanceId: item._id,
+          serialNumber: item.serialNumber,
+          sku: item.product?.sku,
           name: item.product?.name || 'Authenticated product',
-          price: Number(placeholder.price),
+          price: Number(item.product?.price || placeholder.price) || 100,
           imageUrl: item.product?.imageUrl || '',
+          verified: item.product?.verifiedStatus === 'verified',
         },
       });
     }

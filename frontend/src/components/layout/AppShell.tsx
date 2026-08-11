@@ -15,7 +15,7 @@ export default function AppShell() {
   // Sync fresh verification status on route navigation
   useEffect(() => {
     refreshUser();
-  }, [location.pathname]);
+  }, [location.pathname, refreshUser]);
 
   const handleLogout = () => {
     logout();

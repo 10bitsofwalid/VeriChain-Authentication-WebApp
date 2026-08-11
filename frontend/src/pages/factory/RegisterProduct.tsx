@@ -12,7 +12,7 @@ export default function RegisterProduct() {
 
   useEffect(() => {
     refreshUser?.();
-  }, []);
+  }, [refreshUser]);
 
   const [form, setForm] = useState({
     name: '',
