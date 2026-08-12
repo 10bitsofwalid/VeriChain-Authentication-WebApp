@@ -24,6 +24,7 @@ import profileRoutes from './routes/profiles';
 import reviewsRoutes from './routes/reviews';
 import usersRoutes from './routes/users';
 import orderRoutes from './routes/orders';
+import inquiryRoutes from './routes/inquiries';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -64,6 +65,7 @@ app.use('/api/uploads', uploadRoutes);
 app.use('/api/moderator', moderatorRoutes);
 app.use('/api/profiles', profileRoutes);
 app.use('/api/users', usersRoutes);
+app.use('/api/inquiries', inquiryRoutes);
 
 // Health check
 app.get('/api/health', (_req, res) => {

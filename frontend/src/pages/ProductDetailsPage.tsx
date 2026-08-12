@@ -18,10 +18,13 @@ import {
   Check,
   Package,
   Building,
-  ShoppingBag
+  ShoppingBag,
+  MessageSquare,
+  Store,
 } from 'lucide-react';
 import './ProductDetailsPage.css';
 import { useShopping } from '../context/ShoppingContext';
+import ContactSellerModal from '../components/ContactSellerModal';
 
 interface VerifiedProductDetail {
   id: string;
@@ -64,6 +67,7 @@ export default function ProductDetailsPage() {
   // Interactive UI states
   const [copiedText, setCopiedText] = useState<string | null>(null);
   const [showMetadata, setShowMetadata] = useState(false);
+  const [showContactModal, setShowContactModal] = useState(false);
   const [certShine, setCertShine] = useState({ x: 50, y: 50 });
   
   // Reviews state
@@ -430,14 +434,23 @@ export default function ProductDetailsPage() {
                 </div>
               )}
 
-              <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)', flexWrap: 'wrap' }}>
                 <button 
                   className="audit-report-btn" 
-                  style={{ flexGrow: 1, padding: '12px', justifyContent: 'center', background: 'var(--accent-primary, #06b6d4)', color: '#fff' }}
+                  style={{ flex: '1 1 140px', padding: '12px', justifyContent: 'center', background: 'var(--accent-primary, #06b6d4)', color: '#fff' }}
                   onClick={handleAddToCart}
                 >
                   <ShoppingBag size={16} />
                   <span>Add to Cart</span>
+                </button>
+                <button 
+                  className="audit-report-btn" 
+                  style={{ flex: '1 1 140px', padding: '12px', justifyContent: 'center', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.2))', border: '1px solid rgba(6, 182, 212, 0.4)', color: '#fff' }}
+                  onClick={() => setShowContactModal(true)}
+                  title="Contact Seller Directly"
+                >
+                  <MessageSquare size={16} />
+                  <span>Contact Seller</span>
                 </button>
                 <button
                   className="audit-report-btn"
@@ -496,6 +509,32 @@ export default function ProductDetailsPage() {
                 </div>
               </div>
             )}
+
+            {/* Seller Info & Direct Inquiries */}
+            <div className="details-card">
+              <div className="details-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h2><Store size={18} /> Verified Merchant / Seller</h2>
+                <span className="badge badge-success">✓ Ledger Authenticated</span>
+              </div>
+              <div className="profile-card-details" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
+                <div>
+                  <h3 style={{ fontSize: '1rem', fontWeight: 700 }}>{product.seller?.name || 'Verified Authorized Merchant'}</h3>
+                  <span className="verification-banner-details" style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <MapPin size={12} /> {product.seller?.location || 'Verified Distribution Network'}
+                  </span>
+                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '4px' }}>
+                    ⚡ Typical Response Time: <strong style={{ color: 'var(--accent-cyan)' }}>&lt; 1 hour</strong>
+                  </div>
+                </div>
+                <button
+                  className="btn btn-sm btn-primary"
+                  onClick={() => setShowContactModal(true)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                >
+                  <MessageSquare size={14} /> Contact Directly
+                </button>
+              </div>
+            </div>
 
             {/* Factory Info */}
             {product.factory && (
@@ -636,6 +675,14 @@ export default function ProductDetailsPage() {
           </form>
         </section>
       </main>
+
+      {product && (
+        <ContactSellerModal
+          open={showContactModal}
+          onClose={() => setShowContactModal(false)}
+          product={product}
+        />
+      )}
 
       <Footer />
     </div>

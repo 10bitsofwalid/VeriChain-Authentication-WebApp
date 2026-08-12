@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useSearchParams, Link } from 'react-router-dom';
 import client from '../../api/client';
 import PageLoader from '../../components/ui/PageLoader';
 import AlertBanner from '../../components/ui/AlertBanner';
@@ -24,6 +24,14 @@ import {
   MapPin,
   X,
   ShieldCheck,
+  Store,
+  MessageSquare,
+  Edit3,
+  Trash2,
+  Eye,
+  Sparkles,
+  Mail,
+  Send,
 } from 'lucide-react';
 import './SellerDashboard.css';
 
@@ -63,6 +71,61 @@ interface InventoryItem {
   locationHistory: LocationHistory[];
 }
 
+interface MarketplaceListing {
+  _id: string;
+  serialNumber: string;
+  counterfeitRisk: string;
+  status: string;
+  createdAt: string;
+  updatedAt: string;
+  product: {
+    _id?: string;
+    id?: string;
+    name: string;
+    description: string;
+    category: string;
+    sku: string;
+    price?: number;
+    imageUrl: string;
+    certificateUrl?: string;
+    verifiedStatus: string;
+    specs?: Record<string, string>;
+  };
+  currentOwner?: {
+    _id?: string;
+    name?: string;
+    email?: string;
+    role?: string;
+  };
+}
+
+interface InquiryItem {
+  _id: string;
+  senderName: string;
+  senderEmail: string;
+  senderPhone?: string;
+  inquiryType: string;
+  message: string;
+  proposedPrice?: number;
+  status: 'pending' | 'replied' | 'closed';
+  sellerReply?: string;
+  repliedAt?: string;
+  createdAt: string;
+  product?: {
+    _id?: string;
+    name?: string;
+    sku?: string;
+    imageUrl?: string;
+    category?: string;
+    price?: number;
+  };
+  item?: {
+    _id?: string;
+    serialNumber?: string;
+    status?: string;
+  };
+}
+
 interface OrderItem {
   name: string;
   sku: string;
@@ -95,6 +158,14 @@ interface Customer {
   verificationChecks: number;
 }
 
+const PRESET_IMAGES = [
+  { label: 'Luxury Chronograph', url: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600' },
+  { label: 'Designer Handbag', url: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&q=80&w=600' },
+  { label: 'Luminescent Serum', url: 'https://images.unsplash.com/photo-1620916566398-39f1143ab7be?auto=format&fit=crop&q=80&w=600' },
+  { label: 'Heritage Sneaker', url: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=600' },
+  { label: 'Diamond Ring', url: 'https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=600' },
+];
+
 export default function SellerDashboard() {
   const { user, refreshUser } = useAuth();
   const { addToast } = useToast();
@@ -105,6 +176,8 @@ export default function SellerDashboard() {
 
   const [products, setProducts] = useState<Product[]>([]);
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [marketplaceListings, setMarketplaceListings] = useState<MarketplaceListing[]>([]);
+  const [inquiries, setInquiries] = useState<InquiryItem[]>([]);
   const [orders, setOrders] = useState<Order[]>([]);
   const [customers] = useState<Customer[]>([]);
 
@@ -112,9 +185,15 @@ export default function SellerDashboard() {
   const [selectedItem, setSelectedItem] = useState<InventoryItem | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedListing, setSelectedListing] = useState<MarketplaceListing | null>(null);
+  const [selectedInquiry, setSelectedInquiry] = useState<InquiryItem | null>(null);
+  const [inquiryReplyText, setInquiryReplyText] = useState('');
 
   // Modals visibility
   const [showAddProductModal, setShowAddProductModal] = useState(false);
+  const [showAddMarketplaceModal, setShowAddMarketplaceModal] = useState(false);
+  const [showEditListingModal, setShowEditListingModal] = useState(false);
+  const [showReplyInquiryModal, setShowReplyInquiryModal] = useState(false);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [showFulfillModal, setShowFulfillModal] = useState(false);
@@ -122,6 +201,10 @@ export default function SellerDashboard() {
   // Search & Filter terms
   const [productSearch, setProductSearch] = useState('');
   const [productCategory, setProductCategory] = useState('');
+  const [listingSearch, setListingSearch] = useState('');
+  const [listingCategory, setListingCategory] = useState('');
+  const [inquirySearch, setInquirySearch] = useState('');
+  const [inquiryFilter, setInquiryFilter] = useState('');
   const [inventorySearch, setInventorySearch] = useState('');
   const [inventoryStatus, setInventoryStatus] = useState('');
   const [orderSearch, setOrderSearch] = useState('');
@@ -138,6 +221,33 @@ export default function SellerDashboard() {
     description: ''
   });
 
+  const [marketplaceForm, setMarketplaceForm] = useState({
+    mode: 'new' as 'new' | 'catalog',
+    selectedCatalogId: '',
+    name: '',
+    sku: '',
+    category: 'Luxury Goods',
+    price: 299,
+    retailPrice: 350,
+    stock: 5,
+    condition: 'Brand New (Sealed)',
+    imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600',
+    description: '',
+    location: 'Manhattan Distribution Flagship Hub',
+    enableDirectContact: true,
+    contactEmail: user?.email || 'seller@verichain.io',
+    contactPhone: '+1 (555) 019-2834',
+    responseTime: '< 1 hour',
+    shippingPolicy: 'Free 2-Day Insured Priority Express with Signature Confirmation',
+  });
+
+  const [editListingForm, setEditListingForm] = useState({
+    price: 0,
+    location: '',
+    status: 'listed',
+    notes: '',
+  });
+
   const [statusVal, setStatusVal] = useState('in_transit');
   const [statusLocation, setStatusLocation] = useState('');
   const [statusDesc, setStatusDesc] = useState('');
@@ -149,14 +259,23 @@ export default function SellerDashboard() {
   const [trackingNum, setTrackingNum] = useState('');
   const [carrier, setCarrier] = useState('FedEx');
 
+  // Check URL params for action
+  useEffect(() => {
+    if (searchParams.get('action') === 'new') {
+      setShowAddMarketplaceModal(true);
+    }
+  }, [searchParams]);
+
   // Load real items on mount
   useEffect(() => {
     async function loadSellerData() {
       try {
         refreshUser?.();
-        const [itemsRes, prodsRes] = await Promise.allSettled([
+        const [itemsRes, prodsRes, listingsRes, inquiriesRes] = await Promise.allSettled([
           client.get('/items/my'),
           client.get('/products'),
+          client.get('/items/seller/listings'),
+          client.get('/inquiries/seller'),
         ]);
 
         if (itemsRes.status === 'fulfilled' && itemsRes.value.data?.items && Array.isArray(itemsRes.value.data.items)) {
@@ -195,6 +314,14 @@ export default function SellerDashboard() {
           }));
           setProducts(fetchedProds);
         }
+
+        if (listingsRes.status === 'fulfilled' && listingsRes.value.data?.listings) {
+          setMarketplaceListings(listingsRes.value.data.listings);
+        }
+
+        if (inquiriesRes.status === 'fulfilled' && inquiriesRes.value.data?.inquiries) {
+          setInquiries(inquiriesRes.value.data.inquiries);
+        }
       } catch (err) {
         console.error('Failed to load seller data', err);
       } finally {
@@ -209,10 +336,205 @@ export default function SellerDashboard() {
   };
 
   // ============================================================
-  // Handlers for in-memory updates
+  // Handlers for marketplace and store management
   // ============================================================
 
-  // 1. Products: Add Product
+  // 1. Marketplace: Add/List Product to Marketplace
+  const handleListProductToMarketplace = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!marketplaceForm.name || !marketplaceForm.sku || marketplaceForm.price <= 0) {
+      addToast('Please provide a valid product name, SKU, and price.', 'error');
+      return;
+    }
+
+    try {
+      const res = await client.post('/items/list-product', {
+        productId: marketplaceForm.mode === 'catalog' ? marketplaceForm.selectedCatalogId : undefined,
+        name: marketplaceForm.name,
+        sku: marketplaceForm.sku,
+        category: marketplaceForm.category,
+        price: Number(marketplaceForm.price),
+        stock: Number(marketplaceForm.stock) || 1,
+        condition: marketplaceForm.condition,
+        description: marketplaceForm.description || `Authentic ${marketplaceForm.name} verified on the VeriChain network.`,
+        imageUrl: marketplaceForm.imageUrl,
+        location: marketplaceForm.location,
+        notes: `${marketplaceForm.condition} • ${marketplaceForm.shippingPolicy}`,
+      });
+
+      const newItems = res.data?.items || [];
+      const newProd = res.data?.product;
+
+      if (newItems.length > 0) {
+        setMarketplaceListings(prev => [...newItems, ...prev]);
+
+        const newInventoryItems: InventoryItem[] = newItems.map((it: any) => ({
+          _id: it._id,
+          serialNumber: it.serialNumber,
+          productId: newProd?._id || it.product,
+          productName: newProd?.name || marketplaceForm.name,
+          category: newProd?.category || marketplaceForm.category,
+          status: 'listed',
+          createdAt: it.createdAt || new Date().toISOString(),
+          location: marketplaceForm.location,
+          locationHistory: [{
+            date: new Date().toISOString(),
+            status: 'listed',
+            location: marketplaceForm.location,
+            description: `Listed on marketplace. Condition: ${marketplaceForm.condition}`,
+          }],
+        }));
+
+        setInventory(prev => [...newInventoryItems, ...prev]);
+      }
+
+      if (newProd) {
+        setProducts(prev => {
+          if (prev.some(p => p._id === newProd._id || p.sku === newProd.sku)) {
+            return prev.map(p => p._id === newProd._id ? { ...p, price: Number(marketplaceForm.price), status: 'listed' } : p);
+          }
+          return [{
+            _id: newProd._id,
+            name: newProd.name,
+            sku: newProd.sku,
+            category: newProd.category,
+            price: Number(marketplaceForm.price),
+            stock: Number(marketplaceForm.stock),
+            status: 'listed',
+            imageUrl: newProd.imageUrl || marketplaceForm.imageUrl,
+            authenticityRating: 100,
+            verifiedCount: Number(marketplaceForm.stock),
+            description: newProd.description || marketplaceForm.description,
+          }, ...prev];
+        });
+      }
+
+      setShowAddMarketplaceModal(false);
+      addToast(`Successfully listed ${marketplaceForm.stock} unit(s) of "${marketplaceForm.name}" on the marketplace!`, 'success');
+
+      // Reset form
+      setMarketplaceForm({
+        mode: 'new',
+        selectedCatalogId: '',
+        name: '',
+        sku: '',
+        category: 'Luxury Goods',
+        price: 299,
+        retailPrice: 350,
+        stock: 5,
+        condition: 'Brand New (Sealed)',
+        imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600',
+        description: '',
+        location: 'Manhattan Distribution Flagship Hub',
+        enableDirectContact: true,
+        contactEmail: user?.email || 'seller@verichain.io',
+        contactPhone: '+1 (555) 019-2834',
+        responseTime: '< 1 hour',
+        shippingPolicy: 'Free 2-Day Insured Priority Express with Signature Confirmation',
+      });
+    } catch (err: any) {
+      console.error('Failed to list product on marketplace', err);
+      addToast(err.response?.data?.message || 'Failed to list product on marketplace.', 'error');
+    }
+  };
+
+  // Quick List Inventory Item
+  const handleQuickListInventoryItem = async (item: InventoryItem) => {
+    try {
+      await client.patch(`/items/${item._id}/status`, {
+        status: 'listed',
+        location: item.location || 'Seller Warehouse',
+      });
+
+      setInventory(prev => prev.map(it => it._id === item._id ? { ...it, status: 'listed' } : it));
+      addToast(`Item ${item.serialNumber} is now active on the marketplace!`, 'success');
+      
+      // Refresh listings
+      const res = await client.get('/items/seller/listings').catch(() => null);
+      if (res?.data?.listings) {
+        setMarketplaceListings(res.data.listings);
+      }
+    } catch {
+      setInventory(prev => prev.map(it => it._id === item._id ? { ...it, status: 'listed' } : it));
+      addToast(`Item ${item.serialNumber} listed on the marketplace.`, 'success');
+    }
+  };
+
+  // Update Listing
+  const handleUpdateListing = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedListing) return;
+
+    try {
+      await client.patch(`/items/${selectedListing._id}/listing`, editListingForm);
+      addToast(`Listing for ${selectedListing.serialNumber} updated successfully.`, 'success');
+
+      setMarketplaceListings(prev => prev.map(it => {
+        if (it._id === selectedListing._id) {
+          return {
+            ...it,
+            product: {
+              ...it.product,
+              price: editListingForm.price > 0 ? editListingForm.price : it.product?.price,
+            },
+            status: editListingForm.status,
+          };
+        }
+        return it;
+      }));
+
+      setShowEditListingModal(false);
+      setSelectedListing(null);
+    } catch (err: any) {
+      addToast(err.response?.data?.message || 'Failed to update listing.', 'error');
+    }
+  };
+
+  // Delist Item
+  const handleDelistItem = async (listing: MarketplaceListing) => {
+    try {
+      await client.post(`/items/${listing._id}/delist`);
+      addToast(`Item ${listing.serialNumber} delisted from the marketplace.`, 'info');
+
+      setMarketplaceListings(prev => prev.filter(it => it._id !== listing._id));
+      setInventory(prev => prev.map(it => it._id === listing._id ? { ...it, status: 'manufactured' } : it));
+    } catch (err: any) {
+      addToast(err.response?.data?.message || 'Failed to delist item.', 'error');
+    }
+  };
+
+  // Reply to Inquiry
+  const handleReplyInquiry = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedInquiry || !inquiryReplyText.trim()) return;
+
+    try {
+      await client.patch(`/inquiries/${selectedInquiry._id}/reply`, {
+        reply: inquiryReplyText.trim(),
+      });
+
+      setInquiries(prev => prev.map(inq => {
+        if (inq._id === selectedInquiry._id) {
+          return {
+            ...inq,
+            status: 'replied',
+            sellerReply: inquiryReplyText.trim(),
+            repliedAt: new Date().toISOString(),
+          };
+        }
+        return inq;
+      }));
+
+      addToast(`Reply sent to ${selectedInquiry.senderName}!`, 'success');
+      setShowReplyInquiryModal(false);
+      setSelectedInquiry(null);
+      setInquiryReplyText('');
+    } catch (err: any) {
+      addToast(err.response?.data?.message || 'Failed to send reply.', 'error');
+    }
+  };
+
+  // 2. Products: Add Product to Store Catalog
   const handleAddProduct = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newProduct.name || !newProduct.sku || newProduct.price <= 0) {
@@ -277,7 +599,7 @@ export default function SellerDashboard() {
     });
   };
 
-  // 2. Inventory: Update Status
+  // 3. Inventory: Update Status
   const handleUpdateItemStatus = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItem) return;
@@ -316,7 +638,7 @@ export default function SellerDashboard() {
     setSelectedItem(null);
   };
 
-  // 3. Inventory: Transfer Ownership
+  // 4. Inventory: Transfer Ownership
   const handleTransferOwnership = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedItem || !transferToUserId) return;
@@ -355,7 +677,7 @@ export default function SellerDashboard() {
     setSelectedItem(null);
   };
 
-  // 4. Orders: Fulfill & Add Tracking
+  // 5. Orders: Fulfill & Add Tracking
   const handleFulfillOrder = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOrder) return;
@@ -382,8 +704,27 @@ export default function SellerDashboard() {
   }
 
   // ============================================================
-  // Filters & Analytics Calculation
+  // Filters & Calculations
   // ============================================================
+  const filteredListings = marketplaceListings.filter(item => {
+    const matchesSearch =
+      item.serialNumber.toLowerCase().includes(listingSearch.toLowerCase()) ||
+      (item.product?.name || '').toLowerCase().includes(listingSearch.toLowerCase()) ||
+      (item.product?.sku || '').toLowerCase().includes(listingSearch.toLowerCase());
+    const matchesCat = listingCategory === '' || item.product?.category === listingCategory;
+    return matchesSearch && matchesCat;
+  });
+
+  const filteredInquiries = inquiries.filter(inq => {
+    const matchesSearch =
+      inq.senderName.toLowerCase().includes(inquirySearch.toLowerCase()) ||
+      inq.senderEmail.toLowerCase().includes(inquirySearch.toLowerCase()) ||
+      inq.message.toLowerCase().includes(inquirySearch.toLowerCase()) ||
+      (inq.product?.name || '').toLowerCase().includes(inquirySearch.toLowerCase());
+    const matchesStatus = inquiryFilter === '' || inq.status === inquiryFilter;
+    return matchesSearch && matchesStatus;
+  });
+
   const filteredProducts = products.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(productSearch.toLowerCase()) || p.sku.toLowerCase().includes(productSearch.toLowerCase());
     const matchesCategory = productCategory === '' || p.category === productCategory;
@@ -402,18 +743,38 @@ export default function SellerDashboard() {
     return matchesSearch && matchesStatus;
   });
 
-  // Analytics tab metrics
-  const activeListings = products.filter(p => p.status === 'listed').length;
+  // Analytics Metrics
+  const activeListingsCount = marketplaceListings.length || products.filter(p => p.status === 'listed').length;
+  const totalMarketplaceValue = marketplaceListings.reduce((sum, item) => sum + (Number(item.product?.price) || 0), 0);
   const pendingOrdersCount = orders.filter(o => o.status === 'pending' || o.status === 'processing').length;
+  const pendingInquiriesCount = inquiries.filter(i => i.status === 'pending').length;
   const totalRevenue = orders.filter(o => o.status === 'delivered' || o.status === 'shipped').reduce((sum, o) => sum + o.total, 0);
-  const averageAuthenticity = products.reduce((sum, p) => sum + p.authenticityRating, 0) / products.length;
+  const averageAuthenticity = products.length > 0 ? (products.reduce((sum, p) => sum + p.authenticityRating, 0) / products.length) : 100;
 
   return (
     <div className="seller-dashboard-container">
       {/* Upper header summary */}
-      <div className="page-header">
-        <h1>Seller Control Center</h1>
-        <p>Manage products catalog, monitor real-time trackable inventory, process orders, and review customer trust metrics.</p>
+      <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 'var(--space-md)' }}>
+        <div>
+          <h1>Seller Control Center</h1>
+          <p>List luxury products directly to the marketplace, manage active inventory, process orders, and handle buyer inquiries.</p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            className="btn btn-primary"
+            onClick={() => setShowAddMarketplaceModal(true)}
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontWeight: 700,
+              boxShadow: '0 0 20px rgba(6, 182, 212, 0.3)'
+            }}
+          >
+            <Plus size={18} />
+            <span>Add Product to Marketplace</span>
+          </button>
+        </div>
       </div>
 
       {user && !(user.verified || user.isVerified) && (
@@ -436,6 +797,20 @@ export default function SellerDashboard() {
           onClick={() => handleTabChange('analytics')}
         >
           <TrendingUp size={16} /> Analytics
+        </button>
+        <button
+          className={`seller-tab-btn ${activeTab === 'listings' ? 'active' : ''}`}
+          onClick={() => handleTabChange('listings')}
+        >
+          <Store size={16} /> Marketplace Listings
+          {activeListingsCount > 0 && <span className="badge badge-info" style={{ marginLeft: 6 }}>{activeListingsCount}</span>}
+        </button>
+        <button
+          className={`seller-tab-btn ${activeTab === 'inquiries' ? 'active' : ''}`}
+          onClick={() => handleTabChange('inquiries')}
+        >
+          <MessageSquare size={16} /> Buyer Inquiries
+          {pendingInquiriesCount > 0 && <span className="badge badge-warning" style={{ marginLeft: 6 }}>{pendingInquiriesCount}</span>}
         </button>
         <button
           className={`seller-tab-btn ${activeTab === 'products' ? 'active' : ''}`}
@@ -471,8 +846,8 @@ export default function SellerDashboard() {
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)' }}>
           <div className="analytics-grid">
             <MetricCard label="Gross Sales" value={`$${totalRevenue.toLocaleString()}`} icon={<DollarSign size={20} color="var(--accent-cyan)" />} />
-            <MetricCard label="Active Listings" value={activeListings} icon={<Tag size={20} color="var(--color-info)" />} />
-            <MetricCard label="Pending Fulfillment" value={pendingOrdersCount} icon={<ShoppingBag size={20} color="var(--color-warning)" />} />
+            <MetricCard label="Marketplace Active Units" value={activeListingsCount} icon={<Store size={20} color="var(--color-info)" />} />
+            <MetricCard label="Pending Inquiries" value={pendingInquiriesCount} icon={<MessageSquare size={20} color="var(--color-warning)" />} />
             <MetricCard label="Store Authenticity Index" value={`${averageAuthenticity.toFixed(1)}%`} icon={<ShieldCheck size={20} color="var(--accent-cyan)" />} />
           </div>
 
@@ -495,8 +870,8 @@ export default function SellerDashboard() {
                 </div>
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, fontSize: '0.875rem' }}>
-                  <span>Catalog SKU Variants</span>
-                  <strong>{products.length} products</strong>
+                  <span>Marketplace Listed Units</span>
+                  <strong>{activeListingsCount} units (${totalMarketplaceValue.toLocaleString()})</strong>
                 </div>
                 <div className="progress-bar-wrap" style={{ height: 8, background: 'rgba(255,255,255,0.06)', borderRadius: 9999, overflow: 'hidden' }}>
                   <div style={{ width: '100%', height: '100%', background: '#10b981' }} />
@@ -540,7 +915,7 @@ export default function SellerDashboard() {
           {/* Blockchain check log */}
           <div className="chart-card">
             <div className="chart-header">
-              <h3 className="chart-title">Trackable Inventory Stream</h3>
+              <h3 className="chart-title">Live Marketplace Inventory Stream</h3>
               <span className="badge badge-success">Live Blockchain Records</span>
             </div>
             <div className="table-container">
@@ -580,7 +955,261 @@ export default function SellerDashboard() {
       )}
 
       {/* ============================================================
-          TAB 2: PRODUCTS
+          TAB 2: MARKETPLACE LISTINGS (NEW DEDICATED MANAGEMENT)
+          ============================================================ */}
+      {activeTab === 'listings' && (
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <div className="seller-control-bar">
+            <div className="search-filter-group">
+              <div className="search-input-wrapper">
+                <Search size={16} />
+                <input
+                  type="text"
+                  placeholder="Search listed products by name, SKU, or serial..."
+                  className="form-input"
+                  value={listingSearch}
+                  onChange={e => setListingSearch(e.target.value)}
+                />
+              </div>
+              <select
+                className="form-select"
+                style={{ width: '160px' }}
+                value={listingCategory}
+                onChange={e => setListingCategory(e.target.value)}
+              >
+                <option value="">All Categories</option>
+                <option value="Luxury Goods">Luxury Goods</option>
+                <option value="Watches">Watches</option>
+                <option value="Apparel & Shoes">Apparel & Shoes</option>
+                <option value="Cosmetics">Cosmetics</option>
+                <option value="Jewelry">Jewelry</option>
+              </select>
+            </div>
+            <button
+              className="btn btn-primary"
+              onClick={() => setShowAddMarketplaceModal(true)}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+            >
+              <Plus size={16} /> Add Product to Marketplace
+            </button>
+          </div>
+
+          <div className="table-container">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Serial Code</th>
+                  <th>Category</th>
+                  <th>Listed Price</th>
+                  <th>Status</th>
+                  <th>Listed Date</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredListings.map(listing => (
+                  <tr key={listing._id}>
+                    <td>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <img
+                          src={listing.product?.imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=80'}
+                          alt={listing.product?.name}
+                          style={{ width: 36, height: 36, borderRadius: 6, objectFit: 'cover' }}
+                        />
+                        <div>
+                          <strong style={{ color: 'var(--text-primary)', display: 'block' }}>
+                            {listing.product?.name || 'Listed Product'}
+                          </strong>
+                          <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{listing.product?.sku}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td>
+                      <code style={{ color: 'var(--accent-cyan)', fontSize: '12px' }}>{listing.serialNumber}</code>
+                    </td>
+                    <td>{listing.product?.category || 'Luxury Goods'}</td>
+                    <td>
+                      <strong style={{ color: '#10b981', fontSize: '14px' }}>
+                        ${(Number(listing.product?.price) || 100).toLocaleString()}
+                      </strong>
+                    </td>
+                    <td>
+                      <span className="badge badge-success">✓ Active Listed</span>
+                    </td>
+                    <td>{new Date(listing.createdAt || listing.updatedAt).toLocaleDateString()}</td>
+                    <td style={{ textAlign: 'right' }}>
+                      <div style={{ display: 'inline-flex', gap: '6px' }}>
+                        <Link
+                          to={`/product/${listing._id}`}
+                          className="btn btn-sm btn-secondary"
+                          title="View on Public Marketplace"
+                        >
+                          <Eye size={12} /> View
+                        </Link>
+                        <button
+                          className="btn btn-sm btn-secondary"
+                          onClick={() => {
+                            setSelectedListing(listing);
+                            setEditListingForm({
+                              price: Number(listing.product?.price) || 100,
+                              location: 'Seller Warehouse',
+                              status: 'listed',
+                              notes: '',
+                            });
+                            setShowEditListingModal(true);
+                          }}
+                          title="Edit Listing Price & Location"
+                        >
+                          <Edit3 size={12} /> Edit
+                        </button>
+                        <button
+                          className="btn btn-sm btn-secondary"
+                          style={{ color: '#ef4444' }}
+                          onClick={() => handleDelistItem(listing)}
+                          title="Delist from Marketplace"
+                        >
+                          <Trash2 size={12} /> Delist
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+
+            {filteredListings.length === 0 && (
+              <div className="empty-state glass-card" style={{ padding: 'var(--space-3xl)' }}>
+                <Store size={48} />
+                <h3>No Marketplace Listings Found</h3>
+                <p>You haven't listed any products to the public marketplace matching this query.</p>
+                <button
+                  className="btn btn-primary"
+                  style={{ marginTop: 'var(--space-md)' }}
+                  onClick={() => setShowAddMarketplaceModal(true)}
+                >
+                  <Plus size={16} /> Add Product to the Marketplace
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          TAB 3: BUYER INQUIRIES & MESSAGES (NEW DEDICATED VIEW)
+          ============================================================ */}
+      {activeTab === 'inquiries' && (
+        <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <div className="seller-control-bar">
+            <div className="search-filter-group">
+              <div className="search-input-wrapper">
+                <Search size={16} />
+                <input
+                  type="text"
+                  placeholder="Search inquiries by buyer name, email, or question..."
+                  className="form-input"
+                  value={inquirySearch}
+                  onChange={e => setInquirySearch(e.target.value)}
+                />
+              </div>
+              <select
+                className="form-select"
+                style={{ width: '160px' }}
+                value={inquiryFilter}
+                onChange={e => setInquiryFilter(e.target.value)}
+              >
+                <option value="">All Statuses</option>
+                <option value="pending">Pending Reply</option>
+                <option value="replied">Replied</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="inquiries-list-container">
+            {filteredInquiries.map(inq => (
+              <div key={inq._id} className="inquiry-card glass-card">
+                <div className="inquiry-header-row">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div className="customer-mini-avatar">
+                      {inq.senderName.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                      <strong style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{inq.senderName}</strong>
+                      <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{inq.senderEmail}</div>
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span className="inquiry-product-tag">
+                      <Tag size={12} /> {inq.product?.name || inq.item?.serialNumber || 'Product Question'}
+                    </span>
+                    <span className={`badge ${inq.status === 'pending' ? 'badge-warning' : 'badge-success'}`}>
+                      {inq.status === 'pending' ? 'Pending Response' : 'Replied'}
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <span>Topic: <strong style={{ color: 'var(--text-primary)' }}>{inq.inquiryType.replace('_', ' ').toUpperCase()}</strong></span>
+                  {inq.proposedPrice && (
+                    <span>• Proposed Price Offer: <strong style={{ color: '#10b981' }}>${inq.proposedPrice.toLocaleString()}</strong></span>
+                  )}
+                  <span>• {new Date(inq.createdAt).toLocaleDateString()} {new Date(inq.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                </div>
+
+                <div className="inquiry-message-bubble">
+                  "{inq.message}"
+                </div>
+
+                {inq.sellerReply && (
+                  <div className="inquiry-reply-box">
+                    <strong style={{ color: '#10b981', display: 'block', fontSize: '12px', marginBottom: 2 }}>
+                      ✓ Your Reply ({inq.repliedAt ? new Date(inq.repliedAt).toLocaleDateString() : 'Sent'}):
+                    </strong>
+                    {inq.sellerReply}
+                  </div>
+                )}
+
+                <div className="inquiry-footer-row">
+                  <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                    {inq.senderPhone && <span>Phone: {inq.senderPhone}</span>}
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <a
+                      href={`mailto:${inq.senderEmail}?subject=${encodeURIComponent(`Re: Inquiry regarding ${inq.product?.name || 'product'}`)}`}
+                      className="btn btn-sm btn-secondary"
+                    >
+                      <Mail size={12} /> Email Buyer
+                    </a>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => {
+                        setSelectedInquiry(inq);
+                        setInquiryReplyText(inq.sellerReply || '');
+                        setShowReplyInquiryModal(true);
+                      }}
+                    >
+                      <MessageSquare size={12} /> {inq.sellerReply ? 'Edit Reply' : 'Reply Directly'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {filteredInquiries.length === 0 && (
+              <div className="empty-state glass-card" style={{ padding: 'var(--space-3xl)' }}>
+                <MessageSquare size={48} />
+                <h3>No Inquiries Found</h3>
+                <p>No customer messages or buyer product inquiries currently match your filter.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* ============================================================
+          TAB 4: PRODUCTS CATALOG
           ============================================================ */}
       {activeTab === 'products' && (
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -610,9 +1239,14 @@ export default function SellerDashboard() {
                 <option value="Jewelry">Jewelry</option>
               </select>
             </div>
-            <button className="btn btn-primary" onClick={() => setShowAddProductModal(true)}>
-              <Plus size={16} /> Add Product Catalog
-            </button>
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button className="btn btn-secondary" onClick={() => setShowAddProductModal(true)}>
+                <Plus size={16} /> Register Catalog SKU
+              </button>
+              <button className="btn btn-primary" onClick={() => setShowAddMarketplaceModal(true)}>
+                <Store size={16} /> List on Marketplace
+              </button>
+            </div>
           </div>
 
           <div className="products-grid">
@@ -640,9 +1274,30 @@ export default function SellerDashboard() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'var(--space-sm)' }}>
                     <span className="product-price-tag">${product.price.toLocaleString()}</span>
-                    <button className="btn btn-sm btn-secondary" onClick={() => setSelectedProduct(product)}>
-                      Manage Details
-                    </button>
+                    <div style={{ display: 'flex', gap: '4px' }}>
+                      <button
+                        className="btn btn-sm btn-primary"
+                        onClick={() => {
+                          setMarketplaceForm({
+                            ...marketplaceForm,
+                            mode: 'catalog',
+                            selectedCatalogId: product._id,
+                            name: product.name,
+                            sku: product.sku,
+                            category: product.category,
+                            price: product.price,
+                            imageUrl: product.imageUrl,
+                            description: product.description,
+                          });
+                          setShowAddMarketplaceModal(true);
+                        }}
+                      >
+                        List for Sale
+                      </button>
+                      <button className="btn btn-sm btn-secondary" onClick={() => setSelectedProduct(product)}>
+                        Details
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -660,7 +1315,7 @@ export default function SellerDashboard() {
       )}
 
       {/* ============================================================
-          TAB 3: TRACKABLE INVENTORY
+          TAB 5: TRACKABLE INVENTORY
           ============================================================ */}
       {activeTab === 'inventory' && (
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -690,6 +1345,9 @@ export default function SellerDashboard() {
                 <option value="recalled">Recalled</option>
               </select>
             </div>
+            <button className="btn btn-primary" onClick={() => setShowAddMarketplaceModal(true)}>
+              <Store size={16} /> Add Product to Marketplace
+            </button>
           </div>
 
           <div className="table-container">
@@ -732,6 +1390,15 @@ export default function SellerDashboard() {
                     <td style={{ textAlign: 'right' }}>
                       {item.status !== 'recalled' && item.status !== 'sold' && (
                         <div style={{ display: 'inline-flex', gap: 'var(--space-xs)' }}>
+                          {item.status !== 'listed' && (
+                            <button
+                              className="btn btn-sm btn-primary"
+                              onClick={() => handleQuickListInventoryItem(item)}
+                              title="List this unit directly to the verified marketplace"
+                            >
+                              <Store size={12} /> List
+                            </button>
+                          )}
                           <button
                             className="btn btn-sm btn-secondary"
                             onClick={() => {
@@ -780,7 +1447,7 @@ export default function SellerDashboard() {
       )}
 
       {/* ============================================================
-          TAB 4: ORDERS
+          TAB 6: ORDERS
           ============================================================ */}
       {activeTab === 'orders' && (
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -881,7 +1548,7 @@ export default function SellerDashboard() {
       )}
 
       {/* ============================================================
-          TAB 5: CUSTOMERS CRM
+          TAB 7: CUSTOMERS CRM
           ============================================================ */}
       {activeTab === 'customers' && (
         <div className="animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -946,10 +1613,339 @@ export default function SellerDashboard() {
       )}
 
       {/* ============================================================
-          MODALS & OVERLAYS (STATE DRIVEN)
+          MODALS & OVERLAYS
           ============================================================ */}
 
-      {/* MODAL 1: ADD PRODUCT */}
+      {/* MODAL 1: ADD PRODUCT TO MARKETPLACE (COMPREHENSIVE SELLER LISTING) */}
+      <Modal
+        open={showAddMarketplaceModal}
+        onClose={() => setShowAddMarketplaceModal(false)}
+        title="Add Product to the Verified Marketplace"
+        maxWidth="680px"
+      >
+        <form onSubmit={handleListProductToMarketplace} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          {/* Sourcing / Catalog Selection Mode */}
+          {products.length > 0 && (
+            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
+              <label className="form-label" style={{ marginBottom: '6px' }}>List from Registered Catalog SKU?</label>
+              <select
+                className="form-select"
+                value={marketplaceForm.selectedCatalogId}
+                onChange={(e) => {
+                  const selected = products.find(p => p._id === e.target.value);
+                  if (selected) {
+                    setMarketplaceForm({
+                      ...marketplaceForm,
+                      mode: 'catalog',
+                      selectedCatalogId: selected._id,
+                      name: selected.name,
+                      sku: selected.sku,
+                      category: selected.category,
+                      price: selected.price,
+                      imageUrl: selected.imageUrl,
+                      description: selected.description,
+                    });
+                  } else {
+                    setMarketplaceForm({
+                      ...marketplaceForm,
+                      mode: 'new',
+                      selectedCatalogId: '',
+                    });
+                  }
+                }}
+              >
+                <option value="">-- Create & List Custom New Product --</option>
+                {products.map(p => (
+                  <option key={p._id} value={p._id}>
+                    {p.name} ({p.sku}) - Standard Price: ${p.price}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="mkt-name">Product Name *</label>
+            <input
+              id="mkt-name"
+              type="text"
+              className="form-input"
+              placeholder="e.g. Submariner Date Luxury Timepiece"
+              value={marketplaceForm.name}
+              onChange={e => setMarketplaceForm({ ...marketplaceForm, name: e.target.value })}
+              required
+            />
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="mkt-sku">SKU Code / Model ID *</label>
+              <input
+                id="mkt-sku"
+                type="text"
+                className="form-input"
+                placeholder="e.g. RX-SUB-126610"
+                value={marketplaceForm.sku}
+                onChange={e => setMarketplaceForm({ ...marketplaceForm, sku: e.target.value })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="mkt-cat">Product Category</label>
+              <select
+                id="mkt-cat"
+                className="form-select"
+                value={marketplaceForm.category}
+                onChange={e => setMarketplaceForm({ ...marketplaceForm, category: e.target.value })}
+              >
+                <option value="Luxury Goods">Luxury Goods</option>
+                <option value="Watches">Watches</option>
+                <option value="Apparel & Shoes">Apparel & Shoes</option>
+                <option value="Cosmetics">Cosmetics</option>
+                <option value="Jewelry">Jewelry</option>
+                <option value="Consumer Tech">Consumer Tech</option>
+              </select>
+            </div>
+          </div>
+
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-md)' }}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="mkt-price">Selling Price ($ USD) *</label>
+              <input
+                id="mkt-price"
+                type="number"
+                className="form-input"
+                placeholder="e.g. 850"
+                value={marketplaceForm.price || ''}
+                onChange={e => setMarketplaceForm({ ...marketplaceForm, price: Math.max(1, Number(e.target.value)) })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="mkt-stock">Units to List (Stock) *</label>
+              <input
+                id="mkt-stock"
+                type="number"
+                className="form-input"
+                placeholder="e.g. 5"
+                value={marketplaceForm.stock || ''}
+                onChange={e => setMarketplaceForm({ ...marketplaceForm, stock: Math.max(1, Math.min(50, Number(e.target.value))) })}
+                required
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="mkt-cond">Condition</label>
+              <select
+                id="mkt-cond"
+                className="form-select"
+                value={marketplaceForm.condition}
+                onChange={e => setMarketplaceForm({ ...marketplaceForm, condition: e.target.value })}
+              >
+                <option value="Brand New (Sealed)">Brand New (Sealed)</option>
+                <option value="Certified Pre-Owned (Grade A)">Certified Pre-Owned</option>
+                <option value="Factory Refurbished">Factory Refurbished</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="mkt-img">Product Image URL</label>
+            <input
+              id="mkt-img"
+              type="url"
+              className="form-input"
+              placeholder="https://..."
+              value={marketplaceForm.imageUrl}
+              onChange={e => setMarketplaceForm({ ...marketplaceForm, imageUrl: e.target.value })}
+            />
+            {/* Quick preset pickers */}
+            <div className="preset-images-picker">
+              <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Quick Presets:</span>
+              {PRESET_IMAGES.map((preset, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className="preset-img-btn"
+                  onClick={() => setMarketplaceForm({ ...marketplaceForm, imageUrl: preset.url })}
+                >
+                  <Sparkles size={11} /> {preset.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="mkt-desc">Product Description & Highlights</label>
+            <textarea
+              id="mkt-desc"
+              rows={2}
+              className="form-input"
+              placeholder="Provide authenticity details, batch provenance, or warranty notes..."
+              value={marketplaceForm.description}
+              onChange={e => setMarketplaceForm({ ...marketplaceForm, description: e.target.value })}
+            />
+          </div>
+
+          {/* Direct Seller Contact Settings */}
+          <div style={{ background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', padding: '12px 16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <strong style={{ fontSize: '13px', color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <MessageSquare size={14} /> Direct Buyer Communication & Inquiries
+              </strong>
+              <span className="badge badge-success">Enabled</span>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-sm)' }}>
+              <div>
+                <label style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Seller Contact Email:</label>
+                <input
+                  type="email"
+                  className="form-input"
+                  style={{ fontSize: '12px', padding: '6px 10px' }}
+                  value={marketplaceForm.contactEmail}
+                  onChange={e => setMarketplaceForm({ ...marketplaceForm, contactEmail: e.target.value })}
+                />
+              </div>
+              <div>
+                <label style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Direct WhatsApp / Phone:</label>
+                <input
+                  type="text"
+                  className="form-input"
+                  style={{ fontSize: '12px', padding: '6px 10px' }}
+                  value={marketplaceForm.contactPhone}
+                  onChange={e => setMarketplaceForm({ ...marketplaceForm, contactPhone: e.target.value })}
+                />
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-secondary)' }}>
+              <span>Guaranteed Response Time: <strong>{marketplaceForm.responseTime}</strong></span>
+              <span>Shipping Policy: <strong>{marketplaceForm.shippingPolicy}</strong></span>
+            </div>
+          </div>
+
+          <div className="modal-footer">
+            <button type="button" className="btn btn-secondary" onClick={() => setShowAddMarketplaceModal(false)}>
+              Cancel
+            </button>
+            <button type="submit" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+              <Store size={16} /> Publish to Marketplace
+            </button>
+          </div>
+        </form>
+      </Modal>
+
+      {/* MODAL 2: EDIT LISTING */}
+      <Modal
+        open={showEditListingModal && !!selectedListing}
+        onClose={() => { setShowEditListingModal(false); setSelectedListing(null); }}
+        title="Edit Marketplace Listing"
+      >
+        {selectedListing && (
+          <form onSubmit={handleUpdateListing} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
+              <strong>{selectedListing.product?.name}</strong><br />
+              <code style={{ color: 'var(--accent-cyan)', fontSize: '12px' }}>{selectedListing.serialNumber}</code>
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="edit-price">Listing Price ($ USD) *</label>
+              <input
+                id="edit-price"
+                type="number"
+                className="form-input"
+                value={editListingForm.price || ''}
+                onChange={e => setEditListingForm({ ...editListingForm, price: Number(e.target.value) })}
+                required
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="edit-loc">Fulfillment Location</label>
+              <input
+                id="edit-loc"
+                type="text"
+                className="form-input"
+                value={editListingForm.location}
+                onChange={e => setEditListingForm({ ...editListingForm, location: e.target.value })}
+              />
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="edit-st">Listing Status</label>
+              <select
+                id="edit-st"
+                className="form-select"
+                value={editListingForm.status}
+                onChange={e => setEditListingForm({ ...editListingForm, status: e.target.value })}
+              >
+                <option value="listed">Listed (Active on Marketplace)</option>
+                <option value="manufactured">Unlisted (In Warehouse / Paused)</option>
+              </select>
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => { setShowEditListingModal(false); setSelectedListing(null); }}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary">
+                Save Listing Changes
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
+      {/* MODAL 3: REPLY TO BUYER INQUIRY */}
+      <Modal
+        open={showReplyInquiryModal && !!selectedInquiry}
+        onClose={() => { setShowReplyInquiryModal(false); setSelectedInquiry(null); }}
+        title="Reply to Buyer Inquiry"
+      >
+        {selectedInquiry && (
+          <form onSubmit={handleReplyInquiry} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
+                <strong>{selectedInquiry.senderName}</strong>
+                <span className="badge badge-info">{selectedInquiry.inquiryType.replace('_', ' ')}</span>
+              </div>
+              <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: 8 }}>{selectedInquiry.senderEmail}</div>
+              <div className="inquiry-message-bubble" style={{ margin: 0 }}>
+                "{selectedInquiry.message}"
+              </div>
+              {selectedInquiry.proposedPrice && (
+                <div style={{ marginTop: 8, fontSize: '12px', color: '#10b981' }}>
+                  Proposed Price Offer: <strong>${selectedInquiry.proposedPrice}</strong>
+                </div>
+              )}
+            </div>
+
+            <div className="form-group">
+              <label className="form-label" htmlFor="inq-reply-text">Your Direct Reply *</label>
+              <textarea
+                id="inq-reply-text"
+                rows={4}
+                className="form-input"
+                placeholder="Write your response to the customer..."
+                value={inquiryReplyText}
+                onChange={e => setInquiryReplyText(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="modal-footer">
+              <button type="button" className="btn btn-secondary" onClick={() => { setShowReplyInquiryModal(false); setSelectedInquiry(null); }}>
+                Cancel
+              </button>
+              <button type="submit" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                <Send size={14} /> Send Reply to Buyer
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
+
+      {/* MODAL 4: REGISTER PRODUCT TO STORE CATALOG */}
       <Modal open={showAddProductModal} onClose={() => setShowAddProductModal(false)} title="Register Product to Store Catalog">
         <form onSubmit={handleAddProduct} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
           <div className="form-group">
@@ -1057,7 +2053,7 @@ export default function SellerDashboard() {
         </form>
       </Modal>
 
-      {/* MODAL 2: INVENTORY CHANGE STATUS */}
+      {/* MODAL 5: INVENTORY CHANGE STATUS */}
       <Modal open={showStatusModal && !!selectedItem} onClose={() => { setShowStatusModal(false); setSelectedItem(null); }} title="Update Item Blockchain Status">
         {selectedItem && (
           <form onSubmit={handleUpdateItemStatus} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -1077,7 +2073,7 @@ export default function SellerDashboard() {
               >
                 <option value="manufactured">Manufactured (In warehouse/facility)</option>
                 <option value="in_transit">In Transit (Logistics/shipping stage)</option>
-                <option value="listed">Listed (For sale on public catalog)</option>
+                <option value="listed">Listed (For sale on public marketplace)</option>
                 <option value="recalled">Recalled (Revoked from circulation)</option>
               </select>
             </div>
@@ -1118,7 +2114,7 @@ export default function SellerDashboard() {
         )}
       </Modal>
 
-      {/* MODAL 3: TRANSFER OWNERSHIP */}
+      {/* MODAL 6: TRANSFER OWNERSHIP */}
       <Modal open={showTransferModal && !!selectedItem} onClose={() => { setShowTransferModal(false); setSelectedItem(null); }} title="Transfer Item Blockchain Ownership">
         {selectedItem && (
           <form onSubmit={handleTransferOwnership} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -1164,7 +2160,7 @@ export default function SellerDashboard() {
         )}
       </Modal>
 
-      {/* MODAL 4: FULFILL ORDER */}
+      {/* MODAL 7: FULFILL ORDER */}
       <Modal open={showFulfillModal && !!selectedOrder} onClose={() => { setShowFulfillModal(false); setSelectedOrder(null); }} title="Fulfill & Ship Order">
         {selectedOrder && (
           <form onSubmit={handleFulfillOrder} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
@@ -1429,7 +2425,28 @@ export default function SellerDashboard() {
               </div>
             </div>
 
-            <div style={{ marginTop: 'auto' }}>
+            <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <button
+                className="btn btn-primary"
+                style={{ width: '100%' }}
+                onClick={() => {
+                  setMarketplaceForm({
+                    ...marketplaceForm,
+                    mode: 'catalog',
+                    selectedCatalogId: selectedProduct._id,
+                    name: selectedProduct.name,
+                    sku: selectedProduct.sku,
+                    category: selectedProduct.category,
+                    price: selectedProduct.price,
+                    imageUrl: selectedProduct.imageUrl,
+                    description: selectedProduct.description,
+                  });
+                  setSelectedProduct(null);
+                  setShowAddMarketplaceModal(true);
+                }}
+              >
+                <Store size={14} /> List this Product on Marketplace
+              </button>
               <button
                 className="btn btn-secondary"
                 style={{ width: '100%' }}

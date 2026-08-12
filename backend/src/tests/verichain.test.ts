@@ -660,4 +660,144 @@ describe('VeriChain Backend Integration Tests', () => {
       expect(updateRes.body.order.timeline.length).toBeGreaterThanOrEqual(2);
     });
   });
+
+  // ==========================================
+  // 10. Marketplace Listing & Direct Inquiries
+  // ==========================================
+  describe('10. Marketplace Listings & Direct Inquiries Flow', () => {
+    let sellerToken: string;
+    let sellerId: string;
+    let listedItemId: string;
+    let listedProductId: string;
+    let inquiryId: string;
+
+    beforeAll(async () => {
+      // Register verified seller
+      const sellerSignup = await request(app)
+        .post('/api/auth/signup')
+        .send({
+          name: 'Authorized Luxury Merchant',
+          email: 'test-seller-marketplace@verichain.io',
+          password: 'password123',
+          role: 'seller',
+        });
+
+      sellerToken = sellerSignup.body.token;
+      sellerId = sellerSignup.body.user.id;
+    });
+
+    it('should allow a seller to list a product with stock quantity directly on the marketplace', async () => {
+      const listRes = await request(app)
+        .post('/api/items/list-product')
+        .set('Authorization', `Bearer ${sellerToken}`)
+        .send({
+          name: 'Chronograph Royal Timepiece',
+          sku: 'TEST-SKU-CHRONO-99',
+          category: 'Watches',
+          price: 1250,
+          stock: 3,
+          condition: 'Brand New (Sealed)',
+          location: 'Flagship Manhattan Hub',
+          imageUrl: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30',
+          description: 'Official test product for luxury marketplace verification.',
+          notes: 'Brand New • Free 2-Day Priority Insured',
+        });
+
+      expect(listRes.status).toBe(201);
+      expect(listRes.body.success).toBe(true);
+      expect(listRes.body.items.length).toBe(3);
+      expect(listRes.body.product.sku).toBe('TEST-SKU-CHRONO-99');
+      expect(listRes.body.items[0].status).toBe('listed');
+
+      listedItemId = listRes.body.items[0]._id;
+      listedProductId = listRes.body.product._id;
+    });
+
+    it('should allow public access to GET /api/items/marketplace without authentication', async () => {
+      const marketRes = await request(app).get('/api/items/marketplace');
+
+      expect(marketRes.status).toBe(200);
+      expect(marketRes.body.success).toBe(true);
+      expect(Array.isArray(marketRes.body.items)).toBe(true);
+      expect(marketRes.body.items.some((i: any) => i._id === listedItemId)).toBe(true);
+    });
+
+    it('should allow a buyer to submit a direct inquiry/message with price offer to the seller', async () => {
+      const inqRes = await request(app)
+        .post('/api/inquiries')
+        .set('Authorization', `Bearer ${buyerToken}`)
+        .send({
+          productId: listedProductId,
+          itemId: listedItemId,
+          recipientSellerId: sellerId,
+          senderName: 'VIP Buyer Alice',
+          senderEmail: 'test-buyer-alice@verichain.io',
+          senderPhone: '+1 555-0199',
+          inquiryType: 'price_offer',
+          proposedPrice: 1150,
+          message: 'Hello, is this timepiece available for immediate dispatch? Can you accept $1150?',
+        });
+
+      expect(inqRes.status).toBe(201);
+      expect(inqRes.body.success).toBe(true);
+      expect(inqRes.body.inquiry.senderName).toBe('VIP Buyer Alice');
+      expect(inqRes.body.inquiry.proposedPrice).toBe(1150);
+      expect(inqRes.body.inquiry.status).toBe('pending');
+
+      inquiryId = inqRes.body.inquiry._id;
+    });
+
+    it('should allow the seller to view incoming buyer inquiries', async () => {
+      const sellerInqRes = await request(app)
+        .get('/api/inquiries/seller')
+        .set('Authorization', `Bearer ${sellerToken}`);
+
+      expect(sellerInqRes.status).toBe(200);
+      expect(sellerInqRes.body.success).toBe(true);
+      expect(Array.isArray(sellerInqRes.body.inquiries)).toBe(true);
+
+      const target = sellerInqRes.body.inquiries.find((i: any) => i._id === inquiryId);
+      expect(target).toBeDefined();
+      expect(target.message).toContain('timepiece available');
+    });
+
+    it('should allow the seller to reply directly to the buyer inquiry', async () => {
+      const replyRes = await request(app)
+        .patch(`/api/inquiries/${inquiryId}/reply`)
+        .set('Authorization', `Bearer ${sellerToken}`)
+        .send({
+          reply: 'Yes, we can accept $1150 and include free insured priority delivery. Please proceed with checkout!',
+        });
+
+      expect(replyRes.status).toBe(200);
+      expect(replyRes.body.success).toBe(true);
+      expect(replyRes.body.inquiry.status).toBe('replied');
+      expect(replyRes.body.inquiry.sellerReply).toContain('accept $1150');
+    });
+
+    it('should allow the seller to update the listing price and location', async () => {
+      const updateRes = await request(app)
+        .patch(`/api/items/${listedItemId}/listing`)
+        .set('Authorization', `Bearer ${sellerToken}`)
+        .send({
+          price: 1150,
+          location: 'Manhattan Vault A',
+        });
+
+      expect(updateRes.status).toBe(200);
+      expect(updateRes.body.success).toBe(true);
+      expect(updateRes.body.item.location).toBe('Manhattan Vault A');
+    });
+
+    it('should allow the seller to delist the item back to warehouse inventory', async () => {
+      const delistRes = await request(app)
+        .post(`/api/items/${listedItemId}/delist`)
+        .set('Authorization', `Bearer ${sellerToken}`);
+
+      expect(delistRes.status).toBe(200);
+      expect(delistRes.body.success).toBe(true);
+      expect(delistRes.body.item.status).toBe('manufactured');
+    });
+  });
 });
+

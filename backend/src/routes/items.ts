@@ -47,6 +47,39 @@ const buyItemSchema = z.object({
   }),
 });
 
+const listProductSchema = z.object({
+  body: z.object({
+    productId: z.string().optional().refine((val) => !val || Types.ObjectId.isValid(val), {
+      message: 'Invalid product ID',
+    }),
+    name: z.string().optional(),
+    sku: z.string().optional(),
+    category: z.string().optional(),
+    price: z.union([z.number(), z.string()]).transform((val) => Number(val)).optional(),
+    stock: z.union([z.number(), z.string()]).transform((val) => Math.max(1, Math.min(100, Number(val)))).default(1),
+    description: z.string().optional(),
+    imageUrl: z.string().optional(),
+    condition: z.string().optional(),
+    location: z.string().optional(),
+    notes: z.string().optional(),
+    specs: z.record(z.string(), z.string()).optional(),
+  }),
+});
+
+const updateListingSchema = z.object({
+  params: z.object({
+    id: z.string().refine((val) => Types.ObjectId.isValid(val), {
+      message: 'Invalid item ID',
+    }),
+  }),
+  body: z.object({
+    price: z.union([z.number(), z.string()]).transform((val) => Number(val)).optional(),
+    status: z.enum(['listed', 'manufactured', 'in_transit']).optional(),
+    location: z.string().optional(),
+    notes: z.string().optional(),
+  }),
+});
+
 // @route   GET /api/items/recently-verified
 // @desc    Get recently verified and updated items across the network
 router.get('/recently-verified', async (_req: Request, res: Response, next) => {
@@ -264,15 +297,271 @@ router.get('/product/:productId', protect, authorize('factory', 'admin'), ensure
 });
 
 // @route   GET /api/items/marketplace
-// @desc    Get all items listed on the marketplace
-router.get('/marketplace', protect, async (req: AuthRequest, res: Response, next) => {
+// @desc    Get all items listed on the marketplace (Public / Accessible to all roles)
+router.get('/marketplace', async (req: Request, res: Response, next) => {
   try {
-    const items = await ItemInstance.find({ status: 'listed' })
-      .populate('product', 'name description category sku imageUrl certificateUrl verifiedStatus')
-      .populate('currentOwner', 'name email role')
+    const { category, search, sellerId, minPrice, maxPrice, risk, sort } = req.query;
+
+    const query: any = { status: 'listed' };
+    if (risk) {
+      query.counterfeitRisk = risk;
+    }
+    if (sellerId && Types.ObjectId.isValid(sellerId as string)) {
+      query.currentOwner = new Types.ObjectId(sellerId as string);
+    }
+
+    let items = await ItemInstance.find(query)
+      .populate('product', 'name description category sku price imageUrl certificateUrl verifiedStatus specs')
+      .populate('currentOwner', 'name email role trustScore logoUrl verified')
       .sort({ updatedAt: -1 });
 
-    res.json({ success: true, items });
+    // Filter by product category if provided
+    if (category && category !== 'All') {
+      items = items.filter((item: any) => item.product?.category === category);
+    }
+
+    if (search) {
+      const term = (search as string).toLowerCase();
+      items = items.filter((item: any) =>
+        item.product?.name?.toLowerCase().includes(term) ||
+        item.product?.sku?.toLowerCase().includes(term) ||
+        item.product?.description?.toLowerCase().includes(term) ||
+        item.serialNumber?.toLowerCase().includes(term) ||
+        item.currentOwner?.name?.toLowerCase().includes(term)
+      );
+    }
+
+    if (minPrice) {
+      const min = Number(minPrice);
+      items = items.filter((item: any) => Number(item.product?.price || 0) >= min);
+    }
+
+    if (maxPrice) {
+      const max = Number(maxPrice);
+      items = items.filter((item: any) => Number(item.product?.price || 0) <= max);
+    }
+
+    if (sort === 'price_asc') {
+      items.sort((a: any, b: any) => (Number(a.product?.price) || 0) - (Number(b.product?.price) || 0));
+    } else if (sort === 'price_desc') {
+      items.sort((a: any, b: any) => (Number(b.product?.price) || 0) - (Number(a.product?.price) || 0));
+    } else if (sort === 'trust') {
+      items.sort((a: any, b: any) => (b.currentOwner?.trustScore || 0) - (a.currentOwner?.trustScore || 0));
+    }
+
+    res.json({ success: true, items, total: items.length });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   GET /api/items/seller/listings
+// @desc    Get all active marketplace listings owned by the logged-in seller
+router.get('/seller/listings', protect, authorize('seller', 'factory', 'admin'), async (req: AuthRequest, res: Response, next) => {
+  try {
+    const listings = await ItemInstance.find({
+      currentOwner: req.user?.id,
+      status: 'listed',
+    })
+      .populate('product', 'name description category sku price imageUrl certificateUrl verifiedStatus specs')
+      .sort({ updatedAt: -1 });
+
+    const totalValue = listings.reduce((sum, item: any) => sum + (Number(item.product?.price) || 0), 0);
+
+    res.json({
+      success: true,
+      listings,
+      stats: {
+        totalListings: listings.length,
+        totalValue,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   POST /api/items/list-product
+// @desc    List a product directly on the marketplace (Seller / Factory / Admin)
+router.post('/list-product', protect, authorize('seller', 'factory', 'admin'), ensureVerified, validateRequest(listProductSchema), async (req: AuthRequest, res: Response, next) => {
+  try {
+    const {
+      productId,
+      name,
+      sku,
+      category,
+      price,
+      stock = 1,
+      description,
+      imageUrl,
+      condition,
+      location,
+      notes,
+      specs,
+    } = req.body;
+
+    let targetProduct: any = null;
+
+    if (productId) {
+      targetProduct = await Product.findById(productId);
+      if (!targetProduct) {
+        return sendError(res, 404, 'Selected product catalog entry not found');
+      }
+      if (price !== undefined && price > 0) {
+        targetProduct.price = Number(price);
+        await targetProduct.save();
+      }
+    } else {
+      if (!name || !sku) {
+        return sendError(res, 400, 'Product name and SKU are required to create a new product listing');
+      }
+
+      // Check if SKU exists
+      targetProduct = await Product.findOne({ sku });
+      if (!targetProduct) {
+        targetProduct = await Product.create({
+          name,
+          sku,
+          category: category || 'Luxury Goods',
+          price: Number(price) || 100,
+          description: description || `Authentic ${name} listed by verified merchant.`,
+          imageUrl: imageUrl || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&q=80&w=600',
+          factory: new Types.ObjectId(req.user?.id),
+          specs: specs || {},
+          certificateUrl: `https://ipfs.io/ipfs/QmListingCertificate_${sku}_${Date.now()}`,
+          verifiedStatus: 'verified',
+        });
+      } else if (price !== undefined && price > 0) {
+        targetProduct.price = Number(price);
+        await targetProduct.save();
+      }
+    }
+
+    const count = Math.max(1, Math.min(50, Number(stock) || 1));
+    const createdItems = [];
+    const timestamp = Date.now();
+    const sellerLocation = location || 'Verified Seller Warehouse';
+
+    for (let i = 0; i < count; i++) {
+      const serialNumber = `VC-${targetProduct.sku}-${timestamp.toString().slice(-6)}-${(i + 1).toString().padStart(3, '0')}`;
+      const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+
+      const item = await ItemInstance.create({
+        product: targetProduct._id,
+        serialNumber,
+        qrCodeUrl: `https://verichain.io/verify?id=${serialNumber}`,
+        currentOwner: new Types.ObjectId(req.user?.id),
+        status: 'listed',
+        counterfeitRisk: 'low',
+        journey: [
+          {
+            location: sellerLocation,
+            action: 'listed_on_marketplace',
+            actor: new Types.ObjectId(req.user?.id),
+            timestamp: new Date(),
+            txHash,
+          },
+        ],
+      });
+
+      createdItems.push(item);
+    }
+
+    // Write audit log
+    await AuditLog.create({
+      action: 'PRODUCT_LISTED_ON_MARKETPLACE',
+      actor: new Types.ObjectId(req.user?.id),
+      targetType: 'product',
+      targetId: targetProduct._id.toString(),
+      details: `Seller listed ${count} unit(s) of "${targetProduct.name}" (SKU: ${targetProduct.sku}) at $${targetProduct.price} on the marketplace. Condition: ${condition || 'Brand New'}`,
+    }).catch(() => {});
+
+    res.status(201).json({
+      success: true,
+      message: `Successfully listed ${count} unit(s) of "${targetProduct.name}" on the marketplace.`,
+      product: targetProduct,
+      items: createdItems,
+      itemsCount: createdItems.length,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   PATCH /api/items/:id/listing
+// @desc    Update listing details (Price, Status, Location) for an owned item
+router.patch('/:id/listing', protect, authorize('seller', 'factory', 'admin'), ensureVerified, validateRequest(updateListingSchema), async (req: AuthRequest, res: Response, next) => {
+  try {
+    const item = await ItemInstance.findById(req.params.id);
+    if (!item) {
+      return sendError(res, 404, 'Item not found');
+    }
+
+    if (item.currentOwner.toString() !== req.user?.id && req.user?.role !== 'admin') {
+      return sendError(res, 403, 'Access denied. You do not own this listed item.');
+    }
+
+    const { price, status, location } = req.body;
+
+    if (price !== undefined && price > 0) {
+      await Product.findByIdAndUpdate(item.product, { price: Number(price) });
+    }
+
+    if (status) {
+      item.status = status;
+    }
+
+    const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+    item.journey.push({
+      location: location || 'Seller Listing Management',
+      action: status ? `listing_${status}` : 'listing_details_updated',
+      actor: new Types.ObjectId(req.user!.id),
+      timestamp: new Date(),
+      txHash,
+    });
+
+    await item.save();
+
+    res.json({
+      success: true,
+      message: 'Listing updated successfully',
+      item,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// @route   POST /api/items/:id/delist
+// @desc    Delist an item from the marketplace (reverts status to manufactured)
+router.post('/:id/delist', protect, authorize('seller', 'factory', 'admin'), ensureVerified, async (req: AuthRequest, res: Response, next) => {
+  try {
+    const item = await ItemInstance.findById(req.params.id);
+    if (!item) {
+      return sendError(res, 404, 'Item not found');
+    }
+
+    if (item.currentOwner.toString() !== req.user?.id && req.user?.role !== 'admin') {
+      return sendError(res, 403, 'Access denied. You do not own this item.');
+    }
+
+    const txHash = '0x' + Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('');
+    item.status = 'manufactured';
+    item.journey.push({
+      location: 'Seller Inventory',
+      action: 'delisted_from_marketplace',
+      actor: new Types.ObjectId(req.user!.id),
+      timestamp: new Date(),
+      txHash,
+    });
+
+    await item.save();
+
+    res.json({
+      success: true,
+      message: `Item ${item.serialNumber} delisted from the marketplace.`,
+      item,
+    });
   } catch (error) {
     next(error);
   }

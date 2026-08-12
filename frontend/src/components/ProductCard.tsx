@@ -1,10 +1,11 @@
-import { memo } from 'react';
+import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BadgeCheck, ExternalLink, Heart, Scale, ShoppingBag, Tag, User } from 'lucide-react';
+import { BadgeCheck, ExternalLink, Heart, MessageSquare, Scale, ShoppingBag, Tag, User } from 'lucide-react';
 import LazyImage from './LazyImage';
 import { useShopping } from '../context/ShoppingContext';
 import { riskBadge, verificationBadge } from '../utils/badges';
 import { useProductPlaceholder } from '../hooks/useProductPlaceholder';
+import ContactSellerModal from './ContactSellerModal';
 
 interface ProductCardProps {
   item: any;
@@ -18,6 +19,7 @@ function toneFromBadge(className: string) {
 }
 
 export const ProductCard = ({ item }: ProductCardProps) => {
+  const [showContactModal, setShowContactModal] = useState(false);
   const { dispatch, wishlist, compare } = useShopping();
   const itemInstanceId = item._id;
   const productId = item.product?._id || item.product?.id || item._id;
@@ -142,6 +144,14 @@ export const ProductCard = ({ item }: ProductCardProps) => {
           Verify
         </Link>
         <button
+          className="product-icon-button"
+          title="Contact Seller"
+          type="button"
+          onClick={() => setShowContactModal(true)}
+        >
+          <MessageSquare size={16} />
+        </button>
+        <button
           className={`product-icon-button ${inWishlist ? 'product-icon-active' : ''}`}
           title="Add to Wishlist"
           type="button"
@@ -163,6 +173,12 @@ export const ProductCard = ({ item }: ProductCardProps) => {
           </a>
         )}
       </div>
+
+      <ContactSellerModal
+        open={showContactModal}
+        onClose={() => setShowContactModal(false)}
+        item={item}
+      />
     </article>
   );
 };

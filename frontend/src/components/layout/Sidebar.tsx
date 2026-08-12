@@ -30,6 +30,7 @@ import {
   Boxes,
   Truck,
   TrendingUp,
+  MessageSquare,
 } from 'lucide-react';
 import type { User } from '../../context/AuthContext';
 import StatusChip from '../ui/StatusChip';
@@ -235,8 +236,10 @@ function getNavSections(role: string): NavSection[] {
       title: 'SELLER WORKSPACE',
       items: [
         { to: '/dashboard/inventory?tab=analytics', label: 'Analytics', icon: LayoutDashboard },
-        { to: '/dashboard/inventory?tab=products', label: 'Products', icon: Tags },
-        { to: '/dashboard/inventory?tab=inventory', label: 'Inventory', icon: Store },
+        { to: '/dashboard/inventory?tab=listings', label: 'Marketplace Listings', icon: Store },
+        { to: '/dashboard/inventory?tab=inquiries', label: 'Buyer Inquiries', icon: MessageSquare },
+        { to: '/dashboard/inventory?tab=products', label: 'Products Catalog', icon: Tags },
+        { to: '/dashboard/inventory?tab=inventory', label: 'Inventory', icon: Boxes },
         { to: '/dashboard/inventory?tab=orders', label: 'Orders', icon: ShoppingBag },
         { to: '/dashboard/inventory?tab=customers', label: 'Customers', icon: Users },
         { to: '/seller/sourcing', label: 'Seller Sourcing', icon: ClipboardList },

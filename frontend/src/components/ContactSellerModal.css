@@ -1,0 +1,313 @@
+.contact-seller-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 16px);
+}
+
+.seller-header-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  padding: 14px 16px;
+  border-radius: var(--radius-md, 10px);
+}
+
+.seller-avatar-badge {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-primary, #6366f1), var(--accent-cyan, #06b6d4));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #fff;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.seller-avatar-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.seller-header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.seller-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.seller-name-row h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary, #fff);
+}
+
+.verified-seller-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(6, 182, 212, 0.15);
+  color: var(--accent-cyan, #06b6d4);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 9999px;
+}
+
+.seller-stats-line {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.seller-stats-line strong {
+  color: var(--accent-cyan, #06b6d4);
+}
+
+.product-summary-mini {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md, 8px);
+  background: rgba(193, 198, 215, 0.05);
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.08));
+}
+
+.product-mini-thumb {
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  object-fit: cover;
+  background: #0f172a;
+}
+
+.product-mini-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.product-mini-sku {
+  font-family: var(--font-mono, monospace);
+  font-size: 0.72rem;
+  color: var(--accent-cyan, #06b6d4);
+}
+
+.product-mini-title {
+  font-size: 0.9rem;
+  color: var(--text-primary, #fff);
+}
+
+.product-mini-price {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.product-mini-price strong {
+  color: #10b981;
+  font-size: 0.9rem;
+}
+
+.contact-seller-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md, 14px);
+}
+
+.inquiry-type-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+.inquiry-pill {
+  padding: 6px 12px;
+  border-radius: 9999px;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.12));
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-secondary, #cbd5e1);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.inquiry-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.inquiry-pill.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(6, 182, 212, 0.25));
+  border-color: var(--accent-cyan, #06b6d4);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(6, 182, 212, 0.2);
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md, 12px);
+}
+
+@media (max-width: 540px) {
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-with-icon svg {
+  position: absolute;
+  left: 12px;
+  color: var(--text-muted, #94a3b8);
+  pointer-events: none;
+}
+
+.input-with-icon input {
+  padding-left: 36px !important;
+}
+
+.direct-channels-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--border-default, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-sm, 6px);
+}
+
+.channels-label {
+  font-size: 0.78rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.channels-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.channel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary, #cbd5e1);
+  text-decoration: none;
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  transition: all 0.2s;
+}
+
+.channel-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.channel-btn.whatsapp {
+  color: #25d366;
+  border-color: rgba(37, 211, 102, 0.3);
+  background: rgba(37, 211, 102, 0.08);
+}
+
+.channel-btn.whatsapp:hover {
+  background: rgba(37, 211, 102, 0.2);
+}
+
+/* Success Confirmation View */
+.contact-seller-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 24px 12px;
+}
+
+.success-icon-badge {
+  margin-bottom: 14px;
+  animation: pulseScale 1.5s infinite;
+}
+
+.contact-seller-success h3 {
+  font-size: 1.3rem;
+  margin-bottom: 8px;
+  color: var(--text-primary, #fff);
+}
+
+.contact-seller-success p {
+  color: var(--text-secondary, #cbd5e1);
+  font-size: 0.9rem;
+  max-width: 440px;
+  margin-bottom: 18px;
+}
+
+.success-meta-box {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-default, rgba(255, 255, 255, 0.1));
+  border-radius: var(--radius-md, 8px);
+  padding: 14px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--text-muted, #94a3b8);
+}
+
+.meta-row strong {
+  color: var(--text-primary, #fff);
+}
+
+.success-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+  justify-content: center;
+}
+
+@keyframes pulseScale {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+  100% { transform: scale(1); }
+}
