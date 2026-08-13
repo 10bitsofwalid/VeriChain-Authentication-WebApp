@@ -445,30 +445,116 @@
   inset: 0;
   background: rgba(0, 0, 0, 0.75);
   backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 999;
-  padding: 20px;
+  z-index: 1050;
+  padding: clamp(10px, 2.5vw, 24px);
+  overflow-y: auto;
+  overflow-x: hidden;
   animation: fadeIn 0.2s ease-out;
 }
 
+.recall-modal,
 .recall-modal-content {
   background: #0f172a;
   border: 1px solid rgba(6, 182, 212, 0.3);
   border-radius: 16px;
   width: 100%;
-  max-width: 600px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
-  padding: 28px;
+  max-width: 580px;
+  max-height: min(92vh, calc(100dvh - 32px));
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  margin: auto;
+  overflow: hidden;
+}
+
+.recall-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.recall-modal-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.recall-modal-body {
+  padding: 20px 22px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.recall-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.recall-form-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #94a3b8;
+}
+
+.recall-form-group input,
+.recall-form-group select,
+.recall-form-group textarea {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #fff;
+  font-size: 0.9rem;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.recall-form-group input:focus,
+.recall-form-group select:focus,
+.recall-form-group textarea:focus {
+  border-color: #38bdf8;
+}
+
+.recall-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 22px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 540px) {
+  .recall-modal-footer {
+    flex-direction: column-reverse;
+  }
+
+  .recall-modal-footer button {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* Recall Interactive Controls Focus Visible */
 .recall-tab-btn:focus-visible,
 .recall-modal-content button:focus-visible,
+.recall-modal button:focus-visible,
 .recall-focus-bar button:focus-visible {
   outline: 2px solid rgba(6, 182, 212, 0.8);
   outline-offset: 2px;
@@ -480,4 +566,5 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
+
 

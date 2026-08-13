@@ -32,6 +32,8 @@ import {
   Sparkles,
   Mail,
   Send,
+  Clock,
+  Truck,
 } from 'lucide-react';
 import './SellerDashboard.css';
 
@@ -1623,12 +1625,15 @@ export default function SellerDashboard() {
         title="Add Product to the Verified Marketplace"
         maxWidth="680px"
       >
-        <form onSubmit={handleListProductToMarketplace} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+        <form onSubmit={handleListProductToMarketplace} className="seller-modal-form">
           {/* Sourcing / Catalog Selection Mode */}
           {products.length > 0 && (
-            <div style={{ background: 'rgba(255, 255, 255, 0.03)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
-              <label className="form-label" style={{ marginBottom: '6px' }}>List from Registered Catalog SKU?</label>
+            <div className="catalog-select-banner">
+              <label className="form-label" htmlFor="catalog-sku-select" style={{ marginBottom: '6px' }}>
+                List from Registered Catalog SKU?
+              </label>
               <select
+                id="catalog-sku-select"
                 className="form-select"
                 value={marketplaceForm.selectedCatalogId}
                 onChange={(e) => {
@@ -1677,7 +1682,7 @@ export default function SellerDashboard() {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+          <div className="modal-form-grid-2">
             <div className="form-group">
               <label className="form-label" htmlFor="mkt-sku">SKU Code / Model ID *</label>
               <input
@@ -1708,7 +1713,7 @@ export default function SellerDashboard() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 'var(--space-md)' }}>
+          <div className="modal-form-grid-3">
             <div className="form-group">
               <label className="form-label" htmlFor="mkt-price">Selling Price ($ USD) *</label>
               <input
@@ -1787,40 +1792,48 @@ export default function SellerDashboard() {
           </div>
 
           {/* Direct Seller Contact Settings */}
-          <div style={{ background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', padding: '12px 16px', borderRadius: '8px', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <strong style={{ fontSize: '13px', color: 'var(--accent-cyan)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="seller-contact-card">
+            <div className="seller-contact-header">
+              <strong className="seller-contact-title">
                 <MessageSquare size={14} /> Direct Buyer Communication & Inquiries
               </strong>
               <span className="badge badge-success">Enabled</span>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-sm)' }}>
-              <div>
-                <label style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Seller Contact Email:</label>
+            <div className="modal-form-grid-2">
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" htmlFor="mkt-contact-email" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Seller Contact Email:</label>
                 <input
+                  id="mkt-contact-email"
                   type="email"
                   className="form-input"
-                  style={{ fontSize: '12px', padding: '6px 10px' }}
+                  style={{ fontSize: '12px', padding: '7px 10px' }}
                   value={marketplaceForm.contactEmail}
                   onChange={e => setMarketplaceForm({ ...marketplaceForm, contactEmail: e.target.value })}
                 />
               </div>
-              <div>
-                <label style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Direct WhatsApp / Phone:</label>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label" htmlFor="mkt-contact-phone" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Direct WhatsApp / Phone:</label>
                 <input
+                  id="mkt-contact-phone"
                   type="text"
                   className="form-input"
-                  style={{ fontSize: '12px', padding: '6px 10px' }}
+                  style={{ fontSize: '12px', padding: '7px 10px' }}
                   value={marketplaceForm.contactPhone}
                   onChange={e => setMarketplaceForm({ ...marketplaceForm, contactPhone: e.target.value })}
                 />
               </div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-secondary)' }}>
-              <span>Guaranteed Response Time: <strong>{marketplaceForm.responseTime}</strong></span>
-              <span>Shipping Policy: <strong>{marketplaceForm.shippingPolicy}</strong></span>
+            <div className="seller-contact-meta-row">
+              <div className="seller-contact-meta-item">
+                <Clock size={12} className="meta-icon" />
+                <span>Guaranteed Response: <strong>{marketplaceForm.responseTime}</strong></span>
+              </div>
+              <div className="seller-contact-meta-item">
+                <Truck size={12} className="meta-icon" />
+                <span>Shipping: <strong>{marketplaceForm.shippingPolicy}</strong></span>
+              </div>
             </div>
           </div>
 
@@ -1842,7 +1855,7 @@ export default function SellerDashboard() {
         title="Edit Marketplace Listing"
       >
         {selectedListing && (
-          <form onSubmit={handleUpdateListing} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <form onSubmit={handleUpdateListing} className="seller-modal-form">
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
               <strong>{selectedListing.product?.name}</strong><br />
               <code style={{ color: 'var(--accent-cyan)', fontSize: '12px' }}>{selectedListing.serialNumber}</code>
@@ -1903,7 +1916,7 @@ export default function SellerDashboard() {
         title="Reply to Buyer Inquiry"
       >
         {selectedInquiry && (
-          <form onSubmit={handleReplyInquiry} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <form onSubmit={handleReplyInquiry} className="seller-modal-form">
             <div style={{ background: 'rgba(255,255,255,0.03)', padding: '12px 14px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
                 <strong>{selectedInquiry.senderName}</strong>
@@ -1947,7 +1960,7 @@ export default function SellerDashboard() {
 
       {/* MODAL 4: REGISTER PRODUCT TO STORE CATALOG */}
       <Modal open={showAddProductModal} onClose={() => setShowAddProductModal(false)} title="Register Product to Store Catalog">
-        <form onSubmit={handleAddProduct} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+        <form onSubmit={handleAddProduct} className="seller-modal-form">
           <div className="form-group">
             <label className="form-label" htmlFor="prod-name">Product Name *</label>
             <input
@@ -1961,7 +1974,7 @@ export default function SellerDashboard() {
             />
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+          <div className="modal-form-grid-2">
             <div className="form-group">
               <label className="form-label" htmlFor="prod-sku">SKU Code *</label>
               <input
@@ -1991,7 +2004,7 @@ export default function SellerDashboard() {
             </div>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+          <div className="modal-form-grid-2">
             <div className="form-group">
               <label className="form-label" htmlFor="prod-price">Retail Price ($) *</label>
               <input
@@ -2056,7 +2069,7 @@ export default function SellerDashboard() {
       {/* MODAL 5: INVENTORY CHANGE STATUS */}
       <Modal open={showStatusModal && !!selectedItem} onClose={() => { setShowStatusModal(false); setSelectedItem(null); }} title="Update Item Blockchain Status">
         {selectedItem && (
-          <form onSubmit={handleUpdateItemStatus} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <form onSubmit={handleUpdateItemStatus} className="seller-modal-form">
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(193, 198, 215, 0.08)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)' }}>
               Item: <strong>{selectedItem.productName}</strong><br />
               Serial: <code style={{ color: 'var(--accent-cyan)' }}>{selectedItem.serialNumber}</code>
@@ -2117,7 +2130,7 @@ export default function SellerDashboard() {
       {/* MODAL 6: TRANSFER OWNERSHIP */}
       <Modal open={showTransferModal && !!selectedItem} onClose={() => { setShowTransferModal(false); setSelectedItem(null); }} title="Transfer Item Blockchain Ownership">
         {selectedItem && (
-          <form onSubmit={handleTransferOwnership} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <form onSubmit={handleTransferOwnership} className="seller-modal-form">
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(193, 198, 215, 0.08)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)' }}>
               Item: <strong>{selectedItem.productName}</strong><br />
               Serial: <code style={{ color: 'var(--accent-cyan)' }}>{selectedItem.serialNumber}</code>
@@ -2163,7 +2176,7 @@ export default function SellerDashboard() {
       {/* MODAL 7: FULFILL ORDER */}
       <Modal open={showFulfillModal && !!selectedOrder} onClose={() => { setShowFulfillModal(false); setSelectedOrder(null); }} title="Fulfill & Ship Order">
         {selectedOrder && (
-          <form onSubmit={handleFulfillOrder} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+          <form onSubmit={handleFulfillOrder} className="seller-modal-form">
             <div style={{ fontSize: '13px', color: 'var(--text-secondary)', background: 'rgba(193, 198, 215, 0.08)', padding: 'var(--space-sm)', borderRadius: 'var(--radius-sm)' }}>
               Order: <strong>{selectedOrder.orderNumber}</strong><br />
               Customer: <span>{selectedOrder.buyerName}</span>
@@ -2182,7 +2195,7 @@ export default function SellerDashboard() {
               </select>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+            <div className="modal-form-grid-2">
               <div className="form-group">
                 <label className="form-label" htmlFor="ord-carrier">Carrier</label>
                 <select

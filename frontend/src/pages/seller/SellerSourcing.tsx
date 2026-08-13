@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PageLoader from '../../components/ui/PageLoader';
 import AlertBanner from '../../components/ui/AlertBanner';
+import Modal from '../../components/ui/Modal';
 import client from '../../api/client';
 import FactoryCard from '../../components/FactoryCard';
 import ComparisonGrid from '../../components/ComparisonGrid';
@@ -16,7 +17,6 @@ import {
   ShoppingCart, 
   ShoppingBag,
   Clock, 
-  X, 
   CheckCircle, 
   AlertTriangle 
 } from 'lucide-react';
@@ -603,80 +603,72 @@ const SellerSourcing: React.FC = () => {
       )}
 
       {/* Request Allocation Modal */}
-      {showRequestModal && requestProduct && (
-        <div className="modal-overlay" style={{ zIndex: 100 }}>
-          <div className="modal-content glass-card animate-scale-in" style={{ maxWidth: '480px', border: '1px solid var(--border-default)' }}>
-            <div className="modal-header" style={{ borderBottom: '1px solid var(--border-default)', paddingBottom: 'var(--space-md)' }}>
-              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 600 }}>Request Inventory Allocation</h3>
-              <button 
-                className="modal-close" 
-                onClick={handleCloseRequestModal}
-                style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
-              >
-                <X size={20} />
-              </button>
+      <Modal
+        open={showRequestModal && !!requestProduct}
+        onClose={handleCloseRequestModal}
+        title="Request Inventory Allocation"
+        maxWidth="500px"
+      >
+        {requestProduct && (
+          <form onSubmit={handleSubmitRequest} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div 
+              style={{ 
+                background: 'rgba(255, 255, 255, 0.02)', 
+                padding: 'var(--space-md)', 
+                borderRadius: 'var(--radius-md)', 
+                border: '1px solid var(--border-default)',
+                fontSize: '0.9rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px'
+              }}
+            >
+              <div>Product: <strong>{requestProduct.name}</strong></div>
+              <div>Batch ID: <code style={{ color: 'var(--accent-cyan)' }}>{requestProduct.batchId}</code></div>
+              <div>Factory: <strong>{factories.find(f => f._id === selectedFactoryId)?.name}</strong></div>
+              <div>Wholesale Price: <strong>${requestProduct.wholesalePrice.toFixed(2)} / unit</strong></div>
+              <div>Available Quantity: <strong>{requestProduct.availableQty} units</strong></div>
             </div>
 
-            <form onSubmit={handleSubmitRequest} style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg)', marginTop: 'var(--space-lg)' }}>
-              <div 
-                style={{ 
-                  background: 'rgba(255, 255, 255, 0.02)', 
-                  padding: 'var(--space-md)', 
-                  borderRadius: 'var(--radius-md)', 
-                  border: '1px solid var(--border-default)',
-                  fontSize: '0.9rem',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '6px'
-                }}
+            <div className="form-group">
+              <label className="form-label" htmlFor="request-quantity" style={{ marginBottom: '6px', fontWeight: 500 }}>
+                Requested Quantity
+              </label>
+              <input
+                id="request-quantity"
+                type="number"
+                className="form-input"
+                min={1}
+                max={requestProduct.availableQty}
+                value={requestQty}
+                onChange={(e) => setRequestQty(Math.max(1, parseInt(e.target.value) || 1))}
+                required
+                style={{ width: '100%' }}
+              />
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
+                Enter a value between 1 and {requestProduct.availableQty}.
+              </span>
+            </div>
+
+            <div className="modal-footer">
+              <button 
+                type="button" 
+                className="btn btn-secondary" 
+                onClick={handleCloseRequestModal}
               >
-                <div>Product: <strong>{requestProduct.name}</strong></div>
-                <div>Batch ID: <code style={{ color: 'var(--accent-cyan)' }}>{requestProduct.batchId}</code></div>
-                <div>Factory: <strong>{factories.find(f => f._id === selectedFactoryId)?.name}</strong></div>
-                <div>Wholesale Price: <strong>${requestProduct.wholesalePrice.toFixed(2)} / unit</strong></div>
-                <div>Available Quantity: <strong>{requestProduct.availableQty} units</strong></div>
-              </div>
-
-              <div className="form-group">
-                <label className="form-label" htmlFor="request-quantity" style={{ marginBottom: '6px', fontWeight: 500 }}>
-                  Requested Quantity
-                </label>
-                <input
-                  id="request-quantity"
-                  type="number"
-                  className="form-input"
-                  min={1}
-                  max={requestProduct.availableQty}
-                  value={requestQty}
-                  onChange={(e) => setRequestQty(Math.max(1, parseInt(e.target.value) || 1))}
-                  required
-                  style={{ width: '100%' }}
-                />
-                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '4px', display: 'block' }}>
-                  Enter a value between 1 and {requestProduct.availableQty}.
-                </span>
-              </div>
-
-              <div className="modal-footer" style={{ borderTop: '1px solid var(--border-default)', paddingTop: 'var(--space-md)', display: 'flex', gap: 'var(--space-md)', justifyContent: 'flex-end' }}>
-                <button 
-                  type="button" 
-                  className="btn btn-secondary" 
-                  onClick={handleCloseRequestModal}
-                >
-                  Cancel
-                </button>
-                <button 
-                  type="submit" 
-                  className="btn btn-primary"
-                  style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-                >
-                  <ShoppingCart size={14} /> Submit Request
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+                Cancel
+              </button>
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+                style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <ShoppingCart size={14} /> Submit Request
+              </button>
+            </div>
+          </form>
+        )}
+      </Modal>
     </div>
   );
 };

@@ -703,4 +703,84 @@
   margin-top: 4px;
 }
 
+/* Modal Form and Contact Card Responsive Styles */
+.seller-modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  width: 100%;
+}
+
+.catalog-select-banner {
+  background: rgba(255, 255, 255, 0.03);
+  padding: 12px 14px;
+  border-radius: var(--radius-md, 10px);
+  border: 1px solid var(--border-default);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.seller-contact-card {
+  background: rgba(6, 182, 212, 0.05);
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  padding: 14px 16px;
+  border-radius: var(--radius-md, 10px);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.seller-contact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.seller-contact-title {
+  font-size: 13px;
+  color: var(--accent-cyan);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.seller-contact-meta-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(6, 182, 212, 0.2);
+}
+
+.seller-contact-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.seller-contact-meta-item .meta-icon {
+  color: var(--accent-cyan);
+  flex-shrink: 0;
+}
+
+@media (max-width: 580px) {
+  .seller-contact-meta-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .details-drawer-content {
+    max-width: 100vw;
+    width: 100%;
+    padding: var(--space-md);
+  }
+}
+
+
 

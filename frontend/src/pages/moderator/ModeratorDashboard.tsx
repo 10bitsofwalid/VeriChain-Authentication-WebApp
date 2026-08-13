@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PageLoader from '../../components/ui/PageLoader';
 import MetricCard from '../../components/ui/MetricCard';
+import Modal from '../../components/ui/Modal';
 import { useLocation } from 'react-router-dom';
 import client from '../../api/client';
 import {
@@ -474,42 +475,40 @@ export default function ModeratorDashboard({ defaultTab }: ModeratorDashboardPro
       )}
 
       {/* Inspect Product Modal */}
-      {showProductModal && selectedProduct && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '500px' }}>
-            <div className="modal-header">
-              <h3>Verify Product Template</h3>
-              <button className="modal-close" onClick={() => { setShowProductModal(false); setSelectedProduct(null); }}>&times;</button>
-            </div>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)', margin: 'var(--space-sm) 0' }}>
-              <div style={{ display: 'flex', gap: 'var(--space-md)' }}>
-                {selectedProduct.imageUrl && (
-                  <img src={selectedProduct.imageUrl} alt={selectedProduct.name} style={{ width: '96px', height: '96px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-default)' }} />
-                )}
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                  <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>{selectedProduct.name}</span>
-                  <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>SKU: {selectedProduct.sku}</span>
-                  <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Category: {selectedProduct.category}</span>
-                </div>
-              </div>
-
-              <div>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Manufacturer:</span>
-                <p style={{ margin: '2px 0 0 0', fontWeight: 500 }}>{selectedProduct.factory?.name} ({selectedProduct.factory?.email})</p>
-              </div>
-
-              {selectedProduct.certificateUrl && (
-                <div>
-                  <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Certificate Document:</span>
-                  <a href={selectedProduct.certificateUrl} target="_blank" rel="noreferrer" style={{ display: 'block', textDecoration: 'underline', color: 'var(--accent-cyan)', marginTop: '2px', wordBreak: 'break-all' }}>
-                    {selectedProduct.certificateUrl}
-                  </a>
-                </div>
+      <Modal
+        open={showProductModal && !!selectedProduct}
+        onClose={() => { setShowProductModal(false); setSelectedProduct(null); }}
+        title="Verify Product Template"
+        maxWidth="520px"
+      >
+        {selectedProduct && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ display: 'flex', gap: 'var(--space-md)', alignItems: 'center' }}>
+              {selectedProduct.imageUrl && (
+                <img src={selectedProduct.imageUrl} alt={selectedProduct.name} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '8px', border: '1px solid var(--border-default)', flexShrink: 0 }} />
               )}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', minWidth: 0 }}>
+                <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>{selectedProduct.name}</span>
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>SKU: {selectedProduct.sku}</span>
+                <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>Category: {selectedProduct.category}</span>
+              </div>
             </div>
 
-            <div className="modal-footer" style={{ marginTop: 'var(--space-lg)' }}>
+            <div style={{ background: 'rgba(255,255,255,0.02)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
+              <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Manufacturer:</span>
+              <p style={{ margin: '2px 0 0 0', fontWeight: 500 }}>{selectedProduct.factory?.name} ({selectedProduct.factory?.email})</p>
+            </div>
+
+            {selectedProduct.certificateUrl && (
+              <div style={{ background: 'rgba(255,255,255,0.02)', padding: '10px 14px', borderRadius: '8px', border: '1px solid var(--border-default)' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Certificate Document:</span>
+                <a href={selectedProduct.certificateUrl} target="_blank" rel="noreferrer" style={{ display: 'block', textDecoration: 'underline', color: 'var(--accent-cyan)', marginTop: '2px', wordBreak: 'break-all' }}>
+                  {selectedProduct.certificateUrl}
+                </a>
+              </div>
+            )}
+
+            <div className="modal-footer">
               <button className="btn btn-secondary" onClick={() => handleVerifyProduct(selectedProduct._id, 'rejected')} disabled={submitting}>
                 <XCircle size={16} style={{ marginRight: '6px' }} /> Reject Template
               </button>
@@ -518,19 +517,19 @@ export default function ModeratorDashboard({ defaultTab }: ModeratorDashboardPro
               </button>
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* Review Complaint Modal */}
-      {showComplaintModal && selectedComplaint && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '550px' }}>
-            <div className="modal-header">
-              <h3>Dispute Resolution Panel</h3>
-              <button className="modal-close" onClick={() => { setShowComplaintModal(false); setSelectedComplaint(null); }}>&times;</button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', borderBottom: '1px solid var(--border-default)', paddingBottom: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
+      <Modal
+        open={showComplaintModal && !!selectedComplaint}
+        onClose={() => { setShowComplaintModal(false); setSelectedComplaint(null); }}
+        title="Dispute Resolution Panel"
+        maxWidth="560px"
+      >
+        {selectedComplaint && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '13px', borderBottom: '1px solid var(--border-default)', paddingBottom: 'var(--space-md)' }}>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>Dispute Reason: </span>
                 <span style={{ fontWeight: 600, color: 'var(--color-danger)' }}>{selectedComplaint.reason}</span>
@@ -542,7 +541,7 @@ export default function ModeratorDashboard({ defaultTab }: ModeratorDashboardPro
               {selectedComplaint.transactionHash && (
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Acquisition Tx Hash: </span>
-                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)' }}>{selectedComplaint.transactionHash}</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)', wordBreak: 'break-all' }}>{selectedComplaint.transactionHash}</span>
                 </div>
               )}
               <div>
@@ -554,12 +553,12 @@ export default function ModeratorDashboard({ defaultTab }: ModeratorDashboardPro
               {selectedComplaint.evidenceUrl && (
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Evidence URL: </span>
-                  <a href={selectedComplaint.evidenceUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline' }}>
+                  <a href={selectedComplaint.evidenceUrl} target="_blank" rel="noreferrer" style={{ textDecoration: 'underline', color: 'var(--accent-cyan)', wordBreak: 'break-all' }}>
                     {selectedComplaint.evidenceUrl}
                   </a>
                 </div>
               )}
-              <div style={{ display: 'flex', gap: 'var(--space-md)', marginTop: '4px' }}>
+              <div style={{ display: 'flex', gap: 'var(--space-md)', marginTop: '4px', flexWrap: 'wrap' }}>
                 <div>
                   <span style={{ color: 'var(--text-muted)' }}>Buyer (Filer): </span>
                   <span>{selectedComplaint.buyer?.name}</span>
@@ -610,19 +609,19 @@ export default function ModeratorDashboard({ defaultTab }: ModeratorDashboardPro
               </div>
             </form>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
 
       {/* Flagged Item Inspection Modal */}
-      {showFlaggedModal && selectedFlaggedItem && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '500px' }}>
-            <div className="modal-header">
-              <h3>Flagged Asset Verification</h3>
-              <button className="modal-close" onClick={() => { setShowFlaggedModal(false); setSelectedFlaggedItem(null); }}>&times;</button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', fontSize: '13px', borderBottom: '1px solid var(--border-default)', paddingBottom: 'var(--space-md)', marginBottom: 'var(--space-md)' }}>
+      <Modal
+        open={showFlaggedModal && !!selectedFlaggedItem}
+        onClose={() => { setShowFlaggedModal(false); setSelectedFlaggedItem(null); }}
+        title="Flagged Asset Verification"
+        maxWidth="500px"
+      >
+        {selectedFlaggedItem && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-md)' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-sm)', fontSize: '13px', borderBottom: '1px solid var(--border-default)', paddingBottom: 'var(--space-md)' }}>
               <div>
                 <span style={{ color: 'var(--text-muted)' }}>Item Serial: </span>
                 <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 600, color: 'var(--accent-cyan)' }}>{selectedFlaggedItem.serialNumber}</span>
@@ -680,8 +679,8 @@ export default function ModeratorDashboard({ defaultTab }: ModeratorDashboardPro
               </div>
             </form>
           </div>
-        </div>
-      )}
+        )}
+      </Modal>
     </div>
   );
 }
