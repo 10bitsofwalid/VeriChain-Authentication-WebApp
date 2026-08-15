@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, CreditCard, MapPin, ShieldCheck, ChevronRight, ShoppingBag } from 'lucide-react';
+import { Check, CreditCard, MapPin, ShieldCheck, ChevronRight, ShoppingBag, Loader2, AlertCircle } from 'lucide-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { useShopping } from '../../context/ShoppingContext';
@@ -25,6 +25,8 @@ export default function CheckoutPage() {
   const { user } = useAuth();
   const [step, setStep] = useState<Step>('shipping');
   const [orderNum, setOrderNum] = useState<string>('');
+  const [submitting, setSubmitting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const [shippingForm, setShippingForm] = useState({
     firstName: user?.name ? user.name.split(' ')[0] : '',
@@ -63,10 +65,44 @@ export default function CheckoutPage() {
   const current = stepIndex(step);
 
   const next = async () => {
-    const steps: Step[] = ['shipping', 'payment', 'review', 'confirmed'];
-    const i = steps.indexOf(step);
-    if (i === 2) {
-      // Placing order and persisting to ledger
+    setErrorMessage(null);
+
+    // Step 1: Validate Shipping Address
+    if (step === 'shipping') {
+      if (
+        !shippingForm.firstName.trim() ||
+        !shippingForm.lastName.trim() ||
+        !shippingForm.street.trim() ||
+        !shippingForm.city.trim() ||
+        !shippingForm.postalCode.trim() ||
+        !shippingForm.country.trim()
+      ) {
+        setErrorMessage('Please fill in all required shipping address fields before proceeding.');
+        return;
+      }
+      setStep('payment');
+      return;
+    }
+
+    // Step 2: Validate Payment Details
+    if (step === 'payment') {
+      if (
+        !paymentForm.cardName.trim() ||
+        !paymentForm.cardNumber.trim() ||
+        !paymentForm.expiry.trim() ||
+        !paymentForm.cvv.trim()
+      ) {
+        setErrorMessage('Please complete all payment card details before proceeding.');
+        return;
+      }
+      setStep('review');
+      return;
+    }
+
+    // Step 3: Review & Place Order
+    if (step === 'review') {
+      if (submitting) return;
+      setSubmitting(true);
       try {
         const orderPayload = {
           items: items.map(item => ({
@@ -80,12 +116,12 @@ export default function CheckoutPage() {
             image: item.image,
           })),
           shippingAddress: {
-            firstName: shippingForm.firstName || 'Verified',
-            lastName: shippingForm.lastName || 'Buyer',
-            street: shippingForm.street || '123 Blockchain Ave',
-            city: shippingForm.city || 'San Francisco',
-            postalCode: shippingForm.postalCode || '94105',
-            country: shippingForm.country || 'USA',
+            firstName: shippingForm.firstName.trim(),
+            lastName: shippingForm.lastName.trim(),
+            street: shippingForm.street.trim(),
+            city: shippingForm.city.trim(),
+            postalCode: shippingForm.postalCode.trim(),
+            country: shippingForm.country.trim(),
           },
           payment: {
             method: 'Credit Card (Escrow Secured)',
@@ -103,15 +139,16 @@ export default function CheckoutPage() {
         } else {
           setOrderNum(createFallbackOrderNumber());
         }
+        dispatch({ type: 'CLEAR_CART' });
+        setStep('confirmed');
       } catch {
         // Fallback for offline/mock test execution
         setOrderNum(createFallbackOrderNumber());
+        dispatch({ type: 'CLEAR_CART' });
+        setStep('confirmed');
+      } finally {
+        setSubmitting(false);
       }
-
-      dispatch({ type: 'CLEAR_CART' });
-      setStep('confirmed');
-    } else if (i < steps.length - 1) {
-      setStep(steps[i + 1]);
     }
   };
 
@@ -192,6 +229,28 @@ export default function CheckoutPage() {
       <div className="bx-checkout-grid">
         {/* Main panel */}
         <div className="bx-card" style={{ padding: 'var(--space-xl)' }}>
+          {errorMessage && (
+            <div
+              style={{
+                marginBottom: 'var(--space-lg)',
+                padding: '12px 16px',
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: 'var(--radius-md)',
+                color: '#ef4444',
+                fontSize: '0.88rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 8,
+                fontWeight: 500,
+              }}
+              role="alert"
+            >
+              <AlertCircle size={16} style={{ flexShrink: 0 }} />
+              <span>{errorMessage}</span>
+            </div>
+          )}
+
           {step === 'shipping' && (
             <div>
               <div className="bx-section-title" style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 'var(--space-lg)' }}>
@@ -352,13 +411,39 @@ export default function CheckoutPage() {
 
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 'var(--space-sm)', marginTop: 'var(--space-xl)' }}>
             {current > 0 && (
-              <button className="bx-btn-ghost" onClick={() => {
-                const steps: Step[] = ['shipping', 'payment', 'review', 'confirmed'];
-                setStep(steps[steps.indexOf(step) - 1]);
-              }}>Back</button>
+              <button
+                type="button"
+                className="bx-btn-ghost"
+                disabled={submitting}
+                onClick={() => {
+                  setErrorMessage(null);
+                  const steps: Step[] = ['shipping', 'payment', 'review', 'confirmed'];
+                  setStep(steps[steps.indexOf(step) - 1]);
+                }}
+              >
+                Back
+              </button>
             )}
-            <button className="bx-btn-primary" onClick={next}>
-              {step === 'review' ? 'Place Order' : 'Continue'} <ChevronRight size={15} />
+            <button
+              type="button"
+              className="bx-btn-primary"
+              onClick={next}
+              disabled={submitting}
+              style={{ minWidth: 140, justifyContent: 'center' }}
+            >
+              {submitting ? (
+                <>
+                  <Loader2 size={16} className="spin" /> Placing Order...
+                </>
+              ) : step === 'review' ? (
+                <>
+                  Place Order <ChevronRight size={15} />
+                </>
+              ) : (
+                <>
+                  Continue <ChevronRight size={15} />
+                </>
+              )}
             </button>
           </div>
         </div>

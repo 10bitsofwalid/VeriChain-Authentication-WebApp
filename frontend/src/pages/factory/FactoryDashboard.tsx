@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Package, Boxes, TrendingUp, Truck, Users, BarChart2 } from 'lucide-react';
 import InventoryView from './views/InventoryView';
 import ProductionView from './views/ProductionView';
@@ -21,13 +22,31 @@ const TABS = [
 
 type TabId = (typeof TABS)[number]['id'];
 
+const VALID_TABS: TabId[] = ['inventory', 'production', 'allocations', 'seller-requests', 'shipments', 'analytics'];
+
 export default function FactoryDashboard() {
   const { user, refreshUser } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabId>('inventory');
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const tabParam = searchParams.get('tab') as TabId;
+  const initialTab: TabId = tabParam && VALID_TABS.includes(tabParam) ? tabParam : 'inventory';
+  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
 
   useEffect(() => {
     refreshUser?.();
   }, [refreshUser]);
+
+  useEffect(() => {
+    const currentTab = searchParams.get('tab') as TabId;
+    if (currentTab && VALID_TABS.includes(currentTab) && currentTab !== activeTab) {
+      setActiveTab(currentTab);
+    }
+  }, [searchParams, activeTab]);
+
+  const handleTabChange = (tabId: TabId) => {
+    setActiveTab(tabId);
+    setSearchParams({ tab: tabId });
+  };
 
   return (
     <div className="fd-container">
@@ -61,7 +80,7 @@ export default function FactoryDashboard() {
               key={tab.id}
               id={`fd-tab-${tab.id}`}
               className={`fd-tab-btn${activeTab === tab.id ? ' active' : ''}`}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => handleTabChange(tab.id)}
               type="button"
               aria-selected={activeTab === tab.id}
             >

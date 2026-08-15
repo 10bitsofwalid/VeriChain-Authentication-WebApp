@@ -61,6 +61,7 @@ export default function RecallManagementView() {
   const [newRecallBatch, setNewRecallBatch] = useState('');
   const [newRecallSeverity, setNewRecallSeverity] = useState<RecallSeverity>('High');
   const [newRecallReason, setNewRecallReason] = useState('');
+  const [availableProducts, setAvailableProducts] = useState<{ id: string; name: string; sku: string }[]>([]);
 
   useEffect(() => {
     async function loadLiveRecalls() {
@@ -99,7 +100,26 @@ export default function RecallManagementView() {
         setRecalls([]);
       }
     }
+
+    async function loadCatalogProducts() {
+      try {
+        const res = await client.get('/products').catch(async () => client.get('/products/factory'));
+        if (res.data?.products && Array.isArray(res.data.products)) {
+          setAvailableProducts(
+            res.data.products.map((p: any) => ({
+              id: p._id,
+              name: p.name,
+              sku: p.sku || 'SKU-001',
+            }))
+          );
+        }
+      } catch {
+        // Fallback gracefully
+      }
+    }
+
     loadLiveRecalls();
+    loadCatalogProducts();
   }, []);
 
   // Selected Recall Object
@@ -159,12 +179,23 @@ export default function RecallManagementView() {
     setTimeout(() => setNotificationSuccess(null), 3500);
   };
 
-  const handleToggleUnitQuarantine = (unitId: string) => {
+  const handleToggleUnitQuarantine = async (unitId: string) => {
+    const currentUnit = units.find((u) => u.id === unitId);
+    const nextState: QuarantineState =
+      currentUnit?.quarantineState === 'Quarantined' ? 'Pending Sweep' : 'Quarantined';
+    const targetStatus = nextState === 'Quarantined' ? 'recalled' : 'listed';
+
+    try {
+      if (unitId.length === 24) {
+        await client.patch(`/items/${unitId}/status`, { status: targetStatus }).catch(() => null);
+      }
+    } catch {
+      // Keep going with optimistic local update
+    }
+
     setUnits((prev) =>
       prev.map((u) => {
         if (u.id === unitId) {
-          const nextState: QuarantineState =
-            u.quarantineState === 'Quarantined' ? 'Pending Sweep' : 'Quarantined';
           return {
             ...u,
             quarantineState: nextState,
@@ -209,19 +240,34 @@ export default function RecallManagementView() {
     triggerNotification(`Recall ${selectedRecall.recallCode} status updated to ${newStatus}`);
   };
 
-  const handleCreateRecall = (e: React.FormEvent) => {
+  const handleCreateRecall = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newRecallTitle || !newRecallProduct) return;
 
-    const newId = `rec-${Date.now()}`;
+    const matchedProduct = availableProducts.find(
+      (p) => p.name.toLowerCase() === newRecallProduct.toLowerCase() || p.id === newRecallProduct
+    );
+    const targetProdId = matchedProduct?.id || (newRecallProduct.length === 24 ? newRecallProduct : undefined);
+
+    if (targetProdId) {
+      try {
+        await client.post(`/products/${targetProdId}/recall`, {
+          reason: newRecallReason || newRecallTitle || 'Quality assurance quarantine protocol triggered.',
+        });
+      } catch (err) {
+        console.warn('Backend product recall API call:', err);
+      }
+    }
+
+    const newId = targetProdId || `rec-${Date.now()}`;
     const code = `REC-${new Date().getFullYear()}-${Math.floor(100 + Math.random() * 900)}`;
 
     const item: RecallItem = {
       id: newId,
       recallCode: code,
       title: newRecallTitle,
-      productName: newRecallProduct,
-      sku: `SKU-${Math.floor(1000 + Math.random() * 9000)}`,
+      productName: matchedProduct?.name || newRecallProduct,
+      sku: matchedProduct?.sku || `SKU-${Math.floor(1000 + Math.random() * 9000)}`,
       batchId: newRecallBatch || 'B-INIT',
       severity: newRecallSeverity,
       status: 'Active',
@@ -229,7 +275,7 @@ export default function RecallManagementView() {
       rootCause: 'Investigation under progress by QA team.',
       riskLevel: 'Precautionary isolation',
       affectedUnitsCount: 1,
-      quarantinedCount: 0,
+      quarantinedCount: 1,
       quarantineDirectives: 'Isolate batch from main sales distribution channels.',
       initiatedDate: new Date().toISOString().replace('T', ' ').substring(0, 19),
       owner: 'Quality Officer',
@@ -917,11 +963,19 @@ export default function RecallManagementView() {
                     <label>Product Name</label>
                     <input
                       type="text"
+                      list="recall-product-options"
                       placeholder="e.g. AeroChron Titanium S1"
                       value={newRecallProduct}
                       onChange={(e) => setNewRecallProduct(e.target.value)}
                       required
                     />
+                    <datalist id="recall-product-options">
+                      {availableProducts.map((p) => (
+                        <option key={p.id} value={p.name}>
+                          {p.sku}
+                        </option>
+                      ))}
+                    </datalist>
                   </div>
 
                   <div className="recall-form-group">

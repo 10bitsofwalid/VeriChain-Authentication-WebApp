@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Heart, ShoppingBag, Trash2, ShieldCheck, ArrowRight } from 'lucide-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { useShopping } from '../../context/ShoppingContext';
 
 export default function WishlistPage() {
+  const navigate = useNavigate();
   const { wishlist, dispatch } = useShopping();
   const [addedMessage, setAddedMessage] = useState<string | null>(null);
 
@@ -18,13 +19,38 @@ export default function WishlistPage() {
       type: 'ADD_TO_CART',
       payload: {
         id: item.id,
+        productId: item.productId || item.id,
+        itemInstanceId: item.itemInstanceId || (item.serialNumber ? item.id : undefined),
+        serialNumber: item.serialNumber,
+        sku: item.sku,
         name: item.name,
-        price: item.price,
+        price: Number(item.price) || 0,
         imageUrl: item.imageUrl || item.image,
+        quantity: 1,
+        verified: item.verified !== false,
       },
     });
     setAddedMessage(`"${item.name}" added to cart!`);
     setTimeout(() => setAddedMessage(null), 3000);
+  };
+
+  const handleBuyNow = (item: any) => {
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: {
+        id: item.id,
+        productId: item.productId || item.id,
+        itemInstanceId: item.itemInstanceId || (item.serialNumber ? item.id : undefined),
+        serialNumber: item.serialNumber,
+        sku: item.sku,
+        name: item.name,
+        price: Number(item.price) || 0,
+        imageUrl: item.imageUrl || item.image,
+        quantity: 1,
+        verified: item.verified !== false,
+      },
+    });
+    navigate('/buyer/checkout');
   };
 
   const clearAll = () => {
@@ -121,14 +147,15 @@ export default function WishlistPage() {
                   >
                     <ShoppingBag size={14} /> Add to Cart
                   </button>
-                  <Link
-                    to="/buyer/checkout"
+                  <button
+                    type="button"
+                    onClick={() => handleBuyNow(item)}
                     className="bx-btn-ghost"
-                    style={{ padding: '8px 10px' }}
+                    style={{ padding: '8px 10px', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
                     title="Buy now"
                   >
                     <ArrowRight size={14} />
-                  </Link>
+                  </button>
                 </div>
               </div>
             </div>

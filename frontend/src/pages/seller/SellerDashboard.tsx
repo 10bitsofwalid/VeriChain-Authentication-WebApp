@@ -273,11 +273,12 @@ export default function SellerDashboard() {
     async function loadSellerData() {
       try {
         refreshUser?.();
-        const [itemsRes, prodsRes, listingsRes, inquiriesRes] = await Promise.allSettled([
+        const [itemsRes, prodsRes, listingsRes, inquiriesRes, ordersRes] = await Promise.allSettled([
           client.get('/items/my'),
           client.get('/products'),
           client.get('/items/seller/listings'),
           client.get('/inquiries/seller'),
+          client.get('/orders/my'),
         ]);
 
         if (itemsRes.status === 'fulfilled' && itemsRes.value.data?.items && Array.isArray(itemsRes.value.data.items)) {
@@ -323,6 +324,28 @@ export default function SellerDashboard() {
 
         if (inquiriesRes.status === 'fulfilled' && inquiriesRes.value.data?.inquiries) {
           setInquiries(inquiriesRes.value.data.inquiries);
+        }
+
+        if (ordersRes.status === 'fulfilled' && ordersRes.value.data?.orders && Array.isArray(ordersRes.value.data.orders)) {
+          const mappedOrders: Order[] = ordersRes.value.data.orders.map((ord: any) => ({
+            _id: ord._id,
+            orderNumber: ord.orderNumber,
+            buyerName: ord.buyer?.name || (ord.shippingAddress ? `${ord.shippingAddress.firstName} ${ord.shippingAddress.lastName}` : 'Verified Buyer'),
+            buyerEmail: ord.buyer?.email || 'buyer@verichain.network',
+            date: ord.createdAt || new Date().toISOString(),
+            total: Number(ord.total) || 0,
+            status: ord.status || 'pending',
+            items: ord.items?.map((it: any) => ({
+              name: it.name || 'Authentic Item',
+              sku: it.sku || 'SKU',
+              qty: it.quantity || 1,
+              price: it.price || 0,
+              serialNumber: it.serialNumber || 'SN-VERIFIED',
+            })) || [],
+            trackingNumber: ord.trackingNumber,
+            shippingCarrier: ord.carrier,
+          }));
+          setOrders(mappedOrders);
         }
       } catch (err) {
         console.error('Failed to load seller data', err);
@@ -680,25 +703,42 @@ export default function SellerDashboard() {
   };
 
   // 5. Orders: Fulfill & Add Tracking
-  const handleFulfillOrder = (e: React.FormEvent) => {
+  const handleFulfillOrder = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedOrder) return;
 
-    setOrders(prev => prev.map(order => {
-      if (order._id === selectedOrder._id) {
-        return {
-          ...order,
-          status: orderStatusVal,
-          trackingNumber: trackingNum || 'VC-TRK-' + Math.floor(Math.random()*1000000),
-          shippingCarrier: carrier
-        };
-      }
-      return order;
-    }));
+    const generatedTracking = trackingNum.trim() || 'VC-TRK-' + Math.floor(100000 + Math.random() * 900000);
 
-    setShowFulfillModal(false);
-    addToast(`Order ${selectedOrder.orderNumber} updated to ${orderStatusVal}.`, 'success');
-    setSelectedOrder(null);
+    try {
+      if (selectedOrder._id) {
+        await client.patch(`/orders/${selectedOrder._id}/status`, {
+          status: orderStatusVal,
+          trackingNumber: generatedTracking,
+          carrier: carrier,
+          details: `Order fulfilled by seller via ${carrier}. Tracking: ${generatedTracking}`,
+        }).catch((err) => {
+          console.warn('Backend order status update warning:', err);
+        });
+      }
+
+      setOrders(prev => prev.map(order => {
+        if (order._id === selectedOrder._id) {
+          return {
+            ...order,
+            status: orderStatusVal,
+            trackingNumber: generatedTracking,
+            shippingCarrier: carrier,
+          };
+        }
+        return order;
+      }));
+
+      setShowFulfillModal(false);
+      addToast(`Order ${selectedOrder.orderNumber} updated to ${orderStatusVal}.`, 'success');
+      setSelectedOrder(null);
+    } catch (err: any) {
+      addToast(err.response?.data?.message || 'Failed to update order status.', 'error');
+    }
   };
 
   if (loading) {

@@ -1,5 +1,4 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { Link } from 'react-router-dom';
 import client from '../api/client';
 import {
   Shield,
@@ -10,7 +9,6 @@ import {
   Clock,
   MapPin,
   Package,
-  ArrowLeft,
   QrCode,
   Camera,
   Copy,
@@ -24,6 +22,8 @@ import {
   RefreshCw,
 } from 'lucide-react';
 import logoSvg from '../assets/logo.svg';
+import NavBar from '../components/NavBar';
+import Footer from '../components/Footer';
 import './VerifyItem.css';
 
 interface VerifyResult {
@@ -185,18 +185,12 @@ export default function VerifyItem() {
   };
 
   return (
-    <div className="verify-page">
+    <div className="verify-page" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <NavBar />
       <div className="verify-glow-1" />
       <div className="verify-glow-2" />
 
-      <header className="verify-header">
-        <Link to="/" className="back-link">
-          <ArrowLeft size={16} />
-          <span>Back to Home</span>
-        </Link>
-      </header>
-
-      <div className="verify-content animate-fade-in-up">
+      <div className="verify-content animate-fade-in-up" style={{ flex: 1 }}>
         {/* Title Section */}
         <div className="verify-title-section">
           <div className="verify-shield-container">
@@ -608,6 +602,7 @@ export default function VerifyItem() {
           </div>
         </div>
       )}
+      <Footer />
     </div>
   );
 }

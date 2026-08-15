@@ -1323,4 +1323,29 @@ input[type="search"] {
 .bg-mustard { background-color: #F59E0B; }
 .bg-light-gray { background-color: #ECEFF3; }
 .bg-white { background-color: #FFFFFF; }
+.bg-gray-800 { background-color: #1E293B; }
+.bg-emerald-500 { background-color: #10B981; }
+.bg-emerald-400 { background-color: #34D399; }
+.bg-cyan-400 { background-color: #22D3EE; }
+
+.text-emerald-400 { color: #10B981; }
+.text-cyan-400 { color: #06B6D4; }
+.text-red-400 { color: #EF4444; }
+
 .rounded-full { border-radius: 9999px; }
+.overflow-x-auto { overflow-x: auto; }
+.min-w-full { min-width: 100%; }
+.min-h-screen { min-height: 100vh; }
+.border-b { border-bottom: 1px solid var(--border-default); }
+.border-gray-700 { border-color: rgba(223, 227, 232, 0.2); }
+.border-gray-800 { border-color: rgba(223, 227, 232, 0.1); }
+.px-2 { padding-left: 0.5rem; padding-right: 0.5rem; }
+.py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+.font-mono { font-family: var(--font-mono); }
+
+.page-container {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: var(--space-lg) var(--space-md);
+}

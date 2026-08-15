@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { ArrowRight, CheckCircle2, PackageSearch, Search, ShieldCheck, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import logoSvg from '../assets/logo.svg';
@@ -5,6 +6,21 @@ import ActionButton from './ui/ActionButton';
 
 export default function HeroBanner() {
   const navigate = useNavigate();
+  const [query, setQuery] = useState('');
+
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const term = query.trim();
+    if (!term) {
+      navigate('/verify');
+      return;
+    }
+    if (/^SN-|\d{5,}/i.test(term)) {
+      navigate(`/verify?serial=${encodeURIComponent(term)}`);
+    } else {
+      navigate(`/dashboard/marketplace?search=${encodeURIComponent(term)}`);
+    }
+  };
 
   return (
     <section className="marketplace-hero">
@@ -19,13 +35,18 @@ export default function HeroBanner() {
           ownership history, and trust signals backed by a blockchain ledger.
         </p>
 
-        <div className="marketplace-hero-search" role="search">
+        <form className="marketplace-hero-search" role="search" onSubmit={handleSearch}>
           <Search size={20} aria-hidden="true" />
-          <input placeholder="Search serial, product, seller, or category" aria-label="Search marketplace" />
-          <ActionButton variant="primary" size="md" onClick={() => navigate('/verify')}>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search serial, product, seller, or category"
+            aria-label="Search marketplace"
+          />
+          <ActionButton variant="primary" size="md" type="submit">
             Verify
           </ActionButton>
-        </div>
+        </form>
 
         <div className="marketplace-hero-actions">
           <ActionButton variant="primary" size="lg" onClick={() => navigate('/dashboard/marketplace')}>

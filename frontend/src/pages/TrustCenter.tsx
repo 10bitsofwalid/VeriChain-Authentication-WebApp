@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import client from '../api/client';
-import { TrendingUp, Users, Clipboard, CheckCircle } from 'lucide-react';
+import { TrendingUp, Users, Clipboard, CheckCircle, ShieldCheck, Zap } from 'lucide-react';
 import FactoryCard from '../components/FactoryCard';
 import SellerInfoCard from '../components/SellerInfoCard';
 import AnalyticsCard from '../components/AnalyticsCard';
 import { useNavigate } from 'react-router-dom';
+import NavBar from '../components/NavBar';
+import Footer from '../components/Footer';
 import TrustCenterFeed from './TrustCenterFeed';
 import RecallAlerts from './RecallAlerts';
 import VerificationActivity from './VerificationActivity';
+import ActionButton from '../components/ui/ActionButton';
+import PageLoader from '../components/ui/PageLoader';
+import './MarketplaceHome.css';
 
 interface Product {
   _id: string;
@@ -83,89 +88,131 @@ const TrustCenter: React.FC = () => {
     fetchData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <span className="text-lg">Loading Trust Center…</span>
-      </div>
-    );
-  }
-
   const totalProducts = products.length;
   const verifiedProducts = products.filter(p => p.verifiedStatus === 'verified' || p.verified).length;
 
   return (
-    <section className="trust-center container mx-auto p-4 space-y-8">
-      {/* Trust Hero */}
-      <div
-        className="glass-card flex flex-col items-center text-center p-8 animate-fade-in"
-        style={{
-          background: 'linear-gradient(135deg, rgba(15,23,42,0.95), rgba(30,41,59,0.8))',
-          border: '1px solid rgba(255,255,255,0.08)',
-          borderRadius: 'var(--radius-xl)',
-        }}
-      >
-        <h1 className="text-3xl md:text-5xl font-extrabold mb-4" style={{ color: '#fff' }}>
-          Verify with Confidence
-        </h1>
-        <p className="text-lg text-gray-300 mb-6 max-w-2xl">
-          Transparent Ownership • Verified Supply Chain • Decentralized Authenticity
-        </p>
-        <button
-          className="btn btn-primary"
-          onClick={() => navigate('/verify')}
-          style={{ background: 'var(--accent-gradient)' }}
-        >
-          Verify Product
-        </button>
-      </div>
+    <div className="marketplace-home" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <NavBar />
 
-      {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <AnalyticsCard icon={<Users size={24} />} title="Registered Products" value={totalProducts} />
-        <AnalyticsCard icon={<CheckCircle size={24} />} title="Products Verified" value={verifiedProducts} />
-        <AnalyticsCard icon={<Clipboard size={24} />} title="Filed Complaints" value={complaintCount} />
-        <AnalyticsCard icon={<TrendingUp size={24} />} title="Verified Partners" value={factories.length + sellers.length} />
-      </div>
-
-      {/* Top Trusted Factories */}
-      <section className="mt-12">
-        <h2 className="text-2xl font-semibold mb-4">Top Trusted Factories</h2>
-        {factories.length === 0 ? (
-          <p className="text-gray-400">Verified factory profiles will appear here as manufacturers register.</p>
+      <main className="page-container" style={{ flex: 1, padding: 'var(--space-xl) var(--space-md)' }}>
+        {loading ? (
+          <PageLoader minHeight="60vh" />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {factories.map(f => (
-              <FactoryCard key={f._id} factory={f} selected={false} onSelect={() => {}} />
-            ))}
+          <div className="space-y-8">
+            {/* Trust Hero Banner */}
+            <div
+              className="glass-card flex flex-col items-center text-center p-8 animate-fade-in"
+              style={{
+                background: 'linear-gradient(135deg, #16233B 0%, #0B0F19 100%)',
+                border: '1px solid var(--border-default)',
+                borderRadius: 'var(--radius-xl)',
+                boxShadow: 'var(--shadow-md)',
+              }}
+            >
+              <div
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: 'rgba(245, 158, 11, 0.2)',
+                  color: '#F59E0B',
+                  borderRadius: '999px',
+                  padding: '4px 12px',
+                  fontSize: '0.8rem',
+                  fontWeight: 700,
+                  marginBottom: 'var(--space-sm)',
+                }}
+              >
+                <ShieldCheck size={16} />
+                <span>VeriChain Global Trust & Provenance Network</span>
+              </div>
+              <h1 className="text-3xl md:text-5xl font-extrabold mb-4" style={{ color: '#FFFFFF' }}>
+                Verify with Complete Confidence
+              </h1>
+              <p className="text-lg text-gray-300 mb-6 max-w-2xl">
+                Transparent Ownership • Cryptographic Supply Chain • Zero Counterfeit Tolerance
+              </p>
+              <div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap', justifyContent: 'center' }}>
+                <ActionButton variant="primary" size="md" onClick={() => navigate('/verify')}>
+                  <Zap size={16} /> Quick Verify Product
+                </ActionButton>
+                <ActionButton variant="secondary" size="md" onClick={() => navigate('/dashboard/marketplace')}>
+                  Browse Verified Marketplace
+                </ActionButton>
+              </div>
+            </div>
+
+            {/* Platform Telemetry Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              <AnalyticsCard icon={<Users size={24} />} title="Registered Products" value={totalProducts} />
+              <AnalyticsCard icon={<CheckCircle size={24} />} title="Products Verified" value={verifiedProducts} />
+              <AnalyticsCard icon={<Clipboard size={24} />} title="Filed Complaints" value={complaintCount} />
+              <AnalyticsCard icon={<TrendingUp size={24} />} title="Verified Partners" value={factories.length + sellers.length} />
+            </div>
+
+            {/* Top Trusted Manufacturers */}
+            <section className="mt-12">
+              <div style={{ marginBottom: 'var(--space-md)' }}>
+                <span className="marketplace-eyebrow">Accredited Production</span>
+                <h2 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+                  Top Trusted Manufacturers
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                  Audited manufacturing facilities with cryptographic minting credentials.
+                </p>
+              </div>
+              {factories.length === 0 ? (
+                <div className="glass-card" style={{ padding: 'var(--space-lg)', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
+                  <p style={{ color: 'var(--text-muted)' }}>Verified factory profiles will appear here as manufacturers register on the ledger.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {factories.map(f => (
+                    <FactoryCard key={f._id} factory={f} selected={false} onSelect={() => {}} />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Top Trusted Sellers */}
+            <section className="mt-12">
+              <div style={{ marginBottom: 'var(--space-md)' }}>
+                <span className="marketplace-eyebrow">Authorized Distribution</span>
+                <h2 className="text-2xl font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
+                  Top Trusted Merchants & Sellers
+                </h2>
+                <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
+                  Certified merchants with verified chain of custody and high buyer ratings.
+                </p>
+              </div>
+              {sellers.length === 0 ? (
+                <div className="glass-card" style={{ padding: 'var(--space-lg)', borderRadius: 'var(--radius-lg)', textAlign: 'center' }}>
+                  <p style={{ color: 'var(--text-muted)' }}>Verified sellers will appear here as merchants register on the ledger.</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {sellers.map(s => (
+                    <SellerInfoCard key={s._id} seller={s} />
+                  ))}
+                </div>
+              )}
+            </section>
+
+            {/* Live Verification Feed */}
+            <TrustCenterFeed />
+
+            {/* Recall Alerts */}
+            <RecallAlerts />
+
+            {/* Verification Activity */}
+            <VerificationActivity />
           </div>
         )}
-      </section>
+      </main>
 
-      {/* Top Trusted Sellers */}
-      <section className="mt-12">
-        <h2 className="text-2xl font-semibold mb-4">Top Trusted Sellers</h2>
-        {sellers.length === 0 ? (
-          <p className="text-gray-400">Verified sellers will appear here as merchants register.</p>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sellers.map(s => (
-              <SellerInfoCard key={s._id} seller={s} />
-            ))}
-          </div>
-        )}
-      </section>
-
-      {/* Live Verification Feed */}
-      <TrustCenterFeed />
-
-      {/* Recall Alerts */}
-      <RecallAlerts />
-
-      {/* Verification Activity */}
-      <VerificationActivity />
-
-    </section>
+      <Footer />
+    </div>
   );
 };
 

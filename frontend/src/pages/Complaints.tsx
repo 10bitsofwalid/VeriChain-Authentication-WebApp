@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import PageLoader from '../components/ui/PageLoader';
 import AlertBanner from '../components/ui/AlertBanner';
 import Modal from '../components/ui/Modal';
+import NavBar from '../components/NavBar';
+import Footer from '../components/Footer';
 import { complaintStatusBadge } from '../utils/badges';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -12,6 +15,7 @@ import {
   Loader,
   Eye,
 } from 'lucide-react';
+import './MarketplaceHome.css';
 
 interface Complaint {
   _id: string;
@@ -158,13 +162,27 @@ export default function Complaints() {
 
 
 
+  const location = useLocation();
+  const isStandalone = !location.pathname.startsWith('/dashboard');
+
   if (loading) {
+    if (isStandalone) {
+      return (
+        <div className="marketplace-home" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+          <NavBar />
+          <main className="page-container" style={{ flex: 1 }}>
+            <PageLoader minHeight="60vh" />
+          </main>
+          <Footer />
+        </div>
+      );
+    }
     return <PageLoader minHeight="60vh" />;
   }
 
   const isModOrAdmin = ['admin', 'moderator'].includes(user?.role || '');
 
-  return (
+  const content = (
     <div className="animate-fade-in">
       <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
@@ -443,4 +461,18 @@ export default function Complaints() {
       </Modal>
     </div>
   );
+
+  if (isStandalone) {
+    return (
+      <div className="marketplace-home" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <NavBar />
+        <main className="page-container" style={{ flex: 1, padding: 'var(--space-xl) var(--space-md)' }}>
+          {content}
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return content;
 }

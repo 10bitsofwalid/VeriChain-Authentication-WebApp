@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useLocation } from 'react-router-dom';
 import AdminMissionView from './views/AdminMissionView';
 import AdminUsersView from './views/AdminUsersView';
 import AdminComplaintsView from './views/AdminComplaintsView';
@@ -31,20 +31,46 @@ export type AdminTab =
   | 'statistics'
   | 'settings';
 
+const VALID_ADMIN_TABS: AdminTab[] = [
+  'mission',
+  'users',
+  'complaints',
+  'moderation',
+  'reports',
+  'statistics',
+  'settings',
+];
+
 export default function AdminDashboard() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
-  // Tab State with URL query param sync (?tab=users, etc.)
-  const initialTab = (searchParams.get('tab') as AdminTab) || 'mission';
-  const [activeTab, setActiveTab] = useState<AdminTab>(initialTab);
+  const getInitialTab = (): AdminTab => {
+    const tabParam = searchParams.get('tab') as AdminTab;
+    if (tabParam && VALID_ADMIN_TABS.includes(tabParam)) {
+      return tabParam;
+    }
+    if (location.pathname.endsWith('/users')) return 'users';
+    if (location.pathname.endsWith('/products-admin')) return 'moderation';
+    return 'mission';
+  };
+
+  // Tab State with URL query param sync (?tab=users, etc.) and direct pathname fallback
+  const [activeTab, setActiveTab] = useState<AdminTab>(getInitialTab);
   const [badgeCounts, setBadgeCounts] = useState<{ complaints: number; moderation: number }>({ complaints: 0, moderation: 0 });
 
   useEffect(() => {
     const currentTab = searchParams.get('tab') as AdminTab;
-    if (currentTab && currentTab !== activeTab) {
-      setActiveTab(currentTab);
+    if (currentTab && VALID_ADMIN_TABS.includes(currentTab)) {
+      if (currentTab !== activeTab) setActiveTab(currentTab);
+    } else if (!currentTab) {
+      if (location.pathname.endsWith('/users') && activeTab !== 'users') {
+        setActiveTab('users');
+      } else if (location.pathname.endsWith('/products-admin') && activeTab !== 'moderation') {
+        setActiveTab('moderation');
+      }
     }
-  }, [searchParams, activeTab]);
+  }, [searchParams, location.pathname, activeTab]);
 
   useEffect(() => {
     async function loadBadges() {

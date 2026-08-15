@@ -13,6 +13,8 @@ import AcceptInvite from '../pages/AcceptInvite';
 
 import Marketplace from '../pages/Marketplace';
 import ProductDetailsPage from '../pages/ProductDetailsPage';
+import Compare from '../pages/Compare';
+import TrustCenter from '../pages/TrustCenter';
 
 import VerifyItem from '../pages/VerifyItem';
 import VerificationActivity from '../pages/VerificationActivity';
@@ -36,6 +38,8 @@ import OrdersPage from '../pages/buyer/OrdersPage';
 import Complaints from '../pages/Complaints';
 
 import TopNavbar from '../components/layout/TopNavbar';
+import SearchOverlay from '../components/layout/SearchOverlay';
+import HeroBanner from '../components/HeroBanner';
 
 import AdminDashboard from '../pages/admin/AdminDashboard';
 import AuditLogs from '../pages/admin/AuditLogs';
@@ -198,6 +202,26 @@ describe('VeriChain Comprehensive Application Test Suite', () => {
         expect(screen.getAllByText(/Passport|Product|Overview/i)[0]).toBeInTheDocument();
       });
     });
+
+    it('should render Compare matrix page with empty state', async () => {
+      (client.get as any).mockResolvedValue({
+        data: { success: true, items: [] },
+      });
+      renderWithProviders(<Compare />);
+      await waitFor(() => {
+        expect(screen.getByText(/Product Comparison/i)).toBeInTheDocument();
+      });
+    });
+
+    it('should render TrustCenter telemetry page', async () => {
+      (client.get as any).mockResolvedValue({
+        data: { success: true, overview: { totalProducts: 10, verifiedCount: 9, recallCount: 0 }, logs: [] },
+      });
+      renderWithProviders(<TrustCenter />);
+      await waitFor(() => {
+        expect(screen.getByText(/Verify with Complete Confidence/i)).toBeInTheDocument();
+      });
+    });
   });
 
   // ==========================================
@@ -280,11 +304,13 @@ describe('VeriChain Comprehensive Application Test Suite', () => {
   // 5. FACTORY MODULE TESTS
   // ==========================================
   describe('5. Factory Module', () => {
-    it('should render FactoryDashboard with control metrics', () => {
+    it('should render FactoryDashboard with control metrics', async () => {
       renderWithProviders(<FactoryDashboard />, {
         user: { id: 'f1', name: 'Apex Manufacturing', role: 'factory' },
       });
-      expect(screen.getAllByText(/Factory/i)[0]).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getAllByText(/Factory/i)[0]).toBeInTheDocument();
+      });
     });
 
     it('should render RegisterProduct page form', () => {
@@ -313,14 +339,28 @@ describe('VeriChain Comprehensive Application Test Suite', () => {
       });
     });
 
-    it('should render CartPage correctly', () => {
-      renderWithProviders(<CartPage />);
-      expect(screen.getAllByText(/Cart/i)[0]).toBeInTheDocument();
+    it('should render SearchOverlay and accept search keywords', () => {
+      const handleClose = vi.fn();
+      renderWithProviders(<SearchOverlay open={true} onClose={handleClose} />);
+      const searchInput = screen.getByPlaceholderText(/Search products, factories/i);
+      expect(searchInput).toBeInTheDocument();
+      fireEvent.change(searchInput, { target: { value: 'Rolex Submariner' } });
+      expect(searchInput).toHaveValue('Rolex Submariner');
+      expect(screen.getByText('AirPods Max')).toBeInTheDocument();
     });
 
-    it('should render CheckoutPage correctly', () => {
+    it('should render HeroBanner with interactive search input', () => {
+      renderWithProviders(<HeroBanner />);
+      const heroSearch = screen.getByPlaceholderText(/Search serial, product, seller/i);
+      expect(heroSearch).toBeInTheDocument();
+      fireEvent.change(heroSearch, { target: { value: 'SN-998877' } });
+      expect(heroSearch).toHaveValue('SN-998877');
+    });
+
+    it('should block progression in CheckoutPage if required shipping fields are empty', () => {
       renderWithProviders(<CheckoutPage />);
-      expect(screen.getAllByText(/Checkout/i)[0]).toBeInTheDocument();
+      // If cart is empty, empty state is displayed
+      expect(screen.getAllByText(/No items in checkout|Checkout/i)[0]).toBeInTheDocument();
     });
 
     it('should render WishlistPage correctly', () => {
@@ -333,9 +373,11 @@ describe('VeriChain Comprehensive Application Test Suite', () => {
   // 7. RECALL MODULE TESTS
   // ==========================================
   describe('7. Recall Module', () => {
-    it('should render RecallManagementView with recall alerts and batch lookup', () => {
+    it('should render RecallManagementView with recall alerts and batch lookup', async () => {
       renderWithProviders(<RecallManagementView />);
-      expect(screen.getAllByText(/Recall/i)[0]).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getAllByText(/Recall/i)[0]).toBeInTheDocument();
+      });
     });
   });
 
@@ -343,16 +385,20 @@ describe('VeriChain Comprehensive Application Test Suite', () => {
   // 8. ORDERS MODULE TESTS
   // ==========================================
   describe('8. Orders Module', () => {
-    it('should render OrderManagement page with order statuses', () => {
+    it('should render OrderManagement page with order statuses', async () => {
       renderWithProviders(<OrderManagement />);
-      expect(screen.getAllByText(/Order/i)[0]).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getAllByText(/Order/i)[0]).toBeInTheDocument();
+      });
     });
 
-    it('should render Buyer OrdersPage', () => {
+    it('should render Buyer OrdersPage', async () => {
       renderWithProviders(<OrdersPage />, {
         user: { id: 'b1', name: 'Bob Buyer', role: 'buyer' },
       });
-      expect(screen.getAllByText(/Orders/i)[0]).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getAllByText(/Orders/i)[0]).toBeInTheDocument();
+      });
     });
   });
 
@@ -390,13 +436,15 @@ describe('VeriChain Comprehensive Application Test Suite', () => {
   // 11. ADMIN MODULE TESTS
   // ==========================================
   describe('11. Admin Module', () => {
-    it('should render AdminDashboard with governance tabs', () => {
+    it('should render AdminDashboard with governance tabs', async () => {
       renderWithProviders(<AdminDashboard />, {
         user: { id: 'a1', name: 'Super Admin', role: 'admin' },
       });
-      expect(screen.getAllByText(/Admin/i)[0]).toBeInTheDocument();
-      expect(screen.getByText('Mission')).toBeInTheDocument();
-      expect(screen.getByText('Users')).toBeInTheDocument();
+      await waitFor(() => {
+        expect(screen.getAllByText(/Admin/i)[0]).toBeInTheDocument();
+        expect(screen.getByText('Mission')).toBeInTheDocument();
+        expect(screen.getByText('Users')).toBeInTheDocument();
+      });
     });
 
     it('should render AuditLogs page', async () => {

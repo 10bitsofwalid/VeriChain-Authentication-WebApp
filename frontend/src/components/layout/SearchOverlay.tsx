@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect, useRef } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Factory, PackageSearch, Search, ShieldCheck, Store, X } from 'lucide-react';
 import ActionButton from '../ui/ActionButton';
 import StatusChip from '../ui/StatusChip';
@@ -17,12 +17,31 @@ const resultGroups = [
   { label: 'Verify Serial', icon: ShieldCheck, to: '/verify', helper: 'Run authenticity check' },
 ];
 
+const recentSearches = ['AirPods Max', 'SN-0482', 'Certified leather'];
+
 export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
+  const navigate = useNavigate();
+  const [query, setQuery] = useState('');
   const panelRef = useRef<HTMLDivElement | null>(null);
   const previousActiveElement = useRef<HTMLElement | null>(null);
 
+  const handleExecuteSearch = (searchTerm?: string) => {
+    const term = (searchTerm !== undefined ? searchTerm : query).trim();
+    if (!term) return;
+
+    onClose();
+    if (/^SN-|\d{5,}/i.test(term)) {
+      navigate(`/verify?serial=${encodeURIComponent(term)}`);
+    } else {
+      navigate(`/dashboard/marketplace?search=${encodeURIComponent(term)}`);
+    }
+  };
+
   useEffect(() => {
-    if (!open) return;
+    if (!open) {
+      setQuery('');
+      return;
+    }
     previousActiveElement.current = document.activeElement as HTMLElement;
 
     // Focus input
@@ -72,19 +91,47 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   return (
     <div className="vc-search-overlay" role="dialog" aria-modal="true" aria-label="Global search">
       <div className="vc-search-panel" ref={panelRef}>
-        <div className="vc-search-input-row">
+        <form
+          className="vc-search-input-row"
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleExecuteSearch(query);
+          }}
+        >
           <Search size={20} aria-hidden="true" />
-          <input placeholder="Search products, factories, sellers, categories..." aria-label="Search keywords" />
-          <ActionButton variant="ghost" size="icon" onClick={onClose} aria-label="Close search">
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search products, factories, sellers, categories..."
+            aria-label="Search keywords"
+          />
+          <ActionButton variant="ghost" size="icon" onClick={onClose} aria-label="Close search" type="button">
             <X size={18} />
           </ActionButton>
-        </div>
+        </form>
 
         <div className="vc-search-meta">
           <StatusChip tone="info">Recent searches</StatusChip>
-          <span>AirPods Max</span>
-          <span>SN-0482</span>
-          <span>Certified leather</span>
+          {recentSearches.map((item) => (
+            <button
+              key={item}
+              type="button"
+              className="vc-search-chip-btn"
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'var(--text-secondary)',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                padding: '2px 6px',
+                borderRadius: 'var(--radius-sm)',
+                transition: 'color 0.15s ease',
+              }}
+              onClick={() => handleExecuteSearch(item)}
+            >
+              {item}
+            </button>
+          ))}
         </div>
 
         <div className="vc-search-results">

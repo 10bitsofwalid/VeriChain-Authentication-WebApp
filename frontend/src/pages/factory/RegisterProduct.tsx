@@ -1,13 +1,18 @@
 import { useState, useEffect, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
 import { Package, ArrowLeft, Loader, Plus, Trash2 } from 'lucide-react';
 import FileUpload from '../../components/FileUpload';
+import NavBar from '../../components/NavBar';
+import Footer from '../../components/Footer';
+import '../MarketplaceHome.css';
 
 export default function RegisterProduct() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const isStandalone = !location.pathname.startsWith('/dashboard');
   const { user, refreshUser } = useAuth();
 
   useEffect(() => {
@@ -61,8 +66,8 @@ export default function RegisterProduct() {
     }
   };
 
-  return (
-    <div className="animate-fade-in" style={{ maxWidth: 640 }}>
+  const formContent = (
+    <div className="animate-fade-in" style={{ maxWidth: 680, margin: isStandalone ? '0 auto' : undefined }}>
       <button
         onClick={() => navigate('/dashboard')}
         className="btn btn-ghost"
@@ -106,7 +111,7 @@ export default function RegisterProduct() {
           <textarea id="reg-desc" className="form-textarea" placeholder="Describe the product..." value={form.description} onChange={e => update('description', e.target.value)} required />
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 'var(--space-md)' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 'var(--space-md)' }}>
           <div className="form-group">
             <label className="form-label" htmlFor="reg-category">Category *</label>
             <input id="reg-category" className="form-input" placeholder="e.g. Electronics" value={form.category} onChange={e => update('category', e.target.value)} required />
@@ -166,4 +171,18 @@ export default function RegisterProduct() {
       </form>
     </div>
   );
+
+  if (isStandalone) {
+    return (
+      <div className="marketplace-home" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+        <NavBar />
+        <main className="page-container" style={{ flex: 1, padding: 'var(--space-xl) var(--space-md)' }}>
+          {formContent}
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return formContent;
 }

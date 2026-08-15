@@ -271,7 +271,7 @@ function getNavSections(role: string): NavSection[] {
   const accountSection: NavSection = {
     title: 'ACCOUNT',
     items: [
-      { to: '/dashboard', label: 'Notifications', icon: Bell, badge: '5' },
+      { to: '/trust-center', label: 'Notifications', icon: Bell },
       { to: '/buyer/profile', label: 'Profile', icon: UserCircle },
       { to: '/dashboard', label: 'Settings', icon: Settings },
     ],

@@ -203,9 +203,14 @@ export default function ProductDetailsPage() {
         type: 'ADD_TO_WISHLIST',
         payload: {
           id: product.id,
+          productId: product.id,
+          itemInstanceId: product.serialNumber ? product.id : undefined,
+          serialNumber: product.serialNumber,
+          sku: product.sku,
           name: product.name,
           price: Number(product.price) || 120,
           imageUrl: product.imageUrl,
+          verified: product.verifiedStatus === 'verified',
         },
       });
     }
@@ -217,9 +222,15 @@ export default function ProductDetailsPage() {
       type: 'ADD_TO_CART',
       payload: {
         id: product.id,
+        productId: product.id,
+        itemInstanceId: product.serialNumber ? product.id : undefined,
+        serialNumber: product.serialNumber,
+        sku: product.sku,
         name: product.name,
         price: Number(product.price) || 120,
         imageUrl: product.imageUrl,
+        quantity: 1,
+        verified: product.verifiedStatus === 'verified',
       },
     });
   };

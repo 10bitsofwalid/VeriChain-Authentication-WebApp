@@ -205,9 +205,18 @@ function AppRoutes() {
         <Route path="/buyer/profile" element={<ProfilePage />} />
         <Route path="/buyer/purchase-history" element={<PurchaseHistoryPage />} />
 
+        {/* Seller Sourcing within AppShell */}
+        <Route
+          path="/seller/sourcing"
+          element={
+            <ProtectedRoute roles={['seller']}>
+              <SellerSourcing />
+            </ProtectedRoute>
+          }
+        />
+
         <Route path="/dashboard/*" element={<Dashboard />} />
       </Route>
-        <Route path="/seller/sourcing" element={<ProtectedRoute roles={['seller']}><SellerSourcing /></ProtectedRoute>} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

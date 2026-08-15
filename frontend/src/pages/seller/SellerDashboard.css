@@ -67,6 +67,12 @@
   border-bottom: 2px solid var(--border-default);
   padding-bottom: 0;
   overflow-x: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.seller-tabs::-webkit-scrollbar {
+  display: none;
 }
 
 .seller-tab-btn {
