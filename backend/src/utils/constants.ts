@@ -5,7 +5,8 @@ export const RATE_LIMIT_WINDOW_MS = 15 * 60 * 1000; // 15 minutes
 
 export const authLimiter = {
   windowMs: RATE_LIMIT_WINDOW_MS,
-  max: 20,
+  max: process.env.AUTH_RATE_LIMIT_MAX ? parseInt(process.env.AUTH_RATE_LIMIT_MAX, 10) : 20,
+  skipSuccessfulRequests: true,
   message: {
     success: false,
     message: 'Too many login or signup attempts from this IP, please try again after 15 minutes',

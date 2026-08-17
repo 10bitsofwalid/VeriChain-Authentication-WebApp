@@ -70,8 +70,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(freshUser));
         return freshUser;
       }
-    } catch {
-      // Ignore network errors or unauthenticated state
+    } catch (err: any) {
+      if (err.response?.status === 401) {
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER);
+        setUser(null);
+        setToken(null);
+      }
     }
     return null;
   }, []);
@@ -113,8 +118,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
-    // Heartbeat sync every 15s to keep live status in sync without manual refresh
-    const intervalId = window.setInterval(handleSync, 15000);
+    // Heartbeat sync every 30s to keep live status in sync without unnecessary overhead
+    const intervalId = window.setInterval(handleSync, 30000);
 
     return () => {
       window.removeEventListener('focus', handleSync);

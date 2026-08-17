@@ -10,13 +10,12 @@ import { signToken } from '../utils/jwt';
 import { sendError } from '../utils/errorResponse';
 
 const router = Router();
-router.use(authLimiter);
 
 /* Duplicate schema definitions removed. Using schemas imported from '../validation/authSchemas'. */
 
 // @route   POST /api/auth/signup
 // @desc    Register a new buyer, seller, or factory
-router.post('/signup', validateRequest(signupSchema), async (req, res, next) => {
+router.post('/signup', authLimiter, validateRequest(signupSchema), async (req, res, next) => {
   try {
     const { name, email, password, role, factoryLocation, factoryCapacity, factoryCertificateNo, logoUrl, certificateUrl } = req.body;
 
@@ -68,7 +67,7 @@ router.post('/signup', validateRequest(signupSchema), async (req, res, next) => 
 
 // @route   POST /api/auth/login
 // @desc    Authenticate user and get token
-router.post('/login', validateRequest(loginSchema), async (req, res, next) => {
+router.post('/login', authLimiter, validateRequest(loginSchema), async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
@@ -186,7 +185,7 @@ router.post('/invite', protect, async (req: AuthRequest, res: Response, next) =>
 
 // @route   POST /api/auth/accept-invite
 // @desc    Accept invitation and activate account
-router.post('/accept-invite', validateRequest(acceptInviteSchema), async (req, res, next) => {
+router.post('/accept-invite', authLimiter, validateRequest(acceptInviteSchema), async (req, res, next) => {
   try {
     const { token, password } = req.body;
 

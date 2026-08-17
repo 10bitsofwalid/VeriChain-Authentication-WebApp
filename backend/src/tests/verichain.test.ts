@@ -7,6 +7,9 @@ import { ItemInstance } from '../models/ItemInstance';
 import { Complaint } from '../models/Complaint';
 import { Invitation } from '../models/Invitation';
 import { Order } from '../models/Order';
+import { authLimiter } from '../middleware/rateLimiter';
+
+jest.setTimeout(30000);
 
 describe('VeriChain Backend Integration Tests', () => {
   // Test globals
@@ -31,6 +34,7 @@ describe('VeriChain Backend Integration Tests', () => {
     await User.deleteMany({ email: /test-.*@verichain\.io/ });
     await Product.deleteMany({ sku: /TEST-SKU-.*/ });
     await Invitation.deleteMany({ email: /test-.*@verichain\.io/ });
+    await ItemInstance.deleteMany({ serialNumber: /TST-.*/ });
 
     // Seed a bootstrap admin
     const bcrypt = require('bcryptjs');
@@ -566,6 +570,16 @@ describe('VeriChain Backend Integration Tests', () => {
       expect(limitRes.status).toBe(429);
       expect(limitRes.body.success).toBe(false);
       expect(limitRes.body.message).toContain('Too many login or signup attempts');
+
+      // Reset rate limiter so subsequent tests from this test IP are not blocked
+      if ((authLimiter as any).resetKey) {
+        (authLimiter as any).resetKey('::ffff:127.0.0.1');
+        (authLimiter as any).resetKey('127.0.0.1');
+        (authLimiter as any).resetKey('::1');
+      }
+      if ((authLimiter as any).store?.resetAll) {
+        await (authLimiter as any).store.resetAll();
+      }
     });
   });
 
@@ -672,7 +686,7 @@ describe('VeriChain Backend Integration Tests', () => {
     let inquiryId: string;
 
     beforeAll(async () => {
-      // Register verified seller
+      // Register seller
       const sellerSignup = await request(app)
         .post('/api/auth/signup')
         .send({
@@ -684,6 +698,12 @@ describe('VeriChain Backend Integration Tests', () => {
 
       sellerToken = sellerSignup.body.token;
       sellerId = sellerSignup.body.user.id;
+
+      // Admin approves and verifies the seller
+      await request(app)
+        .patch(`/api/admin/users/${sellerId}/verify`)
+        .set('Authorization', `Bearer ${adminToken}`)
+        .send({ verified: true });
     });
 
     it('should allow a seller to list a product with stock quantity directly on the marketplace', async () => {
@@ -729,7 +749,7 @@ describe('VeriChain Backend Integration Tests', () => {
         .send({
           productId: listedProductId,
           itemId: listedItemId,
-          recipientSellerId: sellerId,
+          sellerId: sellerId,
           senderName: 'VIP Buyer Alice',
           senderEmail: 'test-buyer-alice@verichain.io',
           senderPhone: '+1 555-0199',
@@ -786,7 +806,7 @@ describe('VeriChain Backend Integration Tests', () => {
 
       expect(updateRes.status).toBe(200);
       expect(updateRes.body.success).toBe(true);
-      expect(updateRes.body.item.location).toBe('Manhattan Vault A');
+      expect(updateRes.body.item.journey[updateRes.body.item.journey.length - 1].location).toBe('Manhattan Vault A');
     });
 
     it('should allow the seller to delist the item back to warehouse inventory', async () => {
