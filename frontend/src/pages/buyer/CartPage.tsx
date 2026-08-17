@@ -236,9 +236,9 @@ export default function CartPage() {
           {/* Trust badges */}
           <div className="bx-card" style={{ padding: 'var(--space-md)' }}>
             {[
-              [<Lock size={16} color="var(--accent-cyan)" />, 'SSL Encrypted Checkout', '256-bit bank grade encryption'],
-              [<ShieldCheck size={16} color="#059669" />, 'Authenticity Guaranteed', 'Blockchain NFC & Serial verified'],
-              [<RotateCcw size={16} color="#06b6d4" />, '30-Day Easy Returns', '100% money back guarantee'],
+              [<Lock size={16} color="var(--accent-purple)" />, 'SSL Encrypted Checkout', '256-bit bank grade encryption'],
+              [<ShieldCheck size={16} color="#10B981" />, 'Authenticity Guaranteed', 'Blockchain NFC & Serial verified'],
+              [<RotateCcw size={16} color="var(--accent-primary)" />, '30-Day Easy Returns', '100% money back guarantee'],
             ].map(([icon, title, sub], i) => (
               <div key={i} style={{ display: 'flex', gap: '12px', alignItems: 'center', padding: '10px 0', borderBottom: i < 2 ? '1px solid var(--border-subtle)' : 'none' }}>
                 <div style={{ width: 34, height: 34, borderRadius: 'var(--radius-md)', background: 'var(--bg-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>

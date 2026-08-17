@@ -144,9 +144,9 @@ export default function AdminModerationView() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg, 20px)' }}>
       {toastMessage && (
         <div style={{
-          background: 'rgba(6, 182, 212, 0.15)',
-          border: '1px solid rgba(6, 182, 212, 0.4)',
-          color: '#38bdf8',
+          background: 'var(--accent-bg)',
+          border: '1px solid var(--accent-border)',
+          color: 'var(--text-primary)',
           padding: '12px 18px',
           borderRadius: 'var(--radius-md, 8px)',
           fontSize: '0.9rem',
@@ -179,7 +179,7 @@ export default function AdminModerationView() {
         <MetricCard
           label="Rejected Items"
           value={rejectedCount.toString()}
-          icon={<XCircle size={20} color="#8b5cf6" />}
+          icon={<XCircle size={20} color="var(--accent-purple)" />}
         />
       </div>
 
@@ -187,7 +187,7 @@ export default function AdminModerationView() {
       <div className="admin-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-            <FileCheck size={20} color="#06b6d4" />
+            <FileCheck size={20} color="var(--accent-primary)" />
             <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#f8fafc' }}>
               Moderation & Integrity Queue
             </h3>

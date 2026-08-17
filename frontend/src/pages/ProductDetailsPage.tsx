@@ -437,7 +437,7 @@ export default function ProductDetailsPage() {
               <div style={{ display: 'flex', gap: 'var(--space-sm)', marginTop: 'var(--space-md)', flexWrap: 'wrap' }}>
                 <button 
                   className="audit-report-btn" 
-                  style={{ flex: '1 1 140px', padding: '12px', justifyContent: 'center', background: 'var(--accent-primary, #06b6d4)', color: '#fff' }}
+                  style={{ flex: '1 1 140px', padding: '12px', justifyContent: 'center', background: 'var(--accent-gradient)', color: '#fff' }}
                   onClick={handleAddToCart}
                 >
                   <ShoppingBag size={16} />
@@ -445,7 +445,7 @@ export default function ProductDetailsPage() {
                 </button>
                 <button 
                   className="audit-report-btn" 
-                  style={{ flex: '1 1 140px', padding: '12px', justifyContent: 'center', background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(6, 182, 212, 0.2))', border: '1px solid rgba(6, 182, 212, 0.4)', color: '#fff' }}
+                  style={{ flex: '1 1 140px', padding: '12px', justifyContent: 'center', background: 'var(--accent-bg)', border: '1px solid var(--accent-border)', color: 'var(--text-primary)' }}
                   onClick={() => setShowContactModal(true)}
                   title="Contact Seller Directly"
                 >

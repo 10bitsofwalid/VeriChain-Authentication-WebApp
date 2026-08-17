@@ -33,9 +33,9 @@ export default function AnalyticsView() {
   }, []);
 
   const kpis = [
-    { label: 'Catalog SKUs', value: productCount.toString(), color: '#8b5cf6', icon: Package },
-    { label: 'Verified Products', value: verifiedCount.toString(), color: '#10b981', icon: ShieldCheck },
-    { label: 'Pending Verification', value: (productCount - verifiedCount).toString(), color: '#f59e0b', icon: ShoppingCart },
+    { label: 'Catalog SKUs', value: productCount.toString(), color: '#1A2B4C', icon: Package },
+    { label: 'Verified Products', value: verifiedCount.toString(), color: '#10B981', icon: ShieldCheck },
+    { label: 'Pending Verification', value: (productCount - verifiedCount).toString(), color: '#F5A623', icon: ShoppingCart },
   ];
 
   return (
@@ -55,12 +55,12 @@ export default function AnalyticsView() {
         {/* Verification Ratio */}
         <div className="fd-card">
           <div className="fd-section-hd" style={{ marginBottom: 'var(--space-lg)' }}>
-            <h2><BarChart2 size={16} color="#8b5cf6" /> Ledger Verification Health</h2>
+            <h2><BarChart2 size={16} color="var(--accent-purple)" /> Ledger Verification Health</h2>
           </div>
           <div style={{ padding: 'var(--space-md) 0' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
               <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text-primary)' }}>Cryptographic Verification Rate</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: '#10b981' }}>
+              <span style={{ fontSize: 13, fontWeight: 700, color: '#10B981' }}>
                 {productCount > 0 ? Math.round((verifiedCount / productCount) * 100) : 100}%
               </span>
             </div>
@@ -69,7 +69,7 @@ export default function AnalyticsView() {
                 className="fd-progress-fill"
                 style={{
                   width: `${productCount > 0 ? (verifiedCount / productCount) * 100 : 100}%`,
-                  background: '#10b981',
+                  background: '#10B981',
                 }}
               />
             </div>
@@ -82,7 +82,7 @@ export default function AnalyticsView() {
         {/* Top Factory Products Table */}
         <div className="fd-card">
           <div className="fd-section-hd" style={{ marginBottom: 'var(--space-md)' }}>
-            <h2><TrendingUp size={16} color="#06b6d4" /> Registered Products</h2>
+            <h2><TrendingUp size={16} color="var(--accent-primary)" /> Registered Products</h2>
           </div>
           <table className="fd-table" style={{ fontSize: 13 }}>
             <thead>

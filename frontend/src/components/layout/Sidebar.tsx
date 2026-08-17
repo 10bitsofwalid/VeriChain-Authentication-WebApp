@@ -156,7 +156,7 @@ export default function Sidebar({
                 <span>Ledger Network</span>
                 <span className="vc-trust-badge">Active</span>
               </div>
-              <strong style={{ fontSize: '0.85rem', color: 'var(--accent-cyan, #06b6d4)' }}>VRC-721 Consensus</strong>
+              <strong style={{ fontSize: '0.85rem', color: 'var(--accent-purple)' }}>VRC-721 Consensus</strong>
               <div className="vc-trust-meter" aria-hidden="true">
                 <span style={{ width: '100%' }} />
               </div>

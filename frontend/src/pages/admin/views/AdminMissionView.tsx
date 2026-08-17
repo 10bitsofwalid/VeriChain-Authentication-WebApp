@@ -105,16 +105,16 @@ export default function AdminMissionView() {
       {/* Toast Notification */}
       {actionSuccess && (
         <div style={{
-          background: 'rgba(6, 182, 212, 0.15)',
-          border: '1px solid rgba(6, 182, 212, 0.4)',
-          color: '#38bdf8',
+          background: 'var(--accent-bg)',
+          border: '1px solid var(--accent-border)',
+          color: 'var(--text-primary)',
           padding: '12px 18px',
           borderRadius: 'var(--radius-md, 8px)',
           fontSize: '0.9rem',
           display: 'flex',
           alignItems: 'center',
           gap: 10,
-          boxShadow: '0 4px 14px rgba(6, 182, 212, 0.2)',
+          boxShadow: 'var(--shadow-sm)',
         }}>
           <CheckCircle2 size={18} />
           <span>{actionSuccess}</span>
@@ -126,7 +126,7 @@ export default function AdminMissionView() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
-              <ShieldCheck size={26} color="#06b6d4" />
+              <ShieldCheck size={26} color="var(--accent-primary)" />
               <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
                 VeriChain Platform Mission & Integrity
               </h2>
@@ -169,13 +169,13 @@ export default function AdminMissionView() {
           label="Decentralized Ledger Items"
           value={liveStats.totalItems.toString()}
           trend="Live Serialized Units"
-          icon={<Zap size={20} color="#06b6d4" />}
+          icon={<Zap size={20} color="var(--accent-primary)" />}
         />
         <MetricCard
           label="Verified Products"
           value={liveStats.verifiedProducts.toString()}
           trend={`${liveStats.verifiedPartners} Verified Partners`}
-          icon={<Server size={20} color="#8b5cf6" />}
+          icon={<Server size={20} color="var(--accent-purple)" />}
         />
         <MetricCard
           label="Fraud & Recall Status"
@@ -189,7 +189,7 @@ export default function AdminMissionView() {
         <div className="admin-card-header">
           <div>
             <h3 className="admin-card-title">
-              <SlidersHorizontal size={18} color="#06b6d4" />
+              <SlidersHorizontal size={18} color="var(--accent-primary)" />
               Mission Real-Time Control & Telemetry Log
             </h3>
             <p className="admin-card-subtitle">Live security signals, blockchain consensus events, and system alerts</p>

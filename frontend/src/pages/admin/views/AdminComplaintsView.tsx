@@ -113,9 +113,9 @@ export default function AdminComplaintsView() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg, 20px)' }}>
       {toastMessage && (
         <div style={{
-          background: 'rgba(6, 182, 212, 0.15)',
-          border: '1px solid rgba(6, 182, 212, 0.4)',
-          color: '#38bdf8',
+          background: 'var(--accent-bg)',
+          border: '1px solid var(--accent-border)',
+          color: 'var(--text-primary)',
           padding: '12px 18px',
           borderRadius: 'var(--radius-md, 8px)',
           fontSize: '0.9rem',
@@ -138,7 +138,7 @@ export default function AdminComplaintsView() {
         <MetricCard
           label="Under Review"
           value={underReviewCount.toString()}
-          icon={<Clock size={20} color="#06b6d4" />}
+          icon={<Clock size={20} color="var(--accent-primary)" />}
         />
         <MetricCard
           label="Resolved Disputes"
@@ -224,7 +224,7 @@ export default function AdminComplaintsView() {
                 filtered.map(c => (
                   <tr key={c.id}>
                     <td>
-                      <span style={{ fontFamily: 'monospace', fontWeight: 700, color: '#38bdf8' }}>
+                      <span style={{ fontFamily: 'monospace', fontWeight: 700, color: 'var(--accent-purple)' }}>
                         {c.ticketNo}
                       </span>
                     </td>

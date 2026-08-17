@@ -42,8 +42,8 @@
   align-items: center;
   background: var(--accent-gradient);
   border-radius: 16px;
-  box-shadow: 0 12px 26px rgba(91, 95, 239, 0.22);
-  color: white;
+  box-shadow: 0 8px 20px rgba(22, 35, 59, 0.25);
+  color: #F59E0B;
   display: inline-flex;
   height: 42px;
   justify-content: center;
@@ -73,7 +73,7 @@
   color: var(--text-secondary);
   display: inline-flex;
   font-size: 0.875rem;
-  font-weight: 800;
+  font-weight: 700;
   padding: 0.65rem 0.85rem;
   text-decoration: none;
   transition: background var(--transition-fast), color var(--transition-fast);
@@ -83,7 +83,7 @@
 .navbar-links a.active,
 .navbar-links a:hover {
   background: var(--accent-bg);
-  color: var(--accent-primary);
+  color: #16233B;
 }
 
 .navbar-search {
@@ -97,6 +97,13 @@
   min-height: 40px;
   padding: 0 0.8rem;
   width: min(240px, 22vw);
+  transition: all var(--transition-fast);
+}
+
+.navbar-search:focus-within {
+  border-color: var(--accent-purple);
+  box-shadow: var(--vc-focus-ring);
+  background: var(--bg-card);
 }
 
 .navbar-search input,
@@ -127,7 +134,7 @@
 }
 
 .navbar-menu:hover {
-  background: rgba(91, 95, 239, 0.08);
+  background: var(--accent-bg);
 }
 
 @media (max-width: 1060px) {
@@ -170,7 +177,7 @@
 .navbar-brand:focus-visible,
 .navbar-menu:focus-visible,
 .navbar-links a:focus-visible {
-  outline: 2px solid var(--accent-cyan);
+  outline: 2px solid var(--accent-purple);
   outline-offset: 2px;
 }
 
@@ -182,4 +189,3 @@
     align-items: center;
   }
 }
-

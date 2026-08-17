@@ -60,11 +60,11 @@ export default function InventoryView() {
   const totalUnits = items.reduce((s, i) => s + i.qty, 0);
 
   const stats = [
-    { label: 'Total SKUs',   value: totalSKUs.toString(), icon: Package,     color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
+    { label: 'Total SKUs',   value: totalSKUs.toString(), icon: Package,     color: 'var(--accent-primary)', bg: 'rgba(26, 43, 76, 0.1)' },
     { label: 'In Stock',     value: inStock.toString(),   icon: CheckCircle, color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-    { label: 'Low Stock',    value: lowStock.toString(),  icon: AlertCircle, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+    { label: 'Low Stock',    value: lowStock.toString(),  icon: AlertCircle, color: '#F5A623', bg: 'rgba(245, 166, 35, 0.15)' },
     { label: 'Out of Stock', value: outOfStock.toString(),icon: Clock,       color: '#ef4444', bg: 'rgba(239,68,68,0.12)' },
-    { label: 'Total Units',  value: totalUnits.toString(),icon: Zap,         color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+    { label: 'Total Units',  value: totalUnits.toString(),icon: Zap,         color: 'var(--accent-purple)', bg: 'var(--accent-bg)' },
   ];
 
   const filtered = items.filter(item => {
@@ -118,7 +118,7 @@ export default function InventoryView() {
 
       {/* Table */}
       <div className="fd-section-hd">
-        <h2><Package size={16} color="#06b6d4" /> Inventory Items</h2>
+        <h2><Package size={16} color="var(--accent-primary)" /> Inventory Items</h2>
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{filtered.length} items</span>
       </div>
       <div className="fd-table-wrap">

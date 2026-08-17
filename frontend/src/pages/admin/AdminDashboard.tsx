@@ -107,7 +107,7 @@ export default function AdminDashboard() {
             <span className="admin-pulse-dot" />
             <span>Consensus Cluster Active</span>
           </div>
-          <div className="admin-status-pill" style={{ background: 'rgba(6, 182, 212, 0.12)', color: '#06b6d4', borderColor: 'rgba(6, 182, 212, 0.3)' }}>
+          <div className="admin-status-pill" style={{ background: 'var(--accent-bg)', color: 'var(--accent-purple)', borderColor: 'var(--accent-border)' }}>
             <Sparkles size={14} />
             <span>AI Moderation V2.4</span>
           </div>

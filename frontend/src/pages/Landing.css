@@ -1,5 +1,5 @@
 /* ============================================================
-   Landing Page Styles
+   Landing Page Styles — Palette 02 Symmetrical Design
    ============================================================ */
 
 .landing {
@@ -17,7 +17,7 @@
   background: var(--bg-glass);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border-subtle);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .landing-nav-inner {
@@ -34,12 +34,12 @@
   align-items: center;
   gap: 8px;
   font-size: 20px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
 }
 
 .landing-logo svg {
-  color: var(--accent-cyan);
+  color: var(--accent-purple);
 }
 
 .landing-nav-links {
@@ -68,8 +68,8 @@
   width: 800px;
   height: 600px;
   background: radial-gradient(ellipse at center,
-    rgba(0, 88, 188, 0.06) 0%,
-    rgba(0, 112, 235, 0.03) 50%,
+    rgba(245, 158, 11, 0.12) 0%,
+    rgba(22, 35, 59, 0.18) 50%,
     transparent 70%);
   pointer-events: none;
   filter: blur(60px);
@@ -86,18 +86,18 @@
   align-items: center;
   gap: 6px;
   padding: 6px 16px;
-  background: rgba(6, 182, 212, 0.1);
-  border: 1px solid rgba(6, 182, 212, 0.2);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
   border-radius: var(--radius-full);
   font-size: 13px;
-  font-weight: 500;
-  color: var(--accent-cyan);
+  font-weight: 700;
+  color: var(--text-primary);
   margin-bottom: var(--space-lg);
 }
 
 .hero-title {
   font-size: 64px;
-  font-weight: 800;
+  font-weight: 900;
   line-height: 1.1;
   letter-spacing: -0.03em;
   margin-bottom: var(--space-lg);
@@ -135,11 +135,8 @@
 
 .hero-stat-value {
   font-size: 28px;
-  font-weight: 700;
-  background: var(--accent-gradient);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-weight: 800;
+  color: #16233B;
 }
 
 .hero-stat-label {
@@ -172,7 +169,7 @@
 
 .feature-card h3 {
   font-size: 18px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   margin-bottom: var(--space-sm);
 }
@@ -191,6 +188,9 @@
   align-items: center;
   justify-content: center;
   margin-bottom: var(--space-md);
+  background: var(--accent-bg);
+  color: var(--accent-purple);
+  border: 1px solid var(--accent-border);
 }
 
 /* --- CTA --- */
@@ -212,7 +212,7 @@
 
 .cta-card h2 {
   font-size: 32px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
   margin-bottom: var(--space-md);
 }
@@ -225,8 +225,9 @@
 
 /* --- Footer --- */
 .landing-footer {
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-default);
   padding: var(--space-xl) 32px;
+  background: var(--bg-secondary);
 }
 
 .landing-footer-inner {
@@ -241,12 +242,12 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-secondary);
 }
 
 .footer-brand svg {
-  color: var(--accent-cyan);
+  color: var(--accent-purple);
 }
 
 .landing-footer p {

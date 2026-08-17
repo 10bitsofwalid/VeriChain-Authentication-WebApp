@@ -397,10 +397,10 @@ export default function OrderManagement() {
         <div className="om-order-chips">
           {orders.map((ord, idx) => {
             const isActive = idx === selectedOrderIndex;
-            let statusColor = '#3b82f6';
-            if (ord.status === 'shipped') statusColor = '#6366f1';
-            if (ord.status === 'delivered') statusColor = '#10b981';
-            if (ord.status === 'processing') statusColor = '#f59e0b';
+            let statusColor = '#1A2B4C';
+            if (ord.status === 'shipped') statusColor = '#1A2B4C';
+            if (ord.status === 'delivered') statusColor = '#10B981';
+            if (ord.status === 'processing') statusColor = '#F5A623';
 
             return (
               <button
@@ -425,7 +425,7 @@ export default function OrderManagement() {
           <div className="om-panel-header">
             <div className="om-panel-title-group">
               <div className="om-panel-icon buyer">
-                <User size={18} color="var(--accent-cyan)" />
+                <User size={18} color="var(--accent-primary)" />
               </div>
               <div>
                 <div className="om-panel-title">Buyer Information</div>
@@ -464,7 +464,7 @@ export default function OrderManagement() {
           <div className="om-panel-header">
             <div className="om-panel-title-group">
               <div className="om-panel-icon seller">
-                <ShoppingBag size={18} color="#8b5cf6" />
+                <ShoppingBag size={18} color="var(--accent-purple)" />
               </div>
               <div>
                 <div className="om-panel-title">Authorized Merchant</div>
@@ -478,7 +478,7 @@ export default function OrderManagement() {
 
           <div className="om-panel-body">
             <div className="om-avatar">
-              <div className="om-avatar-img" style={{ background: 'rgba(139, 92, 246, 0.15)', color: '#8b5cf6' }}>
+              <div className="om-avatar-img" style={{ background: 'var(--accent-bg)', color: 'var(--accent-purple)' }}>
                 {order.seller.avatarInitials}
               </div>
               <div className="om-avatar-info">
@@ -490,7 +490,7 @@ export default function OrderManagement() {
             <div className="om-field-group">
               <div className="om-field">
                 <span className="om-field-label">Fulfillment Quality</span>
-                <span className="om-field-val" style={{ color: '#10b981' }}>{order.seller.fulfillmentRate}</span>
+                <span className="om-field-val" style={{ color: '#10B981' }}>{order.seller.fulfillmentRate}</span>
               </div>
               <div className="om-field">
                 <span className="om-field-label">Dispatch Node</span>
@@ -505,7 +505,7 @@ export default function OrderManagement() {
           <div className="om-panel-header">
             <div className="om-panel-title-group">
               <div className="om-panel-icon factory">
-                <Building size={18} color="#10b981" />
+                <Building size={18} color="#10B981" />
               </div>
               <div>
                 <div className="om-panel-title">Manufacturing Origin</div>
@@ -517,7 +517,7 @@ export default function OrderManagement() {
 
           <div className="om-panel-body">
             <div className="om-avatar">
-              <div className="om-avatar-img" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
+              <div className="om-avatar-img" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10B981' }}>
                 FO
               </div>
               <div className="om-avatar-info">
@@ -529,7 +529,7 @@ export default function OrderManagement() {
             <div className="om-field-group">
               <div className="om-field">
                 <span className="om-field-label">Quality Score</span>
-                <span className="om-field-val" style={{ color: '#10b981' }}>{order.factory.qcScore} PASS</span>
+                <span className="om-field-val" style={{ color: '#10B981' }}>{order.factory.qcScore} PASS</span>
               </div>
               <div className="om-field">
                 <span className="om-field-label">NFC Seal ID</span>
@@ -546,7 +546,7 @@ export default function OrderManagement() {
           <div className="om-panel-header" style={{ marginBottom: 'var(--space-lg)' }}>
             <div className="om-panel-title-group">
               <div className="om-panel-icon shipment">
-                <Truck size={18} color="#06b6d4" />
+                <Truck size={18} color="var(--accent-primary)" />
               </div>
               <div>
                 <div className="om-panel-title">Logistics & Custody Verification</div>

@@ -1,51 +1,70 @@
 :root {
   color-scheme: light;
 
-  /* Primary brand (rose-red) */
-  --vc-color-primary: #e11d48;
-  --vc-color-primary-rgb: 225, 29, 72;
-  --vc-color-secondary: #475467;
-  --vc-color-accent: #0f172a;
+  /* ============================================================
+     Palette 02 Brand Definitions (Bauhaus / Architectural Modern)
+     ============================================================ */
+  /* Swatch 1: Onyx Black */
+  --vc-color-onyx: #0B0F19;
+  --vc-color-onyx-rgb: 11, 15, 25;
 
-  /* Base palette - Light mode */
-  --vc-color-bg: #f8fafc;
-  --vc-color-surface: #ffffff;
-  --vc-color-surface-soft: rgba(255, 255, 255, 0.72);
-  --vc-color-surface-muted: #f1f5f9;
+  /* Swatch 2: Architectural Navy */
+  --vc-color-navy: #16233B;
+  --vc-color-navy-rgb: 22, 35, 59;
+  --vc-color-primary: #16233B;
+  --vc-color-primary-rgb: 22, 35, 59;
 
-  /* Text - Light mode */
-  --vc-color-text-primary: #0f172a;
-  --vc-color-text-secondary: #475467;
-  --vc-color-text-muted: #64748b;
-  --vc-color-text-inverse: #ffffff;
+  /* Swatch 3: Warm Marigold / Amber */
+  --vc-color-marigold: #F59E0B;
+  --vc-color-marigold-rgb: 245, 158, 11;
+  --vc-color-accent: #F59E0B;
+  --vc-color-accent-rgb: 245, 158, 11;
+  --vc-color-accent-hover: #D97706;
+
+  /* Swatch 4: Muted Mist Gray */
+  --vc-color-mist-gray: #ECEFF3;
+  --vc-color-border-gray: #DFE3E8;
+  --vc-color-surface-muted: #ECEFF3;
+
+  /* Swatch 5: Pure White */
+  --vc-color-white: #FFFFFF;
+  --vc-color-surface: #FFFFFF;
+  --vc-color-surface-soft: rgba(255, 255, 255, 0.95);
+
+  /* Canvas Base — Light Bauhaus Canvas */
+  --vc-color-bg: #F4F6F9;
+  --vc-surface-bg: #F4F6F9;
+  --vc-surface-card: #FFFFFF;
+  --vc-surface-elevated: #FFFFFF;
+  --vc-surface-floating: #FFFFFF;
+  --vc-surface-modal: #FFFFFF;
+  --vc-surface-popover: #FFFFFF;
+  --vc-surface-tooltip: #0B0F19;
+
+  /* Typography */
+  --vc-color-text-primary: #0B0F19;
+  --vc-color-text-secondary: #334155;
+  --vc-color-text-muted: #64748B;
+  --vc-color-text-inverse: #FFFFFF;
 
   /* Semantic colors */
-  --vc-color-success: #16a34a;
-  --vc-color-success-bg: rgba(22, 163, 74, 0.08);
-  --vc-color-success-text: #15803d;
+  --vc-color-success: #10B981;
+  --vc-color-success-bg: rgba(16, 185, 129, 0.1);
+  --vc-color-success-text: #047857;
 
-  --vc-color-warning: #ea580c;
-  --vc-color-warning-bg: rgba(234, 88, 12, 0.08);
-  --vc-color-warning-text: #c2410c;
+  --vc-color-warning: #F59E0B;
+  --vc-color-warning-bg: rgba(245, 158, 11, 0.12);
+  --vc-color-warning-text: #B45309;
 
-  --vc-color-danger: #dc2626;
-  --vc-color-danger-bg: rgba(220, 38, 38, 0.08);
-  --vc-color-danger-text: #b91c1c;
+  --vc-color-danger: #EF4444;
+  --vc-color-danger-bg: rgba(239, 68, 68, 0.1);
+  --vc-color-danger-text: #B91C1C;
 
-  --vc-color-info: #2563eb;
-  --vc-color-info-bg: rgba(37, 99, 235, 0.08);
-  --vc-color-info-text: #1d4ed8;
+  --vc-color-info: #16233B;
+  --vc-color-info-bg: rgba(22, 35, 59, 0.08);
+  --vc-color-info-text: #16233B;
 
-  /* Surface layered system */
-  --vc-surface-bg: var(--vc-color-bg);
-  --vc-surface-card: var(--vc-color-surface);
-  --vc-surface-elevated: #ffffff;
-  --vc-surface-floating: #ffffff;
-  --vc-surface-modal: #ffffff;
-  --vc-surface-popover: #ffffff;
-  --vc-surface-tooltip: #0f172a;
-
-  /* Spacing system */
+  /* Spacing system (symmetrical 4px baseline) */
   --vc-space-1: 0.25rem;  /* 4px */
   --vc-space-2: 0.5rem;   /* 8px */
   --vc-space-3: 0.75rem;  /* 12px */
@@ -59,20 +78,20 @@
   --vc-space-20: 5rem;    /* 80px */
 
   /* Radius system */
-  --vc-radius-sm: 6px;
-  --vc-radius-md: 10px;
+  --vc-radius-sm: 8px;
+  --vc-radius-md: 12px;
   --vc-radius-lg: 16px;
   --vc-radius-xl: 24px;
   --vc-radius-full: 9999px;
 
-  /* Shadows (soft edges) */
-  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.03);
-  --shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.04), 0 1px 2px rgba(15, 23, 42, 0.02);
-  --shadow-md: 0 6px 16px rgba(15, 23, 42, 0.05), 0 2px 4px rgba(15, 23, 42, 0.02);
-  --shadow-lg: 0 12px 32px rgba(15, 23, 42, 0.06), 0 4px 10px rgba(15, 23, 42, 0.03);
-  --shadow-xl: 0 24px 48px rgba(15, 23, 42, 0.08), 0 6px 18px rgba(15, 23, 42, 0.04);
-  --shadow-glow: 0 20px 40px rgba(225, 29, 72, 0.05);
-  --shadow-glow-accent: 0 20px 48px rgba(225, 29, 72, 0.08);
+  /* Shadows (symmetrical soft architectural edges) */
+  --shadow-xs: 0 1px 2px rgba(11, 15, 25, 0.04);
+  --shadow-sm: 0 2px 6px rgba(11, 15, 25, 0.05), 0 1px 2px rgba(11, 15, 25, 0.03);
+  --shadow-md: 0 6px 16px rgba(22, 35, 59, 0.08), 0 2px 4px rgba(11, 15, 25, 0.03);
+  --shadow-lg: 0 12px 32px rgba(22, 35, 59, 0.12), 0 4px 10px rgba(11, 15, 25, 0.04);
+  --shadow-xl: 0 24px 48px rgba(22, 35, 59, 0.16), 0 6px 18px rgba(11, 15, 25, 0.06);
+  --shadow-glow: 0 20px 40px rgba(245, 158, 11, 0.15);
+  --shadow-glow-accent: 0 20px 48px rgba(245, 158, 11, 0.25);
 
   --vc-shadow-sm: var(--shadow-sm);
   --vc-shadow-md: var(--shadow-md);
@@ -80,9 +99,10 @@
   --vc-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 
   /* Border system */
-  --border-subtle: rgba(226, 232, 240, 0.4);
-  --border-default: rgba(226, 232, 240, 0.8);
-  --border-strong: rgba(203, 213, 225, 1);
+  --border-subtle: rgba(223, 227, 232, 0.6);
+  --border-default: #DFE3E8;
+  --border-strong: #CBD5E1;
+  --border-accent: rgba(245, 158, 11, 0.35);
 
   --vc-color-border: var(--border-default);
   --vc-color-border-muted: var(--border-subtle);
@@ -91,42 +111,51 @@
   --vc-transition-fast: 150ms cubic-bezier(0.16, 1, 0.3, 1);
   --vc-transition-base: 250ms cubic-bezier(0.16, 1, 0.3, 1);
   --vc-transition-slow: 350ms cubic-bezier(0.16, 1, 0.3, 1);
+
   /* Component Variant Tokens */
   /* Buttons */
-  --vc-button-bg-primary: var(--vc-color-primary);
-  --vc-button-bg-primary-hover: var(--vc-color-primary-rgb);
-  --vc-button-bg-secondary: var(--vc-color-secondary);
+  --vc-button-bg-primary: #16233B;
+  --vc-button-bg-primary-hover: #0B0F19;
+  --vc-button-bg-secondary: #FFFFFF;
+  --vc-button-bg-accent: #F59E0B;
+  --vc-button-bg-accent-hover: #D97706;
   --vc-button-bg-outline: transparent;
-  --vc-button-text-primary: var(--vc-color-inverse);
-  --vc-button-text-secondary: var(--vc-color-primary);
-  --vc-button-border-radius: var(--vc-radius-md);
-  --vc-button-padding-sm: var(--vc-space-2) var(--vc-space-3);
-  --vc-button-padding-md: var(--vc-space-3) var(--vc-space-4);
-  --vc-button-padding-lg: var(--vc-space-4) var(--vc-space-5);
+  --vc-button-text-primary: #FFFFFF;
+  --vc-button-text-secondary: #16233B;
+  --vc-button-text-accent: #0B0F19;
+  --vc-button-border-radius: var(--vc-radius-full);
+  --vc-button-padding-sm: 6px 14px;
+  --vc-button-padding-md: 10px 22px;
+  --vc-button-padding-lg: 12px 28px;
+
   /* Cards */
-  --vc-card-bg: var(--vc-color-surface);
-  --vc-card-bg-elevated: var(--vc-color-surface-soft);
+  --vc-card-bg: #FFFFFF;
+  --vc-card-bg-elevated: #FFFFFF;
   --vc-card-border-radius: var(--vc-radius-lg);
   --vc-card-shadow-elevated: var(--vc-shadow-md);
   --vc-card-shadow-outlined: var(--vc-shadow-sm);
   --vc-card-shadow-glass: var(--vc-shadow-lg);
+
   /* Inputs */
-  --vc-input-bg: var(--vc-color-surface-muted);
-  --vc-input-border: var(--border-default);
+  --vc-input-bg: #ECEFF3;
+  --vc-input-border: #DFE3E8;
   --vc-input-border-radius: var(--vc-radius-md);
   --vc-input-padding: var(--vc-space-3);
   --vc-input-focus-ring: var(--vc-focus-ring);
+
   /* Badges */
   --vc-badge-bg-primary: var(--vc-color-primary);
   --vc-badge-bg-success: var(--vc-color-success);
   --vc-badge-bg-warning: var(--vc-color-warning);
   --vc-badge-bg-danger: var(--vc-color-danger);
-  --vc-badge-text: var(--vc-color-inverse);
+  --vc-badge-text: var(--vc-color-text-inverse);
   --vc-badge-border-radius: var(--vc-radius-full);
+
   /* Icons */
   --vc-icon-size-sm: 1rem;
   --vc-icon-size-md: 1.5rem;
   --vc-icon-size-lg: 2rem;
+
   /* Animations */
   --vc-animation-fade-in: opacity 0.2s var(--vc-transition-fast);
   --vc-animation-fade-out: opacity 0.2s var(--vc-transition-fast);
@@ -140,28 +169,29 @@
   --vc-layout-max: 1400px;
 
   /* Typography */
-  --vc-font-sans: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
-  --vc-font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  --vc-font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --vc-font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   --vc-line-height-tight: 1.1;
   --vc-line-height-base: 1.5;
 
   /* Focus ring */
-  --vc-focus-ring: 0 0 0 2px var(--vc-surface-card), 0 0 0 4px var(--vc-color-primary);
+  --vc-focus-ring: 0 0 0 2px #FFFFFF, 0 0 0 4px #F59E0B;
 
   /* Gradients */
-  --vc-gradient-primary: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
-  --vc-gradient-soft: linear-gradient(135deg, rgba(225, 29, 72, 0.08), rgba(225, 29, 72, 0.02));
-  --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(225, 29, 72, 0.03), transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(225, 29, 72, 0.04), transparent 28%),
-    linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  --vc-gradient-primary: linear-gradient(135deg, #16233B 0%, #0B0F19 100%);
+  --vc-gradient-accent: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --vc-gradient-soft: linear-gradient(135deg, rgba(245, 158, 11, 0.12), rgba(22, 35, 59, 0.04));
+  --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(245, 158, 11, 0.08), transparent 35%),
+    radial-gradient(circle at 86% 8%, rgba(22, 35, 59, 0.06), transparent 30%),
+    linear-gradient(135deg, #F4F6F9 0%, #E9EDF3 100%);
 
   /* Dashboard Analytics Color Mapping */
-  --color-revenue: #2563eb;
-  --color-trust: #16a34a;
-  --color-risk: #ea580c;
-  --color-counterfeit: #dc2626;
-  --color-pending: #ca8a04;
-  --color-neutral: #64748b;
+  --color-revenue: #16233B;
+  --color-trust: #10B981;
+  --color-risk: #F59E0B;
+  --color-counterfeit: #EF4444;
+  --color-pending: #F59E0B;
+  --color-neutral: #64748B;
 
   /* Status Colors */
   --color-verified: var(--color-trust);
@@ -171,50 +201,53 @@
   --color-expired: var(--color-neutral);
   --color-outofstock: var(--color-neutral);
   --color-lowstock: var(--color-risk);
-  --color-highdemand: #8b5cf6;
+  --color-highdemand: #F59E0B;
 
   /* Aliases (maintain compatibility) */
-  --bg-primary: var(--vc-surface-bg);
-  --bg-secondary: var(--vc-color-surface-muted);
-  --bg-tertiary: var(--vc-surface-elevated);
-  --bg-card: var(--vc-surface-card);
-  --bg-card-hover: var(--vc-surface-elevated);
-  --bg-glass: rgba(255, 255, 255, 0.72);
-  --bg-input: var(--vc-color-surface-muted);
-  --bg-skeleton: #e2e8f0;
+  --bg-primary: #F4F6F9;
+  --bg-secondary: #ECEFF3;
+  --bg-tertiary: #DFE3E8;
+  --bg-card: #FFFFFF;
+  --bg-card-hover: #FFFFFF;
+  --bg-glass: rgba(255, 255, 255, 0.88);
+  --bg-input: #ECEFF3;
+  --bg-skeleton: #DFE3E8;
 
-  --text-primary: var(--vc-color-text-primary);
-  --text-secondary: var(--vc-color-text-secondary);
-  --text-muted: var(--vc-color-text-muted);
-  --text-inverse: var(--vc-color-text-inverse);
+  --text-primary: #0B0F19;
+  --text-secondary: #334155;
+  --text-muted: #64748B;
+  --text-inverse: #FFFFFF;
 
-  --accent: var(--vc-color-primary);
-  --accent-bg: rgba(225, 29, 72, 0.08);
-  --accent-border: rgba(225, 29, 72, 0.16);
-  --accent-primary: var(--vc-color-primary);
-  --accent-cyan: var(--vc-color-primary);
-  --accent-purple: #be123c;
-  --accent-gradient: var(--vc-gradient-primary);
-  --accent-gradient-hover: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);
-  --accent-success: var(--vc-color-success);
-  --accent-warning: var(--vc-color-warning);
-  --accent-danger: var(--vc-color-danger);
+  --accent: #F59E0B;
+  --accent-bg: rgba(245, 158, 11, 0.12);
+  --accent-border: rgba(245, 158, 11, 0.28);
+  --accent-primary: #16233B;
+  --accent-cyan: #16233B;
+  --accent-purple: #F59E0B;
+  --accent-gold: #F59E0B;
+  --accent-gradient: linear-gradient(135deg, #16233B 0%, #0B0F19 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #203254 0%, #16233B 100%);
+  --accent-gold-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --accent-success: #10B981;
+  --accent-warning: #F59E0B;
+  --accent-danger: #EF4444;
 
-  --color-success: var(--vc-color-success);
-  --color-success-bg: var(--vc-color-success-bg);
-  --color-success-text: var(--vc-color-success-text);
-  --color-warning: var(--vc-color-warning);
-  --color-warning-bg: var(--vc-color-warning-bg);
-  --color-danger: var(--vc-color-danger);
-  --color-danger-bg: var(--vc-color-danger-bg);
-  --color-danger-text: var(--vc-color-danger-text);
-  --color-info: var(--vc-color-info);
-  --color-info-bg: var(--vc-color-info-bg);
+  --color-success: #10B981;
+  --color-success-bg: rgba(16, 185, 129, 0.1);
+  --color-success-text: #047857;
+  --color-warning: #F59E0B;
+  --color-warning-bg: rgba(245, 158, 11, 0.12);
+  --color-warning-text: #B45309;
+  --color-danger: #EF4444;
+  --color-danger-bg: rgba(239, 68, 68, 0.1);
+  --color-danger-text: #B91C1C;
+  --color-info: #16233B;
+  --color-info-bg: rgba(22, 35, 59, 0.08);
 
-  --border: var(--vc-color-border);
-  --border-default: var(--vc-color-border);
-  --border-subtle: var(--vc-color-border-muted);
-  --border-accent: var(--accent-border);
+  --border: #DFE3E8;
+  --border-default: #DFE3E8;
+  --border-subtle: rgba(223, 227, 232, 0.6);
+  --border-accent: rgba(245, 158, 11, 0.35);
 
   --shadow: var(--shadow-sm);
   --shadow-sm: var(--shadow-sm);
@@ -242,158 +275,4 @@
   --transition-slow: var(--vc-transition-slow);
   --sidebar-width: var(--vc-layout-sidebar);
   --header-height: var(--vc-layout-header);
-}
-
-/* --- Dark Theme media query --- */
-@media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-
-    /* Base palette - Graphite-Zinc */
-    --vc-color-bg: #090d16;
-    --vc-color-surface: #131722;
-    --vc-color-surface-soft: rgba(19, 23, 34, 0.72);
-    --vc-color-surface-muted: #1d2230;
-
-    /* Text */
-    --vc-color-text-primary: #f8fafc;
-    --vc-color-text-secondary: #94a3b8;
-    --vc-color-text-muted: #64748b;
-    --vc-color-text-inverse: #090d16;
-
-    /* Primary brand (red) */
-    --vc-color-primary: #e11d48;
-    --vc-color-secondary: #94a3b8;
-    --vc-color-accent: #f8fafc;
-
-    /* Semantic colors */
-    --vc-color-success: #10b981;
-    --vc-color-success-bg: rgba(16, 185, 129, 0.12);
-    --vc-color-success-text: #34d399;
-
-    --vc-color-warning: #f59e0b;
-    --vc-color-warning-bg: rgba(245, 158, 11, 0.12);
-    --vc-color-warning-text: #fbbf24;
-
-    --vc-color-danger: #ef4444;
-    --vc-color-danger-bg: rgba(239, 68, 68, 0.12);
-    --vc-color-danger-text: #f87171;
-
-    --vc-color-info: #3b82f6;
-    --vc-color-info-bg: rgba(59, 130, 246, 0.12);
-    --vc-color-info-text: #60a5fa;
-
-    /* Surface layered system */
-    --vc-surface-bg: var(--vc-color-bg);
-    --vc-surface-card: var(--vc-color-surface);
-    --vc-surface-elevated: #1c212f;
-    --vc-surface-floating: #252a3a;
-    --vc-surface-modal: #2b3042;
-    --vc-surface-popover: #32374d;
-    --vc-surface-tooltip: #3d435c;
-
-    /* Shadows */
-    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
-    --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.35);
-    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
-    --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.5);
-
-    --vc-shadow-sm: var(--shadow-sm);
-    --vc-shadow-md: var(--shadow-md);
-    --vc-shadow-lg: var(--shadow-lg);
-    --vc-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-    /* Borders */
-    --border-subtle: rgba(255, 255, 255, 0.04);
-    --border-default: rgba(255, 255, 255, 0.08);
-    --border-strong: rgba(255, 255, 255, 0.16);
-
-    /* Gradients */
-    --vc-gradient-primary: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
-    --vc-gradient-soft: linear-gradient(135deg, rgba(225, 29, 72, 0.15), rgba(225, 29, 72, 0.05));
-    --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(225, 29, 72, 0.06), transparent 30%),
-      radial-gradient(circle at 86% 8%, rgba(225, 29, 72, 0.08), transparent 28%),
-      linear-gradient(135deg, #090d16 0%, #0d121c 100%);
-
-    /* Aliases */
-    --bg-glass: rgba(19, 23, 34, 0.72);
-    --bg-skeleton: #1e293b;
-  }
-}
-
-/* --- Dark Theme manual class overrides --- */
-.dark, [data-theme="dark"] {
-  color-scheme: dark;
-
-  /* Base palette - Graphite-Zinc */
-  --vc-color-bg: #090d16;
-  --vc-color-surface: #131722;
-  --vc-color-surface-soft: rgba(19, 23, 34, 0.72);
-  --vc-color-surface-muted: #1d2230;
-
-  /* Text */
-  --vc-color-text-primary: #f8fafc;
-  --vc-color-text-secondary: #94a3b8;
-  --vc-color-text-muted: #64748b;
-  --vc-color-text-inverse: #090d16;
-
-  /* Primary brand (red) */
-  --vc-color-primary: #e11d48;
-  --vc-color-secondary: #94a3b8;
-  --vc-color-accent: #f8fafc;
-
-  /* Semantic colors */
-  --vc-color-success: #10b981;
-  --vc-color-success-bg: rgba(16, 185, 129, 0.12);
-  --vc-color-success-text: #34d399;
-
-  --vc-color-warning: #f59e0b;
-  --vc-color-warning-bg: rgba(245, 158, 11, 0.12);
-  --vc-color-warning-text: #fbbf24;
-
-  --vc-color-danger: #ef4444;
-  --vc-color-danger-bg: rgba(239, 68, 68, 0.12);
-  --vc-color-danger-text: #f87171;
-
-  --vc-color-info: #3b82f6;
-  --vc-color-info-bg: rgba(59, 130, 246, 0.12);
-  --vc-color-info-text: #60a5fa;
-
-  /* Surface layered system */
-  --vc-surface-bg: var(--vc-color-bg);
-  --vc-surface-card: var(--vc-color-surface);
-  --vc-surface-elevated: #1c212f;
-  --vc-surface-floating: #252a3a;
-  --vc-surface-modal: #2b3042;
-  --vc-surface-popover: #32374d;
-  --vc-surface-tooltip: #3d435c;
-
-  /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.25);
-  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 6px 16px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.4);
-  --shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.5);
-
-  --vc-shadow-sm: var(--shadow-sm);
-  --vc-shadow-md: var(--shadow-md);
-  --vc-shadow-lg: var(--shadow-lg);
-  --vc-shadow-inset: inset 0 1px 0 rgba(255, 255, 255, 0.05);
-
-  /* Borders */
-  --border-subtle: rgba(255, 255, 255, 0.04);
-  --border-default: rgba(255, 255, 255, 0.08);
-  --border-strong: rgba(255, 255, 255, 0.16);
-
-  /* Gradients */
-  --vc-gradient-primary: linear-gradient(135deg, #e11d48 0%, #be123c 100%);
-  --vc-gradient-soft: linear-gradient(135deg, rgba(225, 29, 72, 0.15), rgba(225, 29, 72, 0.05));
-  --vc-gradient-hero: radial-gradient(circle at 12% 20%, rgba(225, 29, 72, 0.06), transparent 30%),
-    radial-gradient(circle at 86% 8%, rgba(225, 29, 72, 0.08), transparent 28%),
-    linear-gradient(135deg, #090d16 0%, #0d121c 100%);
-
-  /* Aliases */
-  --bg-glass: rgba(19, 23, 34, 0.72);
-  --bg-skeleton: #1e293b;
 }

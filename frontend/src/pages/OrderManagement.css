@@ -1,5 +1,5 @@
 /* ============================================================
-   Order Management — VeriChain Design System
+   Order Management — Palette 02 Symmetrical Design
    ============================================================ */
 
 .om-page {
@@ -22,7 +22,7 @@
 }
 .om-header-left h1 {
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
   margin-bottom: 4px;
 }
@@ -51,7 +51,7 @@
 }
 .om-order-bar-label {
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -73,21 +73,21 @@
   background: var(--bg-secondary);
   cursor: pointer;
   font-size: 0.82rem;
-  font-weight: 500;
+  font-weight: 600;
   color: var(--text-secondary);
   transition: all var(--transition-fast);
   white-space: nowrap;
 }
 .om-order-chip:hover {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
-  background: var(--color-success-bg);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
+  background: var(--accent-bg);
 }
 .om-order-chip.active {
-  border-color: var(--accent-cyan);
+  border-color: #16233B;
   background: var(--accent-gradient);
   color: #fff;
-  box-shadow: var(--shadow-glow-accent);
+  box-shadow: var(--shadow-sm);
 }
 .om-order-chip .chip-status-dot {
   width: 7px;
@@ -148,15 +148,15 @@
   justify-content: center;
   flex-shrink: 0;
 }
-.om-panel-icon.buyer   { background: rgba(0, 88, 188, 0.12); }
-.om-panel-icon.seller  { background: rgba(16, 185, 129, 0.12); }
-.om-panel-icon.factory { background: rgba(245, 158, 11, 0.12); }
-.om-panel-icon.ship    { background: rgba(99, 102, 241, 0.12); }
-.om-panel-icon.status  { background: rgba(186, 26, 26, 0.12); }
+.om-panel-icon.buyer   { background: rgba(22, 35, 59, 0.1); color: #16233B; }
+.om-panel-icon.seller  { background: rgba(16, 185, 129, 0.12); color: #047857; }
+.om-panel-icon.factory { background: rgba(245, 158, 11, 0.15); color: #B45309; }
+.om-panel-icon.ship    { background: rgba(22, 35, 59, 0.12); color: #16233B; }
+.om-panel-icon.status  { background: rgba(239, 68, 68, 0.12); color: #B91C1C; }
 
 .om-panel-title {
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
   line-height: 1.2;
 }
@@ -183,28 +183,28 @@
   line-height: 1.4;
 }
 .om-info-row + .om-info-row {
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-default);
   padding-top: var(--space-xs);
 }
 .om-info-label {
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
   flex-shrink: 0;
   min-width: 90px;
 }
 .om-info-value {
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 700;
   text-align: right;
   word-break: break-word;
 }
 .om-info-value.mono {
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--accent-cyan);
+  color: var(--accent-purple);
 }
 .om-info-value.muted {
-  font-weight: 400;
+  font-weight: 500;
   color: var(--text-secondary);
 }
 
@@ -223,16 +223,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 700;
+  font-weight: 800;
   font-size: 1rem;
-  color: #fff;
+  color: #F59E0B;
   flex-shrink: 0;
   letter-spacing: 0.04em;
 }
 .om-avatar-info strong {
   display: block;
   font-size: 0.9rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
 }
 .om-avatar-info span {
@@ -248,17 +248,17 @@
   padding: 3px 10px;
   border-radius: var(--radius-full);
   font-size: 0.72rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   white-space: nowrap;
 }
-.om-badge.pending    { background: var(--color-warning-bg);  color: var(--color-warning); }
+.om-badge.pending    { background: var(--color-warning-bg);  color: var(--color-warning-text); }
 .om-badge.processing { background: var(--color-info-bg);     color: var(--color-info); }
-.om-badge.shipped    { background: rgba(99, 102, 241, 0.12); color: #4f46e5; }
-.om-badge.delivered  { background: var(--color-success-bg);  color: var(--color-success); }
-.om-badge.cancelled  { background: var(--color-danger-bg);   color: var(--color-danger); }
-.om-badge.verified   { background: var(--color-success-bg);  color: var(--color-success); }
+.om-badge.shipped    { background: rgba(22, 35, 59, 0.1);    color: #16233B; }
+.om-badge.delivered  { background: var(--color-success-bg);  color: var(--color-success-text); }
+.om-badge.cancelled  { background: var(--color-danger-bg);   color: var(--color-danger-text); }
+.om-badge.verified   { background: var(--color-success-bg);  color: var(--color-success-text); }
 .om-badge.dot::before {
   content: '';
   width: 6px;
@@ -303,21 +303,23 @@
   z-index: 1;
 }
 .om-ship-node.done {
-  background: var(--accent-cyan);
-  border-color: var(--accent-cyan);
+  background: #16233B;
+  border-color: #16233B;
+  color: #fff;
 }
 .om-ship-node.active {
-  background: var(--color-warning-bg);
-  border-color: var(--color-warning);
+  background: var(--accent-bg);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
   animation: om-pulse 1.5s ease-in-out infinite;
 }
 @keyframes om-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(158, 61, 0, 0.3); }
-  50% { box-shadow: 0 0 0 5px rgba(158, 61, 0, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.3); }
+  50% { box-shadow: 0 0 0 5px rgba(245, 158, 11, 0); }
 }
 .om-ship-info strong {
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   display: block;
 }
@@ -339,22 +341,23 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
+  border: 1px solid var(--border-default);
 }
 .om-status-metric-label {
   font-size: 0.72rem;
   color: var(--text-muted);
-  font-weight: 500;
+  font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
 .om-status-metric-value {
   font-size: 1.3rem;
-  font-weight: 800;
+  font-weight: 900;
   color: var(--text-primary);
   line-height: 1;
 }
-.om-status-metric-value.accent  { color: var(--accent-cyan); }
-.om-status-metric-value.success { color: #10b981; }
+.om-status-metric-value.accent  { color: var(--accent-purple); }
+.om-status-metric-value.success { color: #10B981; }
 .om-status-metric-value.warning { color: var(--color-warning); }
 
 .om-progress-bar-wrap {
@@ -367,12 +370,14 @@
   justify-content: space-between;
   font-size: 0.75rem;
   color: var(--text-secondary);
+  font-weight: 600;
 }
 .om-progress-bar {
   height: 6px;
-  background: var(--bg-tertiary);
+  background: var(--bg-secondary);
   border-radius: var(--radius-full);
   overflow: hidden;
+  border: 1px solid var(--border-default);
 }
 .om-progress-bar-fill {
   height: 100%;
@@ -380,8 +385,8 @@
   background: var(--accent-gradient);
   transition: width 0.6s ease;
 }
-.om-progress-bar-fill.success { background: linear-gradient(90deg, #10b981, #34d399); }
-.om-progress-bar-fill.warning { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.om-progress-bar-fill.success { background: linear-gradient(90deg, #10B981, #34D399); }
+.om-progress-bar-fill.warning { background: linear-gradient(90deg, #F59E0B, #FCD34D); }
 
 /* ---- Timeline Panel ---- */
 .om-timeline {
@@ -397,7 +402,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: linear-gradient(to bottom, var(--accent-cyan), transparent);
+  background: linear-gradient(to bottom, #16233B, transparent);
   opacity: 0.25;
 }
 .om-timeline-item {
@@ -409,7 +414,7 @@
   padding-left: 4px;
 }
 .om-timeline-item + .om-timeline-item {
-  border-top: 1px solid var(--border-subtle);
+  border-top: 1px solid var(--border-default);
 }
 .om-timeline-dot {
   width: 22px;
@@ -423,11 +428,11 @@
   z-index: 1;
   margin-top: 2px;
 }
-.om-timeline-dot.buyer    { background: rgba(0, 88, 188, 0.15); color: var(--accent-cyan); }
-.om-timeline-dot.seller   { background: rgba(16, 185, 129, 0.15); color: #10b981; }
-.om-timeline-dot.factory  { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
-.om-timeline-dot.ship     { background: rgba(99, 102, 241, 0.15); color: #6366f1; }
-.om-timeline-dot.system   { background: rgba(64, 94, 150, 0.15); color: var(--color-info); }
+.om-timeline-dot.buyer    { background: rgba(22, 35, 59, 0.12); color: #16233B; }
+.om-timeline-dot.seller   { background: rgba(16, 185, 129, 0.15); color: #047857; }
+.om-timeline-dot.factory  { background: rgba(245, 158, 11, 0.15); color: #B45309; }
+.om-timeline-dot.ship     { background: rgba(22, 35, 59, 0.12); color: #16233B; }
+.om-timeline-dot.system   { background: rgba(22, 35, 59, 0.15); color: #16233B; }
 
 .om-timeline-content {
   flex: 1;
@@ -435,7 +440,7 @@
 }
 .om-timeline-event {
   font-size: 0.83rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 2px;
 }
@@ -452,10 +457,11 @@
   border-radius: var(--radius-full);
   padding: 1px 8px;
   font-size: 0.68rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text-secondary);
+  border: 1px solid var(--border-default);
 }
 
 /* ---- Items List ---- */
@@ -471,13 +477,13 @@
   padding: 8px 10px;
   background: var(--bg-secondary);
   border-radius: var(--radius-sm);
-  border: 1px solid var(--border-subtle);
+  border: 1px solid var(--border-default);
 }
 .om-item-icon {
   width: 34px;
   height: 34px;
   border-radius: var(--radius-sm);
-  background: var(--bg-tertiary);
+  background: var(--bg-card);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -489,7 +495,7 @@
 }
 .om-item-name {
   font-size: 0.81rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
@@ -502,7 +508,7 @@
 }
 .om-item-price {
   font-size: 0.85rem;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
   white-space: nowrap;
 }
@@ -521,12 +527,12 @@
 }
 .om-total-label {
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-secondary);
 }
 .om-total-value {
   font-size: 1.1rem;
-  font-weight: 800;
+  font-weight: 900;
   color: var(--text-primary);
 }
 
@@ -538,7 +544,7 @@
   padding: 8px 18px;
   border-radius: var(--radius-full);
   font-size: 0.82rem;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
   border: 1px solid transparent;
   transition: all var(--transition-fast);
@@ -561,8 +567,8 @@
   border-color: var(--border-default);
 }
 .om-btn-ghost:hover {
-  border-color: var(--accent-cyan);
-  color: var(--accent-cyan);
+  border-color: var(--accent-purple);
+  color: var(--accent-purple);
 }
 .om-btn-icon {
   padding: 8px;
@@ -573,7 +579,7 @@
 }
 .om-btn-icon:hover {
   background: var(--bg-tertiary);
-  color: var(--accent-cyan);
+  color: var(--accent-purple);
 }
 
 /* ---- Factory Stats ---- */
@@ -587,6 +593,7 @@
   border-radius: var(--radius-sm);
   padding: 10px;
   text-align: center;
+  border: 1px solid var(--border-default);
 }
 .om-factory-stat-val {
   font-size: 1rem;
@@ -599,6 +606,7 @@
   color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
 /* ---- Tracking Box ---- */
@@ -616,8 +624,8 @@
 .om-tracking-id {
   font-family: var(--font-mono);
   font-size: 0.78rem;
-  color: var(--accent-cyan);
-  font-weight: 600;
+  color: var(--accent-purple);
+  font-weight: 700;
   letter-spacing: 0.08em;
 }
 .om-barcode-svg {
@@ -661,7 +669,7 @@
 .om-order-chip:focus-visible,
 .om-header-actions button:focus-visible,
 .om-panel button:focus-visible {
-  outline: 2px solid var(--accent-cyan);
+  outline: 2px solid var(--accent-purple);
   outline-offset: 2px;
 }
 
@@ -672,4 +680,3 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-

@@ -21,9 +21,9 @@ export default function AllocationsView() {
   const [allocations] = useState<AllocationItem[]>([]);
 
   const stats = [
-    { label: 'Total Allocations', value: allocations.length.toString(), icon: TrendingUp, color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
-    { label: 'Active Sellers',    value: '0',                          icon: Store,      color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
-    { label: 'Units Allocated',   value: '0',                          icon: Package,    color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+    { label: 'Total Allocations', value: allocations.length.toString(), icon: TrendingUp, color: 'var(--accent-purple)', bg: 'var(--accent-bg)' },
+    { label: 'Active Sellers',    value: '0',                          icon: Store,      color: 'var(--accent-primary)', bg: 'rgba(26, 43, 76, 0.1)' },
+    { label: 'Units Allocated',   value: '0',                          icon: Package,    color: '#F5A623', bg: 'rgba(245, 166, 35, 0.15)' },
   ];
 
   return (
@@ -43,7 +43,7 @@ export default function AllocationsView() {
       </div>
 
       <div className="fd-section-hd">
-        <h2><TrendingUp size={16} color="#8b5cf6" /> Allocation Registry</h2>
+        <h2><TrendingUp size={16} color="var(--accent-purple)" /> Allocation Registry</h2>
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{allocations.length} allocations</span>
       </div>
 

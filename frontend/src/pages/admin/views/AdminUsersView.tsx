@@ -141,9 +141,9 @@ export default function AdminUsersView() {
       {/* Toast Notification */}
       {notification && (
         <div style={{
-          background: 'rgba(6, 182, 212, 0.15)',
-          border: '1px solid rgba(6, 182, 212, 0.4)',
-          color: '#38bdf8',
+          background: 'var(--accent-bg)',
+          border: '1px solid var(--accent-border)',
+          color: 'var(--text-primary)',
           padding: '12px 18px',
           borderRadius: 'var(--radius-md, 8px)',
           fontSize: '0.9rem',
@@ -235,8 +235,8 @@ export default function AdminUsersView() {
                           width: 38,
                           height: 38,
                           borderRadius: '50%',
-                          background: 'linear-gradient(135deg, rgba(6, 182, 212, 0.3), rgba(59, 130, 246, 0.3))',
-                          border: '1px solid rgba(6, 182, 212, 0.5)',
+                          background: 'var(--accent-gradient)',
+                          border: '1px solid #1A2B4C',
                           display: 'flex',
                           alignItems: 'center',
                           justifyContent: 'center',
@@ -333,7 +333,7 @@ export default function AdminUsersView() {
                 </div>
                 <div className="detail-info-card">
                   <div className="detail-info-label">System Role</div>
-                  <div className="detail-info-value" style={{ textTransform: 'uppercase', color: '#38bdf8' }}>
+                  <div className="detail-info-value" style={{ textTransform: 'uppercase', color: 'var(--accent-purple)' }}>
                     {selectedUserModal.role}
                   </div>
                 </div>
@@ -359,9 +359,9 @@ export default function AdminUsersView() {
                         fontSize: '0.8rem',
                         textTransform: 'uppercase',
                         borderRadius: 6,
-                        border: selectedUserModal.role === r ? '1px solid #06b6d4' : '1px solid rgba(255,255,255,0.08)',
-                        background: selectedUserModal.role === r ? 'rgba(6, 182, 212, 0.2)' : 'transparent',
-                        color: selectedUserModal.role === r ? '#38bdf8' : '#94a3b8',
+                        border: selectedUserModal.role === r ? '1px solid var(--accent-purple)' : '1px solid rgba(255,255,255,0.08)',
+                        background: selectedUserModal.role === r ? 'var(--accent-bg)' : 'transparent',
+                        color: selectedUserModal.role === r ? 'var(--text-primary)' : '#94a3b8',
                       }}
                     >
                       {r}

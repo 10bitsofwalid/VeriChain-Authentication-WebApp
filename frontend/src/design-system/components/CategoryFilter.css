@@ -1,20 +1,30 @@
 .category-filter {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--space-sm);
+  gap: var(--space-sm, 12px);
 }
 
 .filter-button {
-  padding: var(--space-xs) var(--space-sm);
-  border: none;
-  border-radius: var(--border-radius-sm);
-  background: var(--color-bg-muted);
-  color: var(--color-text-primary);
+  padding: 8px 16px;
+  border: 1px solid var(--border-default, #DFE3E8);
+  border-radius: var(--radius-full, 9999px);
+  background: var(--bg-card, #FFFFFF);
+  color: var(--text-secondary, #334155);
+  font-size: 0.875rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: var(--transition-base);
+  transition: all var(--transition-fast, 150ms cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.filter-button:hover {
+  background: var(--bg-secondary, #ECEFF3);
+  border-color: var(--accent-purple, #F59E0B);
+  color: var(--text-primary, #0B0F19);
 }
 
 .filter-button.active {
-  background: var(--color-primary);
-  color: var(--color-on-primary);
+  background: var(--accent-gradient, linear-gradient(135deg, #16233B 0%, #0B0F19 100%));
+  color: #FFFFFF;
+  border-color: #16233B;
+  box-shadow: var(--shadow-sm);
 }

@@ -132,7 +132,7 @@ export default function PurchaseHistoryPage() {
         </div>
 
         <div className="bx-stat-card">
-          <div className="bx-stat-icon" style={{ background: 'rgba(6, 182, 212, 0.1)', color: '#06b6d4' }}>
+          <div className="bx-stat-icon" style={{ background: 'var(--accent-bg)', color: 'var(--accent-primary)' }}>
             <CheckCircle size={20} />
           </div>
           <div className="bx-stat-value">

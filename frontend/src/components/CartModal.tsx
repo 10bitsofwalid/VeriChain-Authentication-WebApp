@@ -85,7 +85,7 @@ export default function CartModal({ onClose }: CartModalProps) {
       >
         <div className="cart-modal-header">
           <div className="cart-modal-title-group">
-            <ShoppingBag size={20} color="var(--accent-cyan, #00d2ff)" />
+            <ShoppingBag size={20} color="var(--accent-purple)" />
             <h2 id="cart-title">Shopping Cart</h2>
             {totalQty > 0 && <span className="cart-modal-count-badge">{totalQty} items</span>}
           </div>

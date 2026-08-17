@@ -12,7 +12,7 @@
 }
 
 .vc-clay-card-interactive:hover {
-  border-color: rgba(91, 95, 239, 0.18);
+  border-color: var(--accent-purple);
   box-shadow: var(--shadow-lg), var(--vc-shadow-inset);
   transform: translateY(-3px);
 }
@@ -36,15 +36,14 @@
 }
 
 .vc-action-button:focus-visible {
-  outline: 2px solid var(--accent-cyan);
+  outline: 2px solid var(--accent-purple);
   outline-offset: 2px;
-  box-shadow: 0 0 0 4px rgba(0, 88, 188, 0.15);
+  box-shadow: var(--vc-focus-ring);
 }
 
 .vc-action-button:active {
   transform: translateY(1px) scale(0.99);
 }
-
 
 .vc-action-button:disabled {
   cursor: not-allowed;
@@ -78,12 +77,23 @@
 
 .vc-action-primary {
   background: var(--accent-gradient);
-  box-shadow: 0 12px 24px rgba(91, 95, 239, 0.22);
+  box-shadow: 0 8px 20px rgba(22, 35, 59, 0.25);
   color: white;
 }
 
 .vc-action-primary:hover {
-  box-shadow: 0 16px 34px rgba(91, 95, 239, 0.28);
+  box-shadow: 0 12px 28px rgba(22, 35, 59, 0.35), 0 0 15px rgba(245, 158, 11, 0.2);
+  transform: translateY(-1px);
+}
+
+.vc-action-accent {
+  background: var(--accent-gold-gradient);
+  box-shadow: 0 8px 20px rgba(245, 158, 11, 0.3);
+  color: #0B0F19;
+}
+
+.vc-action-accent:hover {
+  box-shadow: 0 12px 28px rgba(245, 158, 11, 0.45);
   transform: translateY(-1px);
 }
 
@@ -97,6 +107,7 @@
 .vc-action-secondary:hover,
 .vc-action-ghost:hover {
   background: var(--accent-bg);
+  border-color: var(--accent-purple);
 }
 
 .vc-action-ghost {
@@ -124,26 +135,31 @@
 .vc-status-success {
   background: var(--color-success-bg);
   color: var(--color-success-text);
+  border: 1px solid rgba(16, 185, 129, 0.2);
 }
 
 .vc-status-warning {
   background: var(--color-warning-bg);
   color: var(--color-warning-text);
+  border: 1px solid rgba(245, 158, 11, 0.25);
 }
 
 .vc-status-danger {
   background: var(--color-danger-bg);
   color: var(--color-danger-text);
+  border: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .vc-status-info {
   background: var(--color-info-bg);
   color: var(--accent-primary);
+  border: 1px solid rgba(22, 35, 59, 0.2);
 }
 
 .vc-status-neutral {
   background: var(--bg-secondary);
   color: var(--text-secondary);
+  border: 1px solid var(--border-default);
 }
 
 .vc-metric-card {

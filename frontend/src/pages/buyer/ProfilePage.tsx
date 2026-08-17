@@ -68,7 +68,7 @@ export default function ProfilePage() {
                   width: 80,
                   height: 80,
                   borderRadius: '50%',
-                  background: 'var(--accent-primary, #06b6d4)',
+                  background: 'var(--accent-primary, #1A2B4C)',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',

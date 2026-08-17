@@ -1,8 +1,6 @@
 /* ============================================================
-   Factory Dashboard Styles — Premium Glassmorphism & Modern UI
+   Factory Dashboard Styles — Palette 02 Symmetrical Design
    ============================================================ */
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 .fd-container {
   display: flex;
@@ -10,7 +8,6 @@
   gap: var(--space-lg);
   padding: 2px;
   animation: fadeInUp var(--transition-slow, 0.4s ease) both;
-  font-family: 'Inter', sans-serif;
 }
 
 /* ── Header ─────────────────────────────────────────────────── */
@@ -25,10 +22,7 @@
 .fd-header-info h1 {
   font-size: 26px;
   font-weight: 800;
-  background: linear-gradient(120deg, #06b6d4 0%, #8b5cf6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: var(--text-primary);
   margin: 0 0 4px;
   letter-spacing: -0.5px;
 }
@@ -50,9 +44,7 @@
 .fd-tabs-nav {
   display: flex;
   gap: 6px;
-  background: rgba(193, 198, 215, 0.04);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: var(--bg-card);
   border: 1px solid var(--border-default);
   padding: 6px;
   border-radius: var(--radius-lg);
@@ -68,7 +60,7 @@
   gap: 8px;
   background: transparent;
   border: none;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   padding: 10px 18px;
   font-size: 13.5px;
   font-weight: 600;
@@ -81,14 +73,15 @@
 
 .fd-tab-btn:hover {
   color: var(--text-primary);
-  background: rgba(193, 198, 215, 0.08);
+  background: var(--bg-secondary);
   transform: translateY(-1px);
 }
 
 .fd-tab-btn.active {
-  background: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 100%);
+  background: var(--accent-gradient);
   color: #fff;
-  box-shadow: 0 4px 18px rgba(139, 92, 246, 0.35);
+  border: 1px solid #16233B;
+  box-shadow: var(--shadow-sm);
 }
 
 .fd-tab-btn .fd-tab-badge {
@@ -102,8 +95,8 @@
 }
 
 .fd-tab-btn:not(.active) .fd-tab-badge {
-  background: rgba(139, 92, 246, 0.15);
-  color: #8b5cf6;
+  background: var(--accent-bg);
+  color: #16233B;
 }
 
 /* ── View Panel ──────────────────────────────────────────────── */
@@ -133,8 +126,8 @@
 
 .fd-stat-card:hover {
   transform: translateY(-3px);
-  box-shadow: var(--shadow-card-hover, 0 8px 30px rgba(0,0,0,0.12));
-  border-color: rgba(139, 92, 246, 0.3);
+  box-shadow: var(--shadow-md);
+  border-color: var(--accent-purple);
 }
 
 .fd-stat-icon {
@@ -145,12 +138,15 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  background: var(--accent-bg);
+  color: var(--accent-purple);
+  border: 1px solid var(--accent-border);
 }
 
 .fd-stat-label {
   font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
+  font-weight: 600;
+  color: var(--text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin: 0 0 4px;
@@ -166,7 +162,7 @@
 
 .fd-stat-trend {
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 700;
   color: #10b981;
 }
 
@@ -184,7 +180,7 @@
 
 .fd-section-hd h2 {
   font-size: 16px;
-  font-weight: 700;
+  font-weight: 800;
   color: var(--text-primary);
   display: flex;
   align-items: center;
@@ -226,7 +222,7 @@
   height: 38px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
-  background: var(--bg-elevated);
+  background: var(--bg-secondary);
   color: var(--text-primary);
   font-size: 14px;
   outline: none;
@@ -235,8 +231,8 @@
 }
 
 .fd-search-wrap input:focus {
-  border-color: #8b5cf6;
-  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.12);
+  border-color: var(--accent-purple);
+  box-shadow: var(--vc-focus-ring);
 }
 
 .fd-select {
@@ -244,7 +240,7 @@
   padding: 0 12px;
   border-radius: var(--radius-md);
   border: 1px solid var(--border-default);
-  background: var(--bg-elevated);
+  background: var(--bg-secondary);
   color: var(--text-primary);
   font-size: 13px;
   cursor: pointer;
@@ -265,24 +261,25 @@
 }
 
 .fd-table thead th {
-  background: var(--bg-elevated);
+  background: var(--bg-secondary);
   padding: 12px 16px;
   text-align: left;
   font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: var(--text-secondary);
+  color: var(--text-muted);
   white-space: nowrap;
+  border-bottom: 1px solid var(--border-default);
 }
 
 .fd-table tbody tr {
-  border-top: 1px solid var(--border-subtle, rgba(193,198,215,0.08));
+  border-top: 1px solid var(--border-default);
   transition: background 0.15s;
 }
 
 .fd-table tbody tr:hover {
-  background: rgba(193, 198, 215, 0.04);
+  background: var(--bg-secondary);
 }
 
 .fd-table td {
@@ -293,7 +290,7 @@
 
 .fd-table td:first-child {
   color: var(--text-primary);
-  font-weight: 600;
+  font-weight: 700;
 }
 
 /* ── Badges ──────────────────────────────────────────────────── */
@@ -308,12 +305,12 @@
   letter-spacing: 0.02em;
 }
 
-.fd-badge-green  { background: rgba(16,185,129,0.12); color: #10b981; }
-.fd-badge-blue   { background: rgba(6,182,212,0.12);  color: #06b6d4; }
-.fd-badge-purple { background: rgba(139,92,246,0.12); color: #8b5cf6; }
-.fd-badge-amber  { background: rgba(245,158,11,0.12); color: #f59e0b; }
-.fd-badge-red    { background: rgba(239,68,68,0.12);  color: #ef4444; }
-.fd-badge-gray   { background: rgba(148,163,184,0.12);color: #94a3b8; }
+.fd-badge-green  { background: rgba(16,185,129,0.12); color: #047857; }
+.fd-badge-blue   { background: rgba(22,35,59,0.1);    color: #16233B; }
+.fd-badge-purple { background: rgba(245,158,11,0.15); color: #B45309; }
+.fd-badge-amber  { background: rgba(245,158,11,0.15); color: #B45309; }
+.fd-badge-red    { background: rgba(239,68,68,0.12);  color: #B91C1C; }
+.fd-badge-gray   { background: rgba(148,163,184,0.12);color: #475569; }
 
 /* ── Progress Bar ────────────────────────────────────────────── */
 .fd-progress-wrap {
@@ -325,15 +322,16 @@
 .fd-progress-track {
   flex: 1;
   height: 6px;
-  background: rgba(193,198,215,0.12);
+  background: var(--bg-secondary);
   border-radius: 999px;
   overflow: hidden;
+  border: 1px solid var(--border-default);
 }
 
 .fd-progress-fill {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #06b6d4, #8b5cf6);
+  background: var(--accent-gradient);
   transition: width 0.6s ease;
 }
 
@@ -462,26 +460,27 @@
 
 .fd-kpi-item:hover {
   transform: translateY(-3px);
-  border-color: rgba(139, 92, 246, 0.3);
+  border-color: var(--accent-purple);
 }
 
 .fd-kpi-number {
   font-size: 28px;
-  font-weight: 800;
+  font-weight: 900;
   display: block;
+  color: var(--text-primary);
 }
 
 .fd-kpi-label {
   font-size: 12px;
   color: var(--text-secondary);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Tab & Action Button Focus Visible */
 .fd-tab-btn:focus-visible,
 .fd-header-actions button:focus-visible,
 .fd-kpi-item:focus-visible {
-  outline: 2px solid var(--accent-cyan);
+  outline: 2px solid var(--accent-purple);
   outline-offset: 2px;
 }
 
@@ -492,4 +491,3 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-

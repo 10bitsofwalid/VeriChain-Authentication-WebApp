@@ -29,8 +29,8 @@ export default function SellerRequestsView() {
   const [search, setSearch] = useState('');
 
   const stats = [
-    { label: 'Pending Requests', value: requests.filter(r => r.status === 'Pending').length.toString(), icon: Clock, color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
-    { label: 'Total Partners',   value: '0',                                                             icon: Users, color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+    { label: 'Pending Requests', value: requests.filter(r => r.status === 'Pending').length.toString(), icon: Clock, color: '#F5A623', bg: 'rgba(245, 166, 35, 0.15)' },
+    { label: 'Total Partners',   value: '0',                                                             icon: Users, color: 'var(--accent-purple)', bg: 'var(--accent-bg)' },
   ];
 
   const filtered = requests.filter(r =>
@@ -68,7 +68,7 @@ export default function SellerRequestsView() {
       </div>
 
       <div className="fd-section-hd">
-        <h2><Users size={16} color="#8b5cf6" /> Seller Sourcing Requests</h2>
+        <h2><Users size={16} color="var(--accent-purple)" /> Seller Sourcing Requests</h2>
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{filtered.length} requests</span>
       </div>
 

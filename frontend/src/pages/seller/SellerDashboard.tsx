@@ -899,7 +899,7 @@ export default function SellerDashboard() {
                     {Array.from(new Set(products.map(p => p.category || 'General'))).map((cat, idx) => {
                       const count = products.filter(p => (p.category || 'General') === cat).length;
                       const pct = Math.round((count / products.length) * 100);
-                      const colors = ['var(--accent-cyan)', 'var(--color-info)', '#f59e0b', '#10b981', '#8b5cf6'];
+                      const colors = ['#16233B', '#F59E0B', '#10b981', '#0B0F19', '#DFE3E8'];
                       const color = colors[idx % colors.length];
                       return (
                         <div key={cat} className="legend-item" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

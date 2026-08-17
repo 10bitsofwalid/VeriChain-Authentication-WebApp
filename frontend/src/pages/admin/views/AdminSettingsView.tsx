@@ -62,9 +62,9 @@ export default function AdminSettingsView() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg, 20px)' }}>
       {toastMessage && (
         <div style={{
-          background: 'rgba(6, 182, 212, 0.15)',
-          border: '1px solid rgba(6, 182, 212, 0.4)',
-          color: '#38bdf8',
+          background: 'var(--accent-bg)',
+          border: '1px solid var(--accent-border)',
+          color: 'var(--text-primary)',
           padding: '12px 18px',
           borderRadius: 'var(--radius-md, 8px)',
           fontSize: '0.9rem',
@@ -82,7 +82,7 @@ export default function AdminSettingsView() {
         <div className="admin-card-header">
           <div>
             <h3 className="admin-card-title">
-              <Shield size={20} color="#06b6d4" />
+              <Shield size={20} color="var(--accent-primary)" />
               Platform Security & AI Fraud Controls
             </h3>
             <p className="admin-card-subtitle">Configure automated threat mitigation policies and machine learning thresholds</p>
@@ -96,7 +96,7 @@ export default function AdminSettingsView() {
           {/* AI Moderation Sensitivity */}
           <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 16, borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
             <label style={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
-              <Zap size={16} color="#06b6d4" /> AI Auto-Moderation Sensitivity
+              <Zap size={16} color="var(--accent-primary)" /> AI Auto-Moderation Sensitivity
             </label>
             <p style={{ color: '#94a3b8', fontSize: '0.825rem', marginBottom: 14 }}>
               Controls automatic flagging threshold for unverified product templates and duplicate serial patterns.
@@ -111,10 +111,10 @@ export default function AdminSettingsView() {
                     flex: 1,
                     padding: '8px 12px',
                     borderRadius: 6,
-                    border: aiSensitivity === sens ? '1px solid #06b6d4' : '1px solid rgba(255,255,255,0.1)',
-                    background: aiSensitivity === sens ? 'rgba(6, 182, 212, 0.2)' : 'transparent',
-                    color: aiSensitivity === sens ? '#38bdf8' : '#94a3b8',
-                    fontWeight: aiSensitivity === sens ? 600 : 400,
+                    border: aiSensitivity === sens ? '1px solid var(--accent-purple)' : '1px solid rgba(255,255,255,0.1)',
+                    background: aiSensitivity === sens ? 'var(--accent-bg)' : 'transparent',
+                    color: aiSensitivity === sens ? 'var(--text-primary)' : '#94a3b8',
+                    fontWeight: aiSensitivity === sens ? 700 : 400,
                     cursor: 'pointer',
                     fontSize: '0.85rem',
                   }}
@@ -137,7 +137,7 @@ export default function AdminSettingsView() {
                 type="checkbox"
                 checked={blockDuplicateScans}
                 onChange={e => setBlockDuplicateScans(e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: '#06b6d4', cursor: 'pointer' }}
+                style={{ width: 18, height: 18, accentColor: '#F5A623', cursor: 'pointer' }}
               />
             </div>
 
@@ -147,7 +147,7 @@ export default function AdminSettingsView() {
                 type="checkbox"
                 checked={autoFlagSeller}
                 onChange={e => setAutoFlagSeller(e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: '#06b6d4', cursor: 'pointer' }}
+                style={{ width: 18, height: 18, accentColor: '#F5A623', cursor: 'pointer' }}
               />
             </div>
 
@@ -157,7 +157,7 @@ export default function AdminSettingsView() {
                 type="checkbox"
                 checked={require2FA}
                 onChange={e => setRequire2FA(e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: '#06b6d4', cursor: 'pointer' }}
+                style={{ width: 18, height: 18, accentColor: '#F5A623', cursor: 'pointer' }}
               />
             </div>
           </div>
@@ -169,7 +169,7 @@ export default function AdminSettingsView() {
         <div className="admin-card-header">
           <div>
             <h3 className="admin-card-title">
-              <Key size={18} color="#f59e0b" />
+              <Key size={18} color="var(--accent-purple)" />
               API Access Keys & Integrations
             </h3>
             <p className="admin-card-subtitle">Manage programmatic REST & GraphQL API keys for external factory integrations</p>
@@ -202,7 +202,7 @@ export default function AdminSettingsView() {
                 keys.map(k => (
                   <tr key={k.id}>
                     <td style={{ fontWeight: 600, color: '#f8fafc' }}>{k.name}</td>
-                    <td style={{ fontFamily: 'monospace', color: '#06b6d4', fontSize: '0.85rem' }}>{k.prefix}</td>
+                    <td style={{ fontFamily: 'monospace', color: 'var(--accent-purple)', fontSize: '0.85rem' }}>{k.prefix}</td>
                     <td>
                       <StatusChip tone={k.scope === 'Full Administrative' ? 'danger' : 'info'}>
                         {k.scope}
@@ -233,7 +233,7 @@ export default function AdminSettingsView() {
       <div className="admin-card">
         <div className="admin-card-header">
           <h4 className="admin-card-title">
-            <Bell size={18} color="#8b5cf6" />
+            <Bell size={18} color="var(--accent-purple)" />
             Security Notification Webhook Dispatcher
           </h4>
         </div>

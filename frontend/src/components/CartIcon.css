@@ -16,7 +16,7 @@
 }
 
 .cart-icon-button:hover {
-  background: rgba(91, 95, 239, 0.08);
+  background: var(--accent-bg);
   color: var(--accent-primary);
   transform: translateY(-1px);
 }
@@ -28,10 +28,10 @@
 
 .cart-badge {
   align-items: center;
-  background: var(--color-danger);
+  background: #F59E0B;
   border: 2px solid white;
   border-radius: var(--radius-full);
-  color: white;
+  color: #0B0F19;
   display: inline-flex;
   font-size: 0.7rem;
   font-weight: 900;

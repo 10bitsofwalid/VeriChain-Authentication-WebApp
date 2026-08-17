@@ -1,4 +1,4 @@
-/* Admin Dashboard Styles */
+/* Admin Dashboard Styles — Palette 02 Bauhaus Symmetrical */
 
 .admin-dashboard-container {
   display: flex;
@@ -10,8 +10,8 @@
 
 /* Header & Banner */
 .admin-header-banner {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #16233B 0%, #0B0F19 100%);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl, 16px);
   padding: var(--space-xl, 24px);
   display: flex;
@@ -20,7 +20,7 @@
   flex-wrap: wrap;
   gap: var(--space-md, 16px);
   backdrop-filter: blur(12px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 32px rgba(11, 15, 25, 0.2);
 }
 
 .admin-header-title {
@@ -33,27 +33,25 @@
   width: 52px;
   height: 52px;
   border-radius: var(--radius-lg, 12px);
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(59, 130, 246, 0.2));
-  border: 1px solid rgba(6, 182, 212, 0.4);
+  background: var(--accent-bg);
+  border: 1px solid var(--accent-border);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #06b6d4;
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.2);
+  color: #F59E0B;
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.25);
 }
 
 .admin-header-text h1 {
   font-size: 1.75rem;
-  font-weight: 700;
+  font-weight: 800;
   margin: 0;
-  background: linear-gradient(90deg, #ffffff 0%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #FFFFFF;
 }
 
 .admin-header-text p {
   margin: 4px 0 0 0;
-  color: var(--text-secondary, #94a3b8);
+  color: #CBD5E1;
   font-size: 0.9rem;
 }
 
@@ -70,7 +68,7 @@
   padding: 6px 14px;
   border-radius: 9999px;
   font-size: 0.825rem;
-  font-weight: 600;
+  font-weight: 700;
   border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -94,8 +92,8 @@
   display: flex;
   align-items: center;
   gap: var(--space-xs, 6px);
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   padding: 6px;
   border-radius: var(--radius-lg, 12px);
   overflow-x: auto;
@@ -114,25 +112,25 @@
   border-radius: var(--radius-md, 8px);
   border: none;
   background: transparent;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-muted);
   font-size: 0.875rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
 }
 
 .admin-tab-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
 }
 
 .admin-tab-btn.active {
   color: #ffffff;
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(59, 130, 246, 0.25));
-  border: 1px solid rgba(6, 182, 212, 0.4);
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
-  font-weight: 600;
+  background: var(--accent-gradient);
+  border: 1px solid #16233B;
+  box-shadow: var(--shadow-sm);
+  font-weight: 700;
 }
 
 .admin-tab-badge {
@@ -142,17 +140,16 @@
   padding: 2px 7px;
   border-radius: 9999px;
   font-size: 0.725rem;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 /* Card & Section Layouts */
 .admin-card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl, 16px);
   padding: var(--space-lg, 20px);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
 }
 
 .admin-card-header {
@@ -169,14 +166,14 @@
   align-items: center;
   gap: 10px;
   font-size: 1.125rem;
-  font-weight: 600;
-  color: #f8fafc;
+  font-weight: 800;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .admin-card-subtitle {
   font-size: 0.825rem;
-  color: var(--text-secondary, #94a3b8);
+  color: var(--text-muted);
   margin-top: 2px;
 }
 
@@ -203,7 +200,7 @@
 .admin-table-wrapper {
   overflow-x: auto;
   border-radius: var(--radius-lg, 12px);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-default);
 }
 
 .admin-table {
@@ -214,25 +211,25 @@
 }
 
 .admin-table th {
-  background: rgba(30, 41, 59, 0.6);
-  color: var(--text-secondary, #94a3b8);
-  font-weight: 600;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 0.725rem;
   letter-spacing: 0.05em;
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .admin-table td {
   padding: 14px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  color: #cbd5e1;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-secondary);
   vertical-align: middle;
 }
 
 .admin-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--bg-secondary);
 }
 
 /* Action Controls & Toolbar */
@@ -249,8 +246,8 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md, 8px);
   padding: 8px 14px;
   min-width: 260px;
@@ -260,17 +257,17 @@
   background: transparent;
   border: none;
   outline: none;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 0.875rem;
   width: 100%;
 }
 
 .admin-select {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-md, 8px);
   padding: 8px 14px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 0.875rem;
   outline: none;
 }
@@ -279,7 +276,7 @@
 .admin-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(11, 15, 25, 0.7);
   backdrop-filter: blur(6px);
   display: flex;
   align-items: center;
@@ -290,13 +287,13 @@
 }
 
 .admin-modal-card {
-  background: #0f172a;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: var(--radius-xl, 16px);
   width: 100%;
   max-width: 580px;
   padding: 24px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  box-shadow: 0 20px 50px rgba(11, 15, 25, 0.4);
   animation: slideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -325,7 +322,7 @@
 .admin-tab-btn:focus-visible,
 .admin-header-banner button:focus-visible,
 .admin-modal-card button:focus-visible {
-  outline: 2px solid var(--accent-cyan);
+  outline: 2px solid var(--accent-purple);
   outline-offset: 2px;
 }
 
@@ -336,4 +333,3 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-

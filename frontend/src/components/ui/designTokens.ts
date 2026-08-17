@@ -2,11 +2,12 @@
 export const COLORS = {
   primary: "var(--accent-primary)",
   secondary: "var(--text-secondary)",
+  accent: "var(--accent-purple)",
   background: "var(--bg-card)",
   danger: "var(--color-danger)",
-  success: "var(--color-success-bg)",
-  warning: "var(--color-warning-bg)",
-  info: "var(--color-info-bg)",
+  success: "var(--color-success)",
+  warning: "var(--color-warning)",
+  info: "var(--color-info)",
 };
 
 export const SPACING = {

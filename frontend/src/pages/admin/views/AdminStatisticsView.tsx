@@ -77,7 +77,7 @@ export default function AdminStatisticsView() {
       <div className="admin-card">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <BarChart2 size={20} color="#06b6d4" />
+            <BarChart2 size={20} color="var(--accent-purple)" />
             <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#f8fafc' }}>
               Platform Analytical Telemetry & Verification Trends
             </h3>
@@ -90,7 +90,7 @@ export default function AdminStatisticsView() {
         <MetricCard
           label="Registered Products"
           value={productCount.toString()}
-          icon={<TrendingUp size={20} color="#06b6d4" />}
+          icon={<TrendingUp size={20} color="var(--accent-primary)" />}
         />
         <MetricCard
           label="Authenticity Trust Rate"
@@ -105,7 +105,7 @@ export default function AdminStatisticsView() {
         <MetricCard
           label="Total Registered Users"
           value={(userCounts.buyers + userCounts.sellers + userCounts.factories + userCounts.moderators).toString()}
-          icon={<Users size={20} color="#8b5cf6" />}
+          icon={<Users size={20} color="var(--accent-purple)" />}
         />
       </div>
 
@@ -115,7 +115,7 @@ export default function AdminStatisticsView() {
         <div className="admin-card">
           <div className="admin-card-header">
             <h4 className="admin-card-title">
-              <PieChart size={18} color="#06b6d4" />
+              <PieChart size={18} color="var(--accent-purple)" />
               Consensus Verification Health
             </h4>
           </div>
@@ -133,11 +133,11 @@ export default function AdminStatisticsView() {
 
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.875rem', marginBottom: 6 }}>
-                <span style={{ color: '#38bdf8', fontWeight: 600 }}>Decentralized Node Consensus</span>
+                <span style={{ color: '#F5A623', fontWeight: 600 }}>Decentralized Node Consensus</span>
                 <span style={{ color: '#cbd5e1', fontWeight: 700 }}>Active</span>
               </div>
               <div style={{ background: 'rgba(255,255,255,0.06)', height: 10, borderRadius: 9999, overflow: 'hidden' }}>
-                <div style={{ width: '100%', background: 'linear-gradient(90deg, #0284c7, #38bdf8)', height: '100%' }} />
+                <div style={{ width: '100%', background: 'linear-gradient(90deg, #1A2B4C, #F5A623)', height: '100%' }} />
               </div>
             </div>
           </div>
@@ -147,7 +147,7 @@ export default function AdminStatisticsView() {
         <div className="admin-card">
           <div className="admin-card-header">
             <h4 className="admin-card-title">
-              <Users size={18} color="#8b5cf6" />
+              <Users size={18} color="var(--accent-purple)" />
               Ecosystem Participants & Roles
             </h4>
           </div>
@@ -180,7 +180,7 @@ export default function AdminStatisticsView() {
       <div className="admin-card">
         <div className="admin-card-header">
           <h4 className="admin-card-title">
-            <Award size={18} color="#f59e0b" />
+            <Award size={18} color="var(--accent-purple)" />
             Registered Certified Factories
           </h4>
         </div>
@@ -206,7 +206,7 @@ export default function AdminStatisticsView() {
               ) : (
                 factories.map((fac, idx) => (
                   <tr key={fac.id}>
-                    <td style={{ fontWeight: 700, color: '#06b6d4', width: 60 }}>#{idx + 1}</td>
+                    <td style={{ fontWeight: 700, color: 'var(--accent-purple)', width: 60 }}>#{idx + 1}</td>
                     <td style={{ fontWeight: 600, color: '#f8fafc' }}>{fac.name}</td>
                     <td style={{ color: '#cbd5e1', fontWeight: 500 }}>{fac.country}</td>
                     <td>

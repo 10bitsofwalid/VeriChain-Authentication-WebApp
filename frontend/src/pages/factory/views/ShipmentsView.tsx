@@ -22,9 +22,9 @@ export default function ShipmentsView() {
   const [shipments] = useState<ShipmentItem[]>([]);
 
   const stats = [
-    { label: 'In Transit',   value: shipments.filter(s => s.status === 'In Transit').length.toString(), icon: Truck,   color: '#06b6d4', bg: 'rgba(6,182,212,0.12)' },
+    { label: 'In Transit',   value: shipments.filter(s => s.status === 'In Transit').length.toString(), icon: Truck,   color: 'var(--accent-primary)', bg: 'rgba(26, 43, 76, 0.1)' },
     { label: 'Delivered',    value: shipments.filter(s => s.status === 'Delivered').length.toString(),  icon: Package, color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-    { label: 'Processing',   value: shipments.filter(s => s.status === 'Processing').length.toString(), icon: Clock,   color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+    { label: 'Processing',   value: shipments.filter(s => s.status === 'Processing').length.toString(), icon: Clock,   color: '#F5A623', bg: 'rgba(245, 166, 35, 0.15)' },
   ];
 
   return (
@@ -47,7 +47,7 @@ export default function ShipmentsView() {
         {/* Shipments Table */}
         <div style={{ flex: 1 }}>
           <div className="fd-section-hd">
-            <h2><Truck size={16} color="#06b6d4" /> Active Shipments</h2>
+            <h2><Truck size={16} color="var(--accent-primary)" /> Active Shipments</h2>
             <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{shipments.length} shipments</span>
           </div>
           <div className="fd-table-wrap">

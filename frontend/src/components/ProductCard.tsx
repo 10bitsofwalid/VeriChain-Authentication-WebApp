@@ -6,6 +6,7 @@ import { useShopping } from '../context/ShoppingContext';
 import { riskBadge, verificationBadge } from '../utils/badges';
 import { useProductPlaceholder } from '../hooks/useProductPlaceholder';
 import ContactSellerModal from './ContactSellerModal';
+import '../pages/MarketplaceHome.css';
 
 interface ProductCardProps {
   item: any;

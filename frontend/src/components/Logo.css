@@ -19,7 +19,7 @@
   flex-shrink: 0;
   border-radius: 50%;
   object-fit: contain;
-  filter: drop-shadow(0 2px 8px rgba(227, 100, 20, 0.25));
+  filter: drop-shadow(0 2px 8px rgba(245, 158, 11, 0.35));
   transition: transform var(--transition-normal);
 }
 

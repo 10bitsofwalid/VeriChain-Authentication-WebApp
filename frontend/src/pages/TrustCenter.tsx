@@ -114,7 +114,7 @@ const TrustCenter: React.FC = () => {
         <button
           className="btn btn-primary"
           onClick={() => navigate('/verify')}
-          style={{ background: 'linear-gradient(135deg, #0058bc, #0070eb)' }}
+          style={{ background: 'var(--accent-gradient)' }}
         >
           Verify Product
         </button>

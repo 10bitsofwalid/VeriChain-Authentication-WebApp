@@ -1,4 +1,4 @@
-/* Recall Management Workspace Styling */
+/* Recall Management Workspace Styling — Palette 02 Symmetrical */
 
 .recall-management-container {
   display: flex;
@@ -11,12 +11,12 @@
 
 /* Header Banner */
 .recall-header-card {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.85) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #16233B 0%, #0B0F19 100%);
+  border: 1px solid var(--border-default);
   border-radius: 16px;
   padding: 24px;
   backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 8px 32px rgba(11, 15, 25, 0.2);
 }
 
 .recall-header-top {
@@ -54,8 +54,8 @@
 
 .recall-header-title h1 {
   font-size: 1.5rem;
-  font-weight: 700;
-  color: #f8fafc;
+  font-weight: 800;
+  color: #FFFFFF;
   margin: 0;
   letter-spacing: -0.02em;
   overflow: hidden;
@@ -65,7 +65,7 @@
 }
 
 .recall-header-desc {
-  color: #94a3b8;
+  color: #CBD5E1;
   font-size: 0.9rem;
   margin: 6px 0 0 0;
   max-width: 800px;
@@ -93,8 +93,8 @@
 
 /* Focus Bar */
 .recall-focus-bar {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 12px;
   padding: 14px 20px;
   display: flex;
@@ -116,16 +116,16 @@
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-weight: 700;
 }
 
 .recall-select {
-  background: rgba(30, 41, 59, 0.7);
-  border: 1px solid rgba(6, 182, 212, 0.4);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 8px 14px;
-  color: #38bdf8;
+  color: var(--text-primary);
   font-size: 0.9rem;
   font-weight: 600;
   outline: none;
@@ -134,8 +134,7 @@
 }
 
 .recall-select:hover {
-  border-color: #06b6d4;
-  background: rgba(30, 41, 59, 0.9);
+  border-color: var(--accent-purple);
 }
 
 /* Nav Tabs Bar */
@@ -143,8 +142,8 @@
   display: flex;
   align-items: center;
   gap: 6px;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 12px;
   padding: 6px;
   overflow-x: auto;
@@ -163,49 +162,48 @@
   background: transparent;
   border: none;
   border-radius: 8px;
-  color: #94a3b8;
+  color: var(--text-muted);
   font-size: 0.88rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   white-space: nowrap;
   transition: all 0.2s ease;
 }
 
 .recall-tab-btn:hover {
-  color: #ffffff;
-  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
 }
 
 .recall-tab-btn.active {
-  background: linear-gradient(135deg, rgba(6, 182, 212, 0.25), rgba(59, 130, 246, 0.25));
+  background: var(--accent-gradient);
   color: #ffffff;
-  border: 1px solid rgba(6, 182, 212, 0.4);
-  font-weight: 600;
-  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
+  border: 1px solid #16233B;
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
 }
 
 .recall-tab-badge {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
   color: inherit;
   font-size: 0.75rem;
   padding: 2px 8px;
   border-radius: 9999px;
-  font-weight: 700;
+  font-weight: 800;
 }
 
 .recall-tab-btn.active .recall-tab-badge {
-  background: rgba(6, 182, 212, 0.3);
-  color: #38bdf8;
+  background: rgba(245, 158, 11, 0.3);
+  color: #F59E0B;
 }
 
 /* Card Sections */
 .recall-card {
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 16px;
   padding: 24px;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--shadow-sm);
 }
 
 .recall-card-header {
@@ -222,14 +220,14 @@
   align-items: center;
   gap: 10px;
   font-size: 1.15rem;
-  font-weight: 600;
-  color: #f8fafc;
+  font-weight: 800;
+  color: var(--text-primary);
   margin: 0;
 }
 
 .recall-card-subtitle {
   font-size: 0.85rem;
-  color: #94a3b8;
+  color: var(--text-muted);
   margin-top: 4px;
 }
 
@@ -245,8 +243,8 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 8px 14px;
   min-width: 260px;
@@ -254,25 +252,25 @@
 }
 
 .recall-search-input:focus-within {
-  border-color: rgba(6, 182, 212, 0.5);
-  box-shadow: 0 0 10px rgba(6, 182, 212, 0.15);
+  border-color: var(--accent-purple);
+  box-shadow: var(--vc-focus-ring);
 }
 
 .recall-search-input input {
   background: transparent;
   border: none;
   outline: none;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 0.875rem;
   width: 100%;
 }
 
 .recall-filter-select {
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 8px 14px;
-  color: #ffffff;
+  color: var(--text-primary);
   font-size: 0.875rem;
   outline: none;
   cursor: pointer;
@@ -280,14 +278,14 @@
 }
 
 .recall-filter-select:hover {
-  border-color: rgba(255, 255, 255, 0.25);
+  border-color: var(--accent-purple);
 }
 
 /* Data Tables */
 .recall-table-wrapper {
   overflow-x: auto;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border-default);
 }
 
 .recall-table {
@@ -298,25 +296,25 @@
 }
 
 .recall-table th {
-  background: rgba(30, 41, 59, 0.6);
-  color: #94a3b8;
-  font-weight: 600;
+  background: var(--bg-secondary);
+  color: var(--text-muted);
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-default);
 }
 
 .recall-table td {
   padding: 14px 18px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-  color: #cbd5e1;
+  border-bottom: 1px solid var(--border-default);
+  color: var(--text-secondary);
   vertical-align: middle;
 }
 
 .recall-table tbody tr:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--bg-secondary);
 }
 
 /* Details Info Grid */
@@ -327,8 +325,8 @@
 }
 
 .detail-info-card {
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   padding: 16px;
 }
@@ -337,15 +335,15 @@
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.06em;
-  color: #94a3b8;
+  color: var(--text-muted);
   margin-bottom: 6px;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .detail-info-value {
   font-size: 0.95rem;
-  font-weight: 600;
-  color: #f8fafc;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 /* Timeline Layout */
@@ -365,20 +363,20 @@
   top: 12px;
   bottom: 12px;
   width: 2px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-default);
 }
 
 .timeline-step {
   position: relative;
-  background: rgba(30, 41, 59, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 10px;
   padding: 18px 22px;
   transition: border-color 0.2s ease;
 }
 
 .timeline-step:hover {
-  border-color: rgba(6, 182, 212, 0.4);
+  border-color: var(--accent-purple);
 }
 
 .timeline-marker {
@@ -392,34 +390,34 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0f172a;
-  border: 2px solid #64748b;
-  color: #64748b;
+  background: var(--bg-card);
+  border: 2px solid var(--border-default);
+  color: var(--text-muted);
 }
 
 .timeline-step.completed .timeline-marker {
-  border-color: #10b981;
+  border-color: #10B981;
   background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
+  color: #10B981;
 }
 
 .timeline-step.in_progress .timeline-marker {
-  border-color: #06b6d4;
-  background: rgba(6, 182, 212, 0.2);
-  color: #06b6d4;
+  border-color: var(--accent-purple);
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--accent-purple);
   animation: pulse-ring 2s infinite;
 }
 
 .timeline-step.pending .timeline-marker {
-  border-color: #475569;
-  background: #0f172a;
-  color: #475569;
+  border-color: var(--border-default);
+  background: var(--bg-secondary);
+  color: var(--text-muted);
 }
 
 @keyframes pulse-ring {
-  0% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0.4); }
-  70% { box-shadow: 0 0 0 8px rgba(6, 182, 212, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(6, 182, 212, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(245, 158, 11, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
 }
 
 @keyframes fadeIn {
@@ -429,13 +427,13 @@
 
 /* Notification Template Preview Box */
 .notif-preview-box {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px dashed rgba(6, 182, 212, 0.3);
+  background: var(--bg-secondary);
+  border: 1px dashed var(--accent-border);
   border-radius: 8px;
   padding: 12px 16px;
-  font-family: monospace;
+  font-family: var(--font-mono);
   font-size: 0.85rem;
-  color: #e2e8f0;
+  color: var(--text-primary);
   line-height: 1.4;
 }
 
@@ -443,7 +441,7 @@
 .recall-modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.75);
+  background: rgba(11, 15, 25, 0.75);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
@@ -458,13 +456,13 @@
 
 .recall-modal,
 .recall-modal-content {
-  background: #0f172a;
-  border: 1px solid rgba(6, 182, 212, 0.3);
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
   border-radius: 16px;
   width: 100%;
   max-width: 580px;
   max-height: min(92vh, calc(100dvh - 32px));
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 25px 50px -12px rgba(11, 15, 25, 0.4);
   display: flex;
   flex-direction: column;
   margin: auto;
@@ -476,14 +474,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 16px 22px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--border-default);
   flex-shrink: 0;
+  background: var(--bg-secondary);
 }
 
 .recall-modal-header h3 {
   font-size: 1.1rem;
-  font-weight: 700;
-  color: #f8fafc;
+  font-weight: 800;
+  color: var(--text-primary);
   margin: 0;
 }
 
@@ -505,19 +504,19 @@
 
 .recall-form-group label {
   font-size: 0.8rem;
-  font-weight: 600;
-  color: #94a3b8;
+  font-weight: 700;
+  color: var(--text-secondary);
 }
 
 .recall-form-group input,
 .recall-form-group select,
 .recall-form-group textarea {
   width: 100%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
   border-radius: 8px;
   padding: 10px 12px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 0.9rem;
   outline: none;
   transition: border-color 0.2s;
@@ -526,7 +525,8 @@
 .recall-form-group input:focus,
 .recall-form-group select:focus,
 .recall-form-group textarea:focus {
-  border-color: #38bdf8;
+  border-color: var(--accent-purple);
+  box-shadow: var(--vc-focus-ring);
 }
 
 .recall-modal-footer {
@@ -535,9 +535,10 @@
   align-items: center;
   gap: 10px;
   padding: 16px 22px;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  border-top: 1px solid var(--border-default);
   flex-shrink: 0;
   flex-wrap: wrap;
+  background: var(--bg-secondary);
 }
 
 @media (max-width: 540px) {
@@ -556,7 +557,7 @@
 .recall-modal-content button:focus-visible,
 .recall-modal button:focus-visible,
 .recall-focus-bar button:focus-visible {
-  outline: 2px solid rgba(6, 182, 212, 0.8);
+  outline: 2px solid var(--accent-purple);
   outline-offset: 2px;
 }
 
@@ -566,5 +567,3 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
-
-

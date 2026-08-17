@@ -89,9 +89,9 @@ export default function AdminReportsView() {
     <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-lg, 20px)' }}>
       {toastMessage && (
         <div style={{
-          background: 'rgba(6, 182, 212, 0.15)',
-          border: '1px solid rgba(6, 182, 212, 0.4)',
-          color: '#38bdf8',
+          background: 'var(--accent-bg)',
+          border: '1px solid var(--accent-border)',
+          color: 'var(--text-primary)',
           padding: '12px 18px',
           borderRadius: 'var(--radius-md, 8px)',
           fontSize: '0.9rem',
@@ -109,7 +109,7 @@ export default function AdminReportsView() {
         <div className="admin-card-header" style={{ marginBottom: 16 }}>
           <div>
             <h3 className="admin-card-title">
-              <FileText size={20} color="#06b6d4" />
+              <FileText size={20} color="var(--accent-primary)" />
               Audit & Compliance Report Generator
             </h3>
             <p className="admin-card-subtitle">Export official cryptographic audit trails, platform telemetry, and compliance metrics</p>

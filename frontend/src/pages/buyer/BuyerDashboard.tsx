@@ -62,9 +62,9 @@ export default function BuyerDashboard() {
   const safeComplaints = complaints || [];
 
   const stats = [
-    { label: 'My Products', value: safeItems.length, icon: Package, color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)' },
-    { label: 'Verified', value: safeItems.filter(i => i.product?.verifiedStatus === 'verified').length, icon: Shield, color: '#10b981', bg: 'rgba(16, 185, 129, 0.12)' },
-    { label: 'Open Complaints', value: safeComplaints.filter(c => ['pending', 'under_review'].includes(c.status)).length, icon: AlertTriangle, color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.12)' },
+    { label: 'My Products', value: safeItems.length, icon: Package, color: '#1A2B4C', bg: 'rgba(26, 43, 76, 0.1)' },
+    { label: 'Verified', value: safeItems.filter(i => i.product?.verifiedStatus === 'verified').length, icon: Shield, color: '#10B981', bg: 'rgba(16, 185, 129, 0.12)' },
+    { label: 'Open Complaints', value: safeComplaints.filter(c => ['pending', 'under_review'].includes(c.status)).length, icon: AlertTriangle, color: '#F5A623', bg: 'rgba(245, 166, 35, 0.15)' },
   ];
 
 

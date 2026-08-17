@@ -15,39 +15,72 @@
 .vc-button--md { padding: var(--vc-button-padding-md); font-size: 1rem; }
 .vc-button--lg { padding: var(--vc-button-padding-lg); font-size: 1.125rem; }
 
-/* Primary */
+/* Primary (Architectural Navy with subtle warm glow) */
 .vc-button--primary {
   background-color: var(--vc-button-bg-primary);
   color: var(--vc-button-text-primary);
   border-radius: var(--vc-button-border-radius);
+  box-shadow: var(--shadow-sm);
 }
 .vc-button--primary:hover {
   background-color: var(--vc-button-bg-primary-hover);
+  box-shadow: var(--shadow-md), 0 0 15px rgba(245, 158, 11, 0.15);
+  transform: translateY(-1px);
 }
 
-/* Secondary */
+/* Accent (Warm Marigold / Amber Yellow CTA) */
+.vc-button--accent {
+  background-color: var(--vc-button-bg-accent);
+  color: var(--vc-button-text-accent);
+  border-radius: var(--vc-button-border-radius);
+  font-weight: 700;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.25);
+}
+.vc-button--accent:hover {
+  background-color: var(--vc-button-bg-accent-hover);
+  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.35);
+  transform: translateY(-1px);
+}
+
+/* Secondary (Card white / mist gray with navy text) */
 .vc-button--secondary {
   background-color: var(--vc-button-bg-secondary);
-  color: var(--vc-button-text-primary);
+  color: var(--vc-button-text-secondary);
+  border: 1px solid var(--border-default);
   border-radius: var(--vc-button-border-radius);
+  box-shadow: var(--shadow-xs);
+}
+.vc-button--secondary:hover {
+  border-color: var(--accent-purple);
+  background-color: var(--bg-secondary);
 }
 
 /* Outline */
 .vc-button--outline {
   background-color: var(--vc-button-bg-outline);
   color: var(--vc-button-text-secondary);
-  border: 1px solid var(--vc-button-bg-primary);
+  border: 1px solid var(--border-default);
   border-radius: var(--vc-button-border-radius);
+}
+.vc-button--outline:hover {
+  border-color: var(--accent-purple);
+  color: var(--accent-primary);
+  background-color: var(--accent-bg);
 }
 
 /* Ghost */
 .vc-button--ghost {
   background-color: transparent;
-  color: var(--vc-button-text-secondary);
+  color: var(--text-secondary);
   border: none;
+}
+.vc-button--ghost:hover {
+  color: var(--text-primary);
+  background-color: var(--bg-secondary);
 }
 
 .vc-button:disabled {
-  opacity: 0.6;
+  opacity: 0.5;
   cursor: not-allowed;
+  transform: none !important;
 }

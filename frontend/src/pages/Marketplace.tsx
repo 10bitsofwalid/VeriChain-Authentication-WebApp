@@ -9,6 +9,7 @@ import CategoryFilter from '../design-system/components/CategoryFilter';
 import ProductCard from '../components/ProductCard';
 import PaginationControls from '../design-system/components/PaginationControls';
 import { useAuth } from '../context/AuthContext';
+import './MarketplaceHome.css';
 
 export interface ListedItem {
   _id: string;
@@ -125,7 +126,6 @@ export default function Marketplace() {
               display: 'inline-flex',
               alignItems: 'center',
               gap: '8px',
-              boxShadow: '0 0 20px rgba(6, 182, 212, 0.35)',
               padding: '10px 18px',
               fontWeight: 700,
             }}

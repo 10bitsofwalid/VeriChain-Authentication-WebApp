@@ -304,16 +304,16 @@ export default function RecallManagementView() {
         {notificationSuccess && (
           <div
             style={{
-              background: 'rgba(6, 182, 212, 0.15)',
-              border: '1px solid rgba(6, 182, 212, 0.4)',
-              color: '#38bdf8',
+              background: 'var(--accent-bg)',
+              border: '1px solid var(--accent-border)',
+              color: 'var(--text-primary)',
               padding: '12px 18px',
               borderRadius: '8px',
               fontSize: '0.9rem',
               display: 'flex',
               alignItems: 'center',
               gap: 10,
-              boxShadow: '0 4px 14px rgba(6, 182, 212, 0.2)',
+              boxShadow: 'var(--shadow-sm)',
             }}
           >
             <CheckCircle2 size={18} />
@@ -374,7 +374,7 @@ export default function RecallManagementView() {
           <MetricCard
             label="Affected Units Total"
             value={totalAffected.toLocaleString()}
-            icon={<Boxes size={20} color="#06b6d4" />}
+            icon={<Boxes size={20} color="var(--accent-purple)" />}
           />
           <MetricCard
             label="Quarantine Segregation Rate"
@@ -476,7 +476,7 @@ export default function RecallManagementView() {
             <div className="recall-card-header">
               <div>
                 <h3 className="recall-card-title">
-                  <List size={18} color="#06b6d4" />
+                  <List size={18} color="var(--accent-purple)" />
                   Active & Archived Product Recalls
                 </h3>
                 <p className="recall-card-subtitle">Filter by severity level, code, batch, or resolution state</p>
@@ -537,11 +537,11 @@ export default function RecallManagementView() {
                     <tr
                       key={r.id}
                       style={{
-                        background: r.id === selectedRecall?.id ? 'rgba(6, 182, 212, 0.06)' : undefined,
+                        background: r.id === selectedRecall?.id ? 'var(--accent-bg)' : undefined,
                       }}
                     >
                       <td>
-                        <strong style={{ color: '#38bdf8', fontFamily: 'monospace' }}>{r.recallCode}</strong>
+                        <strong style={{ color: 'var(--accent-purple)', fontFamily: 'monospace' }}>{r.recallCode}</strong>
                       </td>
                       <td>
                         <div style={{ fontWeight: 600, color: '#f8fafc' }}>{r.productName}</div>
@@ -600,7 +600,7 @@ export default function RecallManagementView() {
                 <div className="recall-card-header">
                   <div>
                     <h3 className="recall-card-title">
-                      <FileText size={18} color="#06b6d4" />
+                      <FileText size={18} color="var(--accent-purple)" />
                       Recall Specification & Risk Assessment — {selectedRecall.recallCode}
                     </h3>
                     <p className="recall-card-subtitle">{selectedRecall.title}</p>
@@ -654,8 +654,8 @@ export default function RecallManagementView() {
                     <p style={{ color: '#f8fafc', margin: '4px 0 0 0', lineHeight: 1.5 }}>{selectedRecall.rootCause}</p>
                   </div>
 
-                  <div className="detail-info-card" style={{ borderLeft: '3px solid #06b6d4' }}>
-                    <div className="detail-info-label" style={{ color: '#06b6d4' }}>Health & Risk Assessment Level</div>
+                  <div className="detail-info-card" style={{ borderLeft: '3px solid var(--accent-purple)' }}>
+                    <div className="detail-info-label" style={{ color: 'var(--accent-purple)' }}>Health & Risk Assessment Level</div>
                     <p style={{ color: '#f8fafc', margin: '4px 0 0 0', fontWeight: 600 }}>{selectedRecall.riskLevel}</p>
                   </div>
 
@@ -677,7 +677,7 @@ export default function RecallManagementView() {
             <div className="recall-card-header">
               <div>
                 <h3 className="recall-card-title">
-                  <Boxes size={18} color="#06b6d4" />
+                  <Boxes size={18} color="var(--accent-purple)" />
                   Affected Item Units & Serial Distribution {selectedRecall ? `— ${selectedRecall.batchId}` : ''}
                 </h3>
                 <p className="recall-card-subtitle">
@@ -701,7 +701,7 @@ export default function RecallManagementView() {
                 <tbody>
                   {filteredUnits.map((u) => (
                     <tr key={u.id}>
-                      <td style={{ fontFamily: 'monospace', color: '#38bdf8', fontWeight: 600 }}>{u.serialNumber}</td>
+                      <td style={{ fontFamily: 'monospace', color: 'var(--accent-purple)', fontWeight: 600 }}>{u.serialNumber}</td>
                       <td>{u.location}</td>
                       <td>{u.distributionStatus}</td>
                       <td>
@@ -744,7 +744,7 @@ export default function RecallManagementView() {
             <div className="recall-card-header">
               <div>
                 <h3 className="recall-card-title">
-                  <Clock size={18} color="#06b6d4" />
+                  <Clock size={18} color="var(--accent-purple)" />
                   Recall Milestones & Custody Timeline {selectedRecall ? `— ${selectedRecall.recallCode}` : ''}
                 </h3>
                 <p className="recall-card-subtitle">Chronological ledger of incident discoveries, inspections, and resolutions</p>
@@ -780,7 +780,7 @@ export default function RecallManagementView() {
             <div className="recall-card-header">
               <div>
                 <h3 className="recall-card-title">
-                  <Bell size={18} color="#06b6d4" />
+                  <Bell size={18} color="var(--accent-purple)" />
                   Broadcasts & Regulatory Notifications
                 </h3>
                 <p className="recall-card-subtitle">Dispatch logs sent to retailers, logistics hubs, and verified owners</p>
@@ -838,7 +838,7 @@ export default function RecallManagementView() {
             <div className="recall-card-header">
               <div>
                 <h3 className="recall-card-title">
-                  <HistoryIcon size={18} color="#06b6d4" />
+                  <HistoryIcon size={18} color="var(--accent-purple)" />
                   Compliance Audit Trail
                 </h3>
                 <p className="recall-card-subtitle">Immutable system and operator log of all quarantine modifications</p>
@@ -869,7 +869,7 @@ export default function RecallManagementView() {
                         <span style={{ color: '#94a3b8' }}>{a.previousState || '—'}</span>
                       </td>
                       <td>
-                        <strong style={{ color: '#38bdf8' }}>{a.newState || '—'}</strong>
+                        <strong style={{ color: 'var(--accent-purple)' }}>{a.newState || '—'}</strong>
                       </td>
                       <td style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>{a.notes}</td>
                     </tr>
@@ -993,7 +993,7 @@ export default function RecallManagementView() {
               <div className="recall-modal-body">
                 <p style={{ color: '#cbd5e1', fontSize: '0.9rem', lineHeight: 1.5 }}>
                   This will broadcast cryptographic safety push notifications & emails to all registered owners of batch{' '}
-                  <strong style={{ color: '#38bdf8' }}>{selectedRecall.batchId}</strong> ({selectedRecall.productName}).
+                  <strong style={{ color: 'var(--accent-purple)' }}>{selectedRecall.batchId}</strong> ({selectedRecall.productName}).
                 </p>
                 <div className="detail-info-card" style={{ marginTop: 14 }}>
                   <div className="detail-info-label">Broadcast Template</div>

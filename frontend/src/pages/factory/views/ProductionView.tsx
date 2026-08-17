@@ -22,9 +22,9 @@ export default function ProductionView() {
   const [batches] = useState<BatchItem[]>([]);
 
   const stats = [
-    { label: 'Active Batches',  value: batches.length.toString(), icon: Boxes,        color: '#8b5cf6', bg: 'rgba(139,92,246,0.12)' },
+    { label: 'Active Batches',  value: batches.length.toString(), icon: Boxes,        color: 'var(--accent-purple)', bg: 'var(--accent-bg)' },
     { label: 'Completed Today', value: '0',                       icon: CheckCircle,  color: '#10b981', bg: 'rgba(16,185,129,0.12)' },
-    { label: 'Units Queued',    value: '0',                       icon: Clock,        color: '#f59e0b', bg: 'rgba(245,158,11,0.12)' },
+    { label: 'Units Queued',    value: '0',                       icon: Clock,        color: '#F5A623', bg: 'rgba(245, 166, 35, 0.15)' },
   ];
 
   return (
@@ -44,7 +44,7 @@ export default function ProductionView() {
       </div>
 
       <div className="fd-section-hd">
-        <h2><Loader size={16} color="#8b5cf6" /> Production Batches</h2>
+        <h2><Loader size={16} color="var(--accent-purple)" /> Production Batches</h2>
         <span style={{ fontSize: 13, color: 'var(--text-secondary)' }}>{batches.length} batches</span>
       </div>
 
