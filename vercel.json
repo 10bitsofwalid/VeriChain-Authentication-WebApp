@@ -1,5 +1,5 @@
 {
-  "buildCommand": "cd frontend && npm install --include=dev && npm run build",
+  "buildCommand": "node build.js",
   "outputDirectory": "frontend/dist",
   "framework": "vite",
   "cleanUrls": true,

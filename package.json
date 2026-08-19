@@ -2,7 +2,7 @@
   "name": "verichain-project",
   "private": true,
   "scripts": {
-    "build": "cd frontend && npm install --include=dev && npm run build",
+    "build": "node build.js",
     "dev": "cd frontend && npm run dev"
   }
 }
