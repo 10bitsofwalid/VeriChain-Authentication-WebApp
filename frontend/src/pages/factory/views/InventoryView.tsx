@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Package, Search, Filter, AlertCircle, CheckCircle, Clock, Zap } from 'lucide-react';
+import {
+  IconPackage as Package,
+  IconSearch as Search,
+  IconFilter as Filter,
+  IconAlertCircle as AlertCircle,
+  IconCircleCheck as CheckCircle,
+  IconClock as Clock,
+  IconBolt as Zap,
+} from '@tabler/icons-react';
 import client from '../../../api/client';
 
 interface FactoryInventoryItem {

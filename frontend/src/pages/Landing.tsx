@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import {
-  Search,
-  ArrowRight,
-  CheckCircle,
-  Globe,
-  Lock,
-  Zap,
-} from 'lucide-react';
+  IconSearch as Search,
+  IconArrowRight as ArrowRight,
+  IconCircleCheck as CheckCircle,
+  IconGlobe as Globe,
+  IconLock as Lock,
+  IconBolt as Zap,
+} from '@tabler/icons-react';
 import Logo from '../components/Logo';
 import './Landing.css';
 

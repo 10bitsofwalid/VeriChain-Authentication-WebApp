@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Check, CreditCard, MapPin, ShieldCheck, ChevronRight, ShoppingBag, Loader2, AlertCircle } from 'lucide-react';
+import {
+  IconCheck as Check,
+  IconCreditCard as CreditCard,
+  IconMapPin as MapPin,
+  IconShieldCheck as ShieldCheck,
+  IconChevronRight as ChevronRight,
+  IconShoppingBag as ShoppingBag,
+  IconLoader2 as Loader2,
+  IconAlertCircle as AlertCircle,
+} from '@tabler/icons-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { useShopping } from '../../context/ShoppingContext';

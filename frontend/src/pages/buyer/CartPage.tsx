@@ -1,6 +1,15 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Trash2, ShieldCheck, AlertTriangle, ArrowRight, ShoppingBag, Lock, RotateCcw } from 'lucide-react';
+import {
+  IconShoppingCart as ShoppingCart,
+  IconTrash as Trash2,
+  IconShieldCheck as ShieldCheck,
+  IconAlertTriangle as AlertTriangle,
+  IconArrowRight as ArrowRight,
+  IconShoppingBag as ShoppingBag,
+  IconLock as Lock,
+  IconRotate2 as RotateCcw,
+} from '@tabler/icons-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { useShopping } from '../../context/ShoppingContext';

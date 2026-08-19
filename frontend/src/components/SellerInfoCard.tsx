@@ -1,5 +1,9 @@
 import { Link } from 'react-router-dom';
-import { ShieldCheck, ExternalLink, Store } from 'lucide-react';
+import {
+  IconRosetteDiscountCheck as RosetteCheck,
+  IconArrowUpRight as ArrowUpRight,
+  IconBuildingStore as Store,
+} from '@tabler/icons-react';
 
 interface SellerInfoCardProps {
   seller: any;
@@ -43,7 +47,7 @@ export default function SellerInfoCard({ seller, title }: SellerInfoCardProps) {
               fontWeight: 700,
             }}
           >
-            <Store size={13} /> Storefront <ExternalLink size={11} />
+            <Store size={14} /> Storefront <ArrowUpRight size={13} />
           </Link>
         )}
       </div>
@@ -92,7 +96,7 @@ export default function SellerInfoCard({ seller, title }: SellerInfoCardProps) {
                   gap: '3px',
                 }}
               >
-                <ShieldCheck size={10} /> Verified
+                <RosetteCheck size={11} /> Verified
               </span>
             )}
           </div>

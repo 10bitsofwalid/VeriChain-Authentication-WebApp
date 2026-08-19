@@ -5,21 +5,21 @@ import StatusChip from '../../components/ui/StatusChip';
 import PageContainer from '../../components/layout/PageContainer';
 import client from '../../api/client';
 import {
-  AlertTriangle,
-  ShieldAlert,
-  Search,
-  Plus,
-  Send,
-  CheckCircle2,
-  List,
-  FileText,
-  Boxes,
-  Clock,
-  Bell,
-  History as HistoryIcon,
-  X,
-  Tag,
-} from 'lucide-react';
+  IconAlertTriangle as AlertTriangle,
+  IconShieldExclamation as ShieldAlert,
+  IconSearch as Search,
+  IconPlus as Plus,
+  IconSend as Send,
+  IconCircleCheck as CheckCircle2,
+  IconList as List,
+  IconFileText as FileText,
+  IconPackages as Boxes,
+  IconClock as Clock,
+  IconBell as Bell,
+  IconHistory as HistoryIcon,
+  IconX as X,
+  IconTag as Tag,
+} from '@tabler/icons-react';
 
 import type {
   RecallItem,

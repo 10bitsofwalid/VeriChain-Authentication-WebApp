@@ -4,13 +4,13 @@ import StatusChip from '../../../components/ui/StatusChip';
 import MetricCard from '../../../components/ui/MetricCard';
 import client from '../../../api/client';
 import {
-  AlertTriangle,
-  Search,
-  CheckCircle2,
-  Clock,
-  ShieldAlert,
-  X,
-} from 'lucide-react';
+  IconAlertTriangle as AlertTriangle,
+  IconSearch as Search,
+  IconCircleCheck as CheckCircle2,
+  IconClock as Clock,
+  IconShieldExclamation as ShieldAlert,
+  IconX as X,
+} from '@tabler/icons-react';
 
 interface ComplaintRecord {
   id: string;

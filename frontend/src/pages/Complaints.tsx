@@ -10,12 +10,12 @@ import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import FileUpload from '../components/FileUpload';
 import {
-  AlertTriangle,
-  Plus,
-  Loader,
-  Eye,
-  LogIn,
-} from 'lucide-react';
+  IconAlertTriangle as AlertTriangle,
+  IconPlus as Plus,
+  IconLoader as Loader,
+  IconEye as Eye,
+  IconLogin as LogIn,
+} from '@tabler/icons-react';
 import './MarketplaceHome.css';
 
 interface Complaint {

@@ -2,28 +2,32 @@ import { useState, useEffect, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
 import {
-  Shield,
-  Search,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Clock,
-  MapPin,
-  Package,
-  QrCode,
-  Camera,
-  Copy,
-  Check,
-  FileText,
-  Award,
-  User,
-  Building,
-  Truck,
-  Database,
-  RefreshCw,
-  ShoppingBag,
-  ExternalLink,
-} from 'lucide-react';
+  IconShield as Shield,
+  IconSearch as Search,
+  IconCircleCheck as CheckCircle,
+  IconCircleX as XCircle,
+  IconAlertTriangle as AlertTriangle,
+  IconClock as Clock,
+  IconMapPin as MapPin,
+  IconPackage as Package,
+  IconQrcode as QrCode,
+  IconCamera as Camera,
+  IconCopy as Copy,
+  IconCheck as Check,
+  IconFileText as FileText,
+  IconAward as Award,
+  IconUser as User,
+  IconBuilding as Building,
+  IconTruck as Truck,
+  IconDatabase as Database,
+  IconRefresh as RefreshCw,
+  IconShoppingBag as ShoppingBag,
+  IconExternalLink as ExternalLink,
+  IconRosetteDiscountCheck as RosetteCheck,
+  IconCpu as Cpu,
+  IconLock as Lock,
+  IconFingerprint as Fingerprint,
+} from '@tabler/icons-react';
 import logoSvg from '../assets/logo.svg';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
@@ -597,6 +601,193 @@ export default function VerifyItem() {
 
             </div>
 
+          </div>
+        )}
+
+        {/* Informational Hero Cards when No Result Searched */}
+        {!result && !error && (
+          <div style={{ marginTop: 'var(--space-2xl)', display: 'flex', flexDirection: 'column', gap: 'var(--space-2xl)' }}>
+            {/* How Verification Works 3-Step Grid */}
+            <section>
+              <div style={{ textAlign: 'center', marginBottom: 'var(--space-lg)' }}>
+                <span className="marketplace-eyebrow" style={{ textTransform: 'uppercase', letterSpacing: '0.08em', fontSize: '0.75rem', fontWeight: 700, color: 'var(--accent-purple, #F59E0B)' }}>
+                  Decentralized Provenance Protocol
+                </span>
+                <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', margin: '4px 0 0' }}>
+                  How Cryptographic Verification Works
+                </h2>
+              </div>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+                  gap: 'var(--space-lg)',
+                }}
+              >
+                <div
+                  className="glass-card"
+                  style={{
+                    padding: 'var(--space-lg)',
+                    borderRadius: 'var(--radius-xl)',
+                    border: '1px solid var(--border-default)',
+                    background: 'var(--bg-card)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-sm)',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 'var(--radius-lg)',
+                      background: 'rgba(245, 158, 11, 0.12)',
+                      color: '#F59E0B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <QrCode size={22} />
+                  </div>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', margin: '4px 0 0' }}>
+                    1. Scan Physical Seal
+                  </h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+                    Locate the tamper-evident cryptographic QR code or NFC chip etched onto the product packaging and scan or enter the serial.
+                  </p>
+                </div>
+
+                <div
+                  className="glass-card"
+                  style={{
+                    padding: 'var(--space-lg)',
+                    borderRadius: 'var(--radius-xl)',
+                    border: '1px solid var(--border-default)',
+                    background: 'var(--bg-card)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-sm)',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 'var(--radius-lg)',
+                      background: 'rgba(22, 35, 59, 0.08)',
+                      color: '#16233B',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Cpu size={22} />
+                  </div>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', margin: '4px 0 0' }}>
+                    2. Consensus Validation
+                  </h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+                    VeriChain nodes cross-verify the manufacturer digital signature, minting timestamp, and batch zero-knowledge proofs.
+                  </p>
+                </div>
+
+                <div
+                  className="glass-card"
+                  style={{
+                    padding: 'var(--space-lg)',
+                    borderRadius: 'var(--radius-xl)',
+                    border: '1px solid var(--border-default)',
+                    background: 'var(--bg-card)',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 'var(--space-sm)',
+                    boxShadow: 'var(--shadow-sm)',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: 44,
+                      height: 44,
+                      borderRadius: 'var(--radius-lg)',
+                      background: 'rgba(16, 185, 129, 0.12)',
+                      color: '#10B981',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <RosetteCheck size={22} />
+                  </div>
+                  <h3 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-primary)', margin: '4px 0 0' }}>
+                    3. Certificate Audit
+                  </h3>
+                  <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>
+                    Inspect the interactive 3D holographic digital birth certificate, verified owner custody timeline, and anti-counterfeit risk index.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            {/* Network Guarantees Banner */}
+            <div
+              className="glass-card"
+              style={{
+                padding: 'var(--space-lg) var(--space-xl)',
+                borderRadius: 'var(--radius-xl)',
+                border: '1px solid var(--border-default)',
+                background: 'linear-gradient(135deg, rgba(22, 35, 59, 0.03) 0%, rgba(245, 158, 11, 0.04) 100%)',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: 'var(--space-lg)',
+                alignItems: 'center',
+              }}
+            >
+              <div style={{ display: 'flex', gap: 'var(--space-md)', alignItems: 'center' }}>
+                <div style={{ color: '#10B981', flexShrink: 0 }}>
+                  <Shield size={28} />
+                </div>
+                <div>
+                  <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                    Anti-Counterfeit Protection
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    Automated burst detection blocks cloned QR seals
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 'var(--space-md)', alignItems: 'center' }}>
+                <div style={{ color: 'var(--accent-purple, #F59E0B)', flexShrink: 0 }}>
+                  <Fingerprint size={28} />
+                </div>
+                <div>
+                  <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                    Cryptographic Digital Twin
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    Every unit is unique with verifiable ledger provenance
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: 'var(--space-md)', alignItems: 'center' }}>
+                <div style={{ color: '#16233B', flexShrink: 0 }}>
+                  <Lock size={28} />
+                </div>
+                <div>
+                  <strong style={{ display: 'block', fontSize: '0.9rem', color: 'var(--text-primary)' }}>
+                    Tamper-Evident Custody
+                  </strong>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>
+                    Direct manufacturer-to-consumer chain of custody
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </div>

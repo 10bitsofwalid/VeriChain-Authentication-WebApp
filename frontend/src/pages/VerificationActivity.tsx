@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle2, ShieldCheck, Activity } from 'lucide-react';
+import { IconCircleCheck as CheckCircle2, IconShieldCheck as ShieldCheck, IconActivity as Activity } from '@tabler/icons-react';
 
 const VerificationActivity: React.FC = () => {
   return (

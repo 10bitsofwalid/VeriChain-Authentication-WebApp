@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MessageSquare, Users, ShieldAlert, ArrowUp, Search, Plus, Send } from 'lucide-react';
+import {
+  IconMessage as MessageSquare,
+  IconUsers as Users,
+  IconShieldExclamation as ShieldAlert,
+  IconArrowUp as ArrowUp,
+  IconSearch as Search,
+  IconPlus as Plus,
+  IconSend as Send,
+} from '@tabler/icons-react';
 import client from '../../api/client';
 import Modal from '../../components/ui/Modal';
 import { useAuth } from '../../context/AuthContext';

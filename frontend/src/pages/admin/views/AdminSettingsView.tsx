@@ -2,15 +2,15 @@ import { useState, useEffect } from 'react';
 import ActionButton from '../../../components/ui/ActionButton';
 import StatusChip from '../../../components/ui/StatusChip';
 import {
-  Shield,
-  Key,
-  Bell,
-  CheckCircle2,
-  Lock,
-  Plus,
-  Trash2,
-  Zap,
-} from 'lucide-react';
+  IconShield as Shield,
+  IconKey as Key,
+  IconBell as Bell,
+  IconCircleCheck as CheckCircle2,
+  IconLock as Lock,
+  IconPlus as Plus,
+  IconTrash as Trash2,
+  IconBolt as Zap,
+} from '@tabler/icons-react';
 
 interface ApiKeyRecord {
   id: string;
@@ -104,7 +104,9 @@ export default function AdminSettingsView() {
     setKeys(updated);
     try {
       localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify(updated));
-    } catch {}
+    } catch (e) {
+      console.warn('Failed to persist keys to storage', e);
+    }
     showToast('API Key revoked and invalidated');
   };
 
@@ -122,7 +124,9 @@ export default function AdminSettingsView() {
     setKeys(updated);
     try {
       localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify(updated));
-    } catch {}
+    } catch (e) {
+      console.warn('Failed to persist key to storage', e);
+    }
     showToast('Generated new VeriChain API Key and saved to keystore');
   };
 

@@ -3,11 +3,11 @@ import ActionButton from '../../../components/ui/ActionButton';
 import StatusChip from '../../../components/ui/StatusChip';
 import client from '../../../api/client';
 import {
-  FileText,
-  Download,
-  Calendar,
-  CheckCircle2,
-} from 'lucide-react';
+  IconFileText as FileText,
+  IconDownload as Download,
+  IconCalendar as Calendar,
+  IconCircleCheck as CheckCircle2,
+} from '@tabler/icons-react';
 
 interface ReportTemplate {
   id: string;

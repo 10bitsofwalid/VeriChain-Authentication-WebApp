@@ -2,7 +2,18 @@ import React, { useState, useEffect } from 'react';
 import PageLoader from '../../components/ui/PageLoader';
 import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
-import { Mail, User, Shield, Check, Copy, Trash2, ArrowLeft, Loader, Plus, RefreshCw } from 'lucide-react';
+import {
+  IconMail as Mail,
+  IconUser as User,
+  IconShield as Shield,
+  IconCheck as Check,
+  IconCopy as Copy,
+  IconTrash as Trash2,
+  IconArrowLeft as ArrowLeft,
+  IconLoader as Loader,
+  IconPlus as Plus,
+  IconRefresh as RefreshCw,
+} from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 
 interface Invitation {

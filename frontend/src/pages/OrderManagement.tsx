@@ -1,16 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  ShieldCheck,
-  CheckCircle,
-  Truck,
-  Building,
-  User,
-  ShoppingBag,
-  Download,
-  Share2,
-  RefreshCw,
-} from 'lucide-react';
+  IconShieldCheck as ShieldCheck,
+  IconCircleCheck as CheckCircle,
+  IconTruck as Truck,
+  IconBuilding as Building,
+  IconUser as User,
+  IconShoppingBag as ShoppingBag,
+  IconDownload as Download,
+  IconShare as Share2,
+  IconRefresh as RefreshCw,
+} from '@tabler/icons-react';
 import client from '../api/client';
 import EmptyState from '../components/ui/EmptyState';
 import './OrderManagement.css';

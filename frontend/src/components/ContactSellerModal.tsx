@@ -1,15 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import {
-  MessageSquare,
-  Mail,
-  Phone,
-  ShieldCheck,
-  Send,
-  CheckCircle,
-  ExternalLink,
-  DollarSign,
-  Sparkles,
-} from 'lucide-react';
+  IconMessage as MessageSquare,
+  IconMail as Mail,
+  IconPhone as Phone,
+  IconShieldCheck as ShieldCheck,
+  IconSend as Send,
+  IconCircleCheck as CheckCircle,
+  IconExternalLink as ExternalLink,
+  IconCurrencyDollar as DollarSign,
+  IconSparkles as Sparkles,
+} from '@tabler/icons-react';
 import Modal from './ui/Modal';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from './ToastProvider';

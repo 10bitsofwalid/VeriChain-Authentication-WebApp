@@ -5,15 +5,15 @@ import Modal from '../../components/ui/Modal';
 import { useLocation } from 'react-router-dom';
 import client from '../../api/client';
 import {
-  Shield,
-  AlertTriangle,
-  CheckCircle,
-  XCircle,
-  Eye,
-  Loader,
-  AlertOctagon,
-  TrendingUp,
-} from 'lucide-react';
+  IconShield as Shield,
+  IconAlertTriangle as AlertTriangle,
+  IconCircleCheck as CheckCircle,
+  IconCircleX as XCircle,
+  IconEye as Eye,
+  IconLoader as Loader,
+  IconAlertOctagon as AlertOctagon,
+  IconTrendingUp as TrendingUp,
+} from '@tabler/icons-react';
 
 interface ModeratorAnalytics {
   pendingVerifications: number;

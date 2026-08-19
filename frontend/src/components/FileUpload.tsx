@@ -1,5 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Upload, X, File, AlertCircle, Loader } from 'lucide-react';
+import {
+  IconUpload as Upload,
+  IconX as X,
+  IconFile as File,
+  IconAlertCircle as AlertCircle,
+  IconLoader as Loader,
+} from '@tabler/icons-react';
 import client from '../api/client';
 
 interface FileUploadProps {

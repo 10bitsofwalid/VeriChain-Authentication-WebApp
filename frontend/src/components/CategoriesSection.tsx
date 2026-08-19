@@ -1,5 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { Gem, Laptop, Pill, Shirt, Sparkles, Watch } from 'lucide-react';
+import {
+  IconDiamond as Gem,
+  IconDeviceLaptop as Laptop,
+  IconPill as Pill,
+  IconShirt as Shirt,
+  IconSparkles as Sparkles,
+  IconDeviceWatch as Watch,
+} from '@tabler/icons-react';
 
 const categories = [
   { name: 'Electronics', icon: Laptop, label: 'Verified Catalog', tone: 'blue' },

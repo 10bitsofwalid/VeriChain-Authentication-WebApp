@@ -1,6 +1,15 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { History, Search, ShieldCheck, Download, ExternalLink, AlertCircle, CheckCircle, RotateCcw } from 'lucide-react';
+import {
+  IconHistory as History,
+  IconSearch as Search,
+  IconShieldCheck as ShieldCheck,
+  IconDownload as Download,
+  IconExternalLink as ExternalLink,
+  IconAlertCircle as AlertCircle,
+  IconCircleCheck as CheckCircle,
+  IconRotate2 as RotateCcw,
+} from '@tabler/icons-react';
 import client from '../../api/client';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';

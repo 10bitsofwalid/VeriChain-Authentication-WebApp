@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShoppingCart } from 'lucide-react';
+import { IconShoppingCart as ShoppingCart } from '@tabler/icons-react';
 
 interface Product {
   _id: string;

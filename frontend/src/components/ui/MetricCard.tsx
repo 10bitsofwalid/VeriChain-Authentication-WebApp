@@ -1,4 +1,4 @@
-import type { LucideIcon } from 'lucide-react';
+import type { TablerIcon as LucideIcon } from '@tabler/icons-react';
 import React from 'react';
 import ClayCard from './ClayCard';
 import './ui.css';

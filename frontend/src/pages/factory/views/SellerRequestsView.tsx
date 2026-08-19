@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Clock, Search } from 'lucide-react';
+import { IconUsers as Users, IconClock as Clock, IconSearch as Search } from '@tabler/icons-react';
 import client from '../../../api/client';
 
 interface SellerRequestItem {

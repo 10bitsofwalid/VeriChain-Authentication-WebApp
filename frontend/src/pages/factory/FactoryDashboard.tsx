@@ -1,6 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Package, Boxes, TrendingUp, Truck, Users, BarChart2 } from 'lucide-react';
+import {
+  IconPackage as Package,
+  IconPackages as Boxes,
+  IconTrendingUp as TrendingUp,
+  IconTruck as Truck,
+  IconUsers as Users,
+  IconChartBar as BarChart2,
+} from '@tabler/icons-react';
 import InventoryView from './views/InventoryView';
 import ProductionView from './views/ProductionView';
 import AllocationsView from './views/AllocationsView';

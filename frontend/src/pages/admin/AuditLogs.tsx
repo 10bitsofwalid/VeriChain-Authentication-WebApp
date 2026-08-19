@@ -3,11 +3,11 @@ import PageLoader from '../../components/ui/PageLoader';
 import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
 import {
-  FileText,
-  Clock,
-  ChevronLeft,
-  ChevronRight,
-} from 'lucide-react';
+  IconFileText as FileText,
+  IconClock as Clock,
+  IconChevronLeft as ChevronLeft,
+  IconChevronRight as ChevronRight,
+} from '@tabler/icons-react';
 
 interface AuditLogEntry {
   _id: string;

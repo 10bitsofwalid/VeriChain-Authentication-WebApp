@@ -1,6 +1,12 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, ShoppingBag, Trash2, ShieldCheck, ArrowRight } from 'lucide-react';
+import {
+  IconHeart as Heart,
+  IconShoppingBag as ShoppingBag,
+  IconTrash as Trash2,
+  IconShieldCheck as ShieldCheck,
+  IconArrowRight as ArrowRight,
+} from '@tabler/icons-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { useShopping } from '../../context/ShoppingContext';

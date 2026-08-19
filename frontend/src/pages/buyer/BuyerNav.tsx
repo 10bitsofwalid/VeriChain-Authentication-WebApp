@@ -1,5 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { ShoppingCart, CreditCard, Package, Heart, User, History } from 'lucide-react';
+import {
+  IconShoppingCart as ShoppingCart,
+  IconCreditCard as CreditCard,
+  IconPackage as Package,
+  IconHeart as Heart,
+  IconUser as User,
+  IconHistory as History,
+} from '@tabler/icons-react';
 import { useShopping } from '../../context/ShoppingContext';
 import './BuyerExperience.css';
 

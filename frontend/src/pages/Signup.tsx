@@ -2,7 +2,17 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, User, Loader, MapPin, Award, Hash, Eye, EyeOff } from 'lucide-react';
+import {
+  IconMail as Mail,
+  IconLock as Lock,
+  IconUser as User,
+  IconLoader as Loader,
+  IconMapPin as MapPin,
+  IconAward as Award,
+  IconHash as Hash,
+  IconEye as Eye,
+  IconEyeOff as EyeOff,
+} from '@tabler/icons-react';
 import FileUpload from '../components/FileUpload';
 import Logo from '../components/Logo';
 import './Auth.css';

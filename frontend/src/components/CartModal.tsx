@@ -3,7 +3,12 @@ import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import { useShopping } from '../context/ShoppingContext';
 import './CartModal.css';
-import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react';
+import {
+  IconX as X,
+  IconTrash as Trash2,
+  IconShoppingBag as ShoppingBag,
+  IconArrowRight as ArrowRight,
+} from '@tabler/icons-react';
 import LazyImage from './LazyImage';
 
 interface CartModalProps {

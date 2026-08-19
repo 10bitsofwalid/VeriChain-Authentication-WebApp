@@ -9,17 +9,17 @@ import SellerProductCard from '../../components/SellerProductCard';
 import { useToast } from '../../components/ToastProvider';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { STORAGE_KEYS } from '../../utils/constants';
-import { 
-  Building, 
-  ShieldCheck, 
-  MapPin, 
-  Heart, 
-  ShoppingCart, 
-  ShoppingBag,
-  Clock, 
-  CheckCircle, 
-  AlertTriangle 
-} from 'lucide-react';
+import {
+  IconBuilding as Building,
+  IconShieldCheck as ShieldCheck,
+  IconMapPin as MapPin,
+  IconHeart as Heart,
+  IconShoppingCart as ShoppingCart,
+  IconShoppingBag as ShoppingBag,
+  IconClock as Clock,
+  IconCircleCheck as CheckCircle,
+  IconAlertTriangle as AlertTriangle,
+} from '@tabler/icons-react';
 
 // Types
 interface Factory {

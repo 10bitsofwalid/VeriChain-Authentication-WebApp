@@ -3,14 +3,14 @@ import MetricCard from '../../../components/ui/MetricCard';
 import StatusChip from '../../../components/ui/StatusChip';
 import client from '../../../api/client';
 import {
-  TrendingUp,
-  ShieldCheck,
-  AlertTriangle,
-  Users,
-  BarChart2,
-  PieChart,
-  Award,
-} from 'lucide-react';
+  IconTrendingUp as TrendingUp,
+  IconShieldCheck as ShieldCheck,
+  IconAlertTriangle as AlertTriangle,
+  IconUsers as Users,
+  IconChartBar as BarChart2,
+  IconChartPie as PieChart,
+  IconAward as Award,
+} from '@tabler/icons-react';
 
 interface FactoryLeader {
   id: string;

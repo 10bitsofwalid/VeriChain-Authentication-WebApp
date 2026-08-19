@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import client from '../api/client';
-import { TrendingUp, Users, Clipboard, CheckCircle, ShieldCheck, Zap } from 'lucide-react';
+import {
+  IconUsers as Users,
+  IconClipboardList as ClipboardList,
+  IconRosetteDiscountCheck as RosetteCheck,
+  IconShieldCheck as ShieldCheck,
+  IconPackage as Package,
+  IconQrcode as Qrcode,
+} from '@tabler/icons-react';
 import FactoryCard from '../components/FactoryCard';
 import SellerInfoCard from '../components/SellerInfoCard';
 import AnalyticsCard from '../components/AnalyticsCard';
@@ -135,7 +142,7 @@ const TrustCenter: React.FC = () => {
               </p>
               <div style={{ display: 'flex', gap: 'var(--space-sm)', flexWrap: 'wrap', justifyContent: 'center' }}>
                 <ActionButton variant="primary" size="md" onClick={() => navigate('/verify')}>
-                  <Zap size={16} /> Quick Verify Product
+                  <Qrcode size={16} /> Quick Verify Product
                 </ActionButton>
                 <ActionButton variant="secondary" size="md" onClick={() => navigate('/dashboard/marketplace')}>
                   Browse Verified Marketplace
@@ -145,10 +152,10 @@ const TrustCenter: React.FC = () => {
 
             {/* Platform Telemetry Metrics */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <AnalyticsCard icon={<Users size={24} />} title="Registered Products" value={totalProducts} />
-              <AnalyticsCard icon={<CheckCircle size={24} />} title="Products Verified" value={verifiedProducts} />
-              <AnalyticsCard icon={<Clipboard size={24} />} title="Filed Complaints" value={complaintCount} />
-              <AnalyticsCard icon={<TrendingUp size={24} />} title="Verified Partners" value={factories.length + sellers.length} />
+              <AnalyticsCard icon={<Package size={24} />} title="Registered Products" value={totalProducts} />
+              <AnalyticsCard icon={<RosetteCheck size={24} />} title="Products Verified" value={verifiedProducts} />
+              <AnalyticsCard icon={<ClipboardList size={24} />} title="Filed Complaints" value={complaintCount} />
+              <AnalyticsCard icon={<Users size={24} />} title="Verified Partners" value={factories.length + sellers.length} />
             </div>
 
             {/* Top Trusted Manufacturers */}

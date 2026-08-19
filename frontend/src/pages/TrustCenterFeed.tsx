@@ -1,6 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle2, ShieldCheck, Clock, ExternalLink, Sparkles } from 'lucide-react';
+import {
+  IconRosetteDiscountCheck as RosetteCheck,
+  IconClock as Clock,
+  IconArrowUpRight as ArrowUpRight,
+  IconPackage as Package,
+  IconDeviceLaptop as Laptop,
+  IconShirt as Shirt,
+  IconDiamond as Gem,
+  IconPill as Pill,
+  IconDeviceWatch as Watch,
+  IconQrcode as Qrcode,
+} from '@tabler/icons-react';
 import client from '../api/client';
 
 interface LiveFeedItem {
@@ -11,6 +22,16 @@ interface LiveFeedItem {
   imageUrl?: string;
   currentOwnerName?: string;
   timestamp: string;
+}
+
+function getProductCategoryIcon(category?: string) {
+  const cat = (category || '').toLowerCase();
+  if (cat.includes('electronics') || cat.includes('tech') || cat.includes('laptop')) return <Laptop size={22} />;
+  if (cat.includes('apparel') || cat.includes('cloth') || cat.includes('fashion') || cat.includes('shirt')) return <Shirt size={22} />;
+  if (cat.includes('jewelry') || cat.includes('luxury') || cat.includes('gem') || cat.includes('diamond')) return <Gem size={22} />;
+  if (cat.includes('pharma') || cat.includes('med') || cat.includes('health') || cat.includes('pill')) return <Pill size={22} />;
+  if (cat.includes('watch') || cat.includes('timepiece')) return <Watch size={22} />;
+  return <Package size={22} />;
 }
 
 const TrustCenterFeed: React.FC = () => {
@@ -59,7 +80,7 @@ const TrustCenterFeed: React.FC = () => {
           className="btn btn-secondary"
           style={{ fontSize: '0.82rem', padding: '6px 14px', borderRadius: 'var(--radius-full)', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
         >
-          <ShieldCheck size={14} /> Verify Your Product
+          <Qrcode size={15} /> Verify Your Product
         </Link>
       </div>
 
@@ -107,7 +128,7 @@ const TrustCenterFeed: React.FC = () => {
                         flexShrink: 0,
                       }}
                     >
-                      <Sparkles size={20} />
+                      {getProductCategoryIcon(event.category)}
                     </div>
                   )}
                   <div style={{ minWidth: 0 }}>
@@ -135,7 +156,7 @@ const TrustCenterFeed: React.FC = () => {
                     flexShrink: 0,
                   }}
                 >
-                  <CheckCircle2 size={11} /> Verified
+                  <RosetteCheck size={12} /> Verified
                 </span>
               </div>
 
@@ -147,7 +168,7 @@ const TrustCenterFeed: React.FC = () => {
                   to={`/verify?serial=${encodeURIComponent(event.serialNumber)}`}
                   style={{ fontSize: '0.72rem', color: 'var(--accent-purple, #F59E0B)', textDecoration: 'none', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '3px' }}
                 >
-                  Audit <ExternalLink size={10} />
+                  Audit <ArrowUpRight size={12} />
                 </Link>
               </div>
 

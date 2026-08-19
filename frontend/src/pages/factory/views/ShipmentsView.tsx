@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Truck, Package, Clock, MapPin } from 'lucide-react';
+import {
+  IconTruck as Truck,
+  IconPackage as Package,
+  IconClock as Clock,
+  IconMapPin as MapPin,
+} from '@tabler/icons-react';
 import client from '../../../api/client';
 
 interface ShipmentItem {

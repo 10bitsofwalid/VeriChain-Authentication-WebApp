@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Factory, PackageSearch, Search, ShieldCheck, Store, X } from 'lucide-react';
+import {
+  IconBuildingFactory as Factory,
+  IconPackage as PackageSearch,
+  IconSearch as Search,
+  IconShieldCheck as ShieldCheck,
+  IconBuildingStore as Store,
+  IconX as X,
+} from '@tabler/icons-react';
 import ActionButton from '../ui/ActionButton';
 import StatusChip from '../ui/StatusChip';
 import './layout.css';

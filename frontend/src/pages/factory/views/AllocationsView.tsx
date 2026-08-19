@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { TrendingUp, Store, Package } from 'lucide-react';
+import { IconTrendingUp as TrendingUp, IconBuildingStore as Store, IconPackage as Package } from '@tabler/icons-react';
 import client from '../../../api/client';
 
 interface AllocationItem {

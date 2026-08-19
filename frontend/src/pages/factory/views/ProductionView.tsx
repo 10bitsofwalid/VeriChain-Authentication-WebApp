@@ -1,5 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Boxes, CheckCircle, Clock, Loader } from 'lucide-react';
+import {
+  IconPackages as Boxes,
+  IconCircleCheck as CheckCircle,
+  IconClock as Clock,
+  IconLoader as Loader,
+} from '@tabler/icons-react';
 import client from '../../../api/client';
 
 interface BatchItem {

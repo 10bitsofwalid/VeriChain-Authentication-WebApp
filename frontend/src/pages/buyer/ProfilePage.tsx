@@ -1,5 +1,11 @@
 import { useState } from 'react';
-import { User, ShieldCheck, Lock, Check, Edit2 } from 'lucide-react';
+import {
+  IconUser as User,
+  IconShieldCheck as ShieldCheck,
+  IconLock as Lock,
+  IconCheck as Check,
+  IconEdit as Edit2,
+} from '@tabler/icons-react';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';
 import { useAuth } from '../../context/AuthContext';

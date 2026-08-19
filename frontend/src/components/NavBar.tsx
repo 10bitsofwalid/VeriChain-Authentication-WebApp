@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Menu, Search, X } from 'lucide-react';
+import { IconMenu as Menu, IconSearch as Search, IconX as X } from '@tabler/icons-react';
 import { useAuth } from '../context/AuthContext';
 import CartIcon from './CartIcon';
 import ActionButton from './ui/ActionButton';

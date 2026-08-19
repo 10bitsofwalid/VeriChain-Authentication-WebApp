@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Package, Truck, CheckCircle, XCircle, Clock, RotateCcw, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
+import {
+  IconPackage as Package,
+  IconTruck as Truck,
+  IconCircleCheck as CheckCircle,
+  IconCircleX as XCircle,
+  IconClock as Clock,
+  IconRotate2 as RotateCcw,
+  IconChevronDown as ChevronDown,
+  IconChevronUp as ChevronUp,
+  IconShieldCheck as ShieldCheck,
+} from '@tabler/icons-react';
 import client from '../../api/client';
 import './BuyerExperience.css';
 import BuyerNav from './BuyerNav';

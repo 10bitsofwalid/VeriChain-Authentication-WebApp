@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate, Link } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Lock, Loader, CheckCircle } from 'lucide-react';
+import { IconLock as Lock, IconLoader as Loader, IconCircleCheck as CheckCircle } from '@tabler/icons-react';
 import Logo from '../components/Logo';
 import './Auth.css';
 

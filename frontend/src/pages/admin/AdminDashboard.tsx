@@ -11,16 +11,16 @@ import client from '../../api/client';
 import './AdminDashboard.css';
 
 import {
-  ShieldCheck,
-  Target,
-  Users,
-  AlertTriangle,
-  ShieldAlert,
-  FileText,
-  BarChart2,
-  Settings,
-  Sparkles,
-} from 'lucide-react';
+  IconShieldCheck as ShieldCheck,
+  IconTarget as Target,
+  IconUsers as Users,
+  IconAlertTriangle as AlertTriangle,
+  IconShieldExclamation as ShieldAlert,
+  IconFileText as FileText,
+  IconChartBar as BarChart2,
+  IconSettings as Settings,
+  IconSparkles as Sparkles,
+} from '@tabler/icons-react';
 
 export type AdminTab =
   | 'mission'

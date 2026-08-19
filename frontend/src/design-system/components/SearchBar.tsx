@@ -1,6 +1,6 @@
 import React from 'react';
 import './SearchBar.css';
-import { Search } from 'lucide-react';
+import { IconSearch as Search } from '@tabler/icons-react';
 
 interface SearchBarProps {
   value: string;

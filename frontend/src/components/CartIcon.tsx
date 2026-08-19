@@ -1,5 +1,5 @@
 import { useState, useCallback, memo } from 'react';
-import { ShoppingBag } from 'lucide-react';
+import { IconShoppingBag as ShoppingBag } from '@tabler/icons-react';
 import CartModal from './CartModal';
 import { useShopping } from '../context/ShoppingContext';
 import './CartIcon.css';

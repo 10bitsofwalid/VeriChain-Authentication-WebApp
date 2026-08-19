@@ -1,6 +1,15 @@
 import { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { BadgeCheck, ExternalLink, Heart, MessageSquare, Scale, ShoppingBag, Tag, User } from 'lucide-react';
+import {
+  IconRosetteDiscountCheck as BadgeCheck,
+  IconExternalLink as ExternalLink,
+  IconHeart as Heart,
+  IconMessage as MessageSquare,
+  IconScale as Scale,
+  IconShoppingBag as ShoppingBag,
+  IconTag as Tag,
+  IconUser as User,
+} from '@tabler/icons-react';
 import LazyImage from './LazyImage';
 import { useShopping } from '../context/ShoppingContext';
 import { riskBadge, verificationBadge } from '../utils/badges';

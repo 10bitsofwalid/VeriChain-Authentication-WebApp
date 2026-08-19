@@ -3,7 +3,12 @@ import PageLoader from '../../components/ui/PageLoader';
 import { verificationBadge } from '../../utils/badges';
 import { Link } from 'react-router-dom';
 import client from '../../api/client';
-import { Package, Shield, AlertTriangle, Search } from 'lucide-react';
+import {
+  IconPackage as Package,
+  IconShield as Shield,
+  IconAlertTriangle as AlertTriangle,
+  IconSearch as Search,
+} from '@tabler/icons-react';
 import DashboardMetricCard from '../../components/DashboardMetricCard';
 import AnalyticsSection from '../../components/AnalyticsSection';
 

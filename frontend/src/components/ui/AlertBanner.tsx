@@ -1,5 +1,5 @@
 import React from 'react';
-import { AlertCircle, CheckCircle } from 'lucide-react';
+import { IconAlertCircle as AlertCircle, IconCircleCheck as CheckCircle } from '@tabler/icons-react';
 
 interface AlertBannerProps {
   type: 'success' | 'error';

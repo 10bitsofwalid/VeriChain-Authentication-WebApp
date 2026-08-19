@@ -1,6 +1,16 @@
 import React, { memo, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, Calendar, CheckCircle, Package, ShieldCheck, Star, TrendingUp, Users, ShoppingBag } from 'lucide-react';
+import {
+  IconAlertTriangle as AlertTriangle,
+  IconCalendar as Calendar,
+  IconCircleCheck as CheckCircle,
+  IconPackage as Package,
+  IconShieldCheck as ShieldCheck,
+  IconStar as Star,
+  IconTrendingUp as TrendingUp,
+  IconUsers as Users,
+  IconShoppingBag as ShoppingBag,
+} from '@tabler/icons-react';
 import AnalyticsCard from './AnalyticsCard';
 import EmptyState from './ui/EmptyState';
 import LazyImage from './LazyImage';

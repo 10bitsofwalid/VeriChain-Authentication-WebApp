@@ -2,7 +2,13 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, Loader, Eye, EyeOff } from 'lucide-react';
+import {
+  IconMail as Mail,
+  IconLock as Lock,
+  IconLoader as Loader,
+  IconEye as Eye,
+  IconEyeOff as EyeOff,
+} from '@tabler/icons-react';
 import Logo from '../components/Logo';
 import './Auth.css';
 

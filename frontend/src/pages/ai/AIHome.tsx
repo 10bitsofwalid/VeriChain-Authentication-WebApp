@@ -1,5 +1,15 @@
 import { useState } from 'react';
-import { Bot, FileText, AlertTriangle, ShieldCheck, HelpCircle, Loader2, Upload, CheckCircle2, X } from 'lucide-react';
+import {
+  IconRobot as Bot,
+  IconFileText as FileText,
+  IconAlertTriangle as AlertTriangle,
+  IconShieldCheck as ShieldCheck,
+  IconHelpCircle as HelpCircle,
+  IconLoader2 as Loader2,
+  IconUpload as Upload,
+  IconCircleCheck as CheckCircle2,
+  IconX as X,
+} from '@tabler/icons-react';
 import client from '../../api/client';
 import ActionButton from '../../components/ui/ActionButton';
 

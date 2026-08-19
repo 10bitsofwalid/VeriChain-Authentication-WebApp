@@ -3,7 +3,13 @@ import { Link, useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import { useShopping } from '../context/ShoppingContext';
-import { Heart, ShoppingBag, Trash2, ShieldCheck, ArrowRight } from 'lucide-react';
+import {
+  IconHeart as Heart,
+  IconShoppingBag as ShoppingBag,
+  IconTrash as Trash2,
+  IconShieldCheck as ShieldCheck,
+  IconArrowRight as ArrowRight,
+} from '@tabler/icons-react';
 import ActionButton from '../components/ui/ActionButton';
 import './MarketplaceHome.css';
 

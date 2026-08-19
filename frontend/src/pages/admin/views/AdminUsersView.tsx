@@ -3,12 +3,12 @@ import ActionButton from '../../../components/ui/ActionButton';
 import StatusChip from '../../../components/ui/StatusChip';
 import client from '../../../api/client';
 import {
-  Search,
-  CheckCircle,
-  UserCheck,
-  UserX,
-  X,
-} from 'lucide-react';
+  IconSearch as Search,
+  IconCircleCheck as CheckCircle,
+  IconUserCheck as UserCheck,
+  IconUserX as UserX,
+  IconX as X,
+} from '@tabler/icons-react';
 
 interface UserRecord {
   id: string;

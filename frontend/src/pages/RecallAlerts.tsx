@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ShieldCheck, AlertTriangle } from 'lucide-react';
+import { IconShieldCheck as ShieldCheck, IconAlertTriangle as AlertTriangle } from '@tabler/icons-react';
 import client from '../api/client';
 
 interface RecalledItem {

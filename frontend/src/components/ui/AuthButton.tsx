@@ -1,5 +1,5 @@
 import React from 'react';
-import { Loader } from 'lucide-react';
+import { IconLoader as Loader } from '@tabler/icons-react';
 
 interface AuthButtonProps {
   type?: 'button' | 'submit' | 'reset';

@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, PackageOpen } from 'lucide-react';
+import { IconArrowRight as ArrowRight, IconPackageExport as PackageOpen } from '@tabler/icons-react';
 import ProductCard from './ProductCard';
 import EmptyState from './ui/EmptyState';
 

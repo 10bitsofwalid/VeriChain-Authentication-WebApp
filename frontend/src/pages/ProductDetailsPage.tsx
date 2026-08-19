@@ -6,23 +6,23 @@ import client from '../api/client';
 import PageLoader from '../components/ui/PageLoader';
 import EmptyState from '../components/ui/EmptyState';
 import {
-  CheckCircle,
-  Shield,
-  Layers,
-  MapPin,
-  Clock,
-  Star,
-  Heart,
-  Share2,
-  Copy,
-  Check,
-  Package,
-  Building,
-  ShoppingBag,
-  MessageSquare,
-  Store,
-  ExternalLink,
-} from 'lucide-react';
+  IconCircleCheck as CheckCircle,
+  IconShield as Shield,
+  IconStack2 as Layers,
+  IconMapPin as MapPin,
+  IconClock as Clock,
+  IconStar as Star,
+  IconHeart as Heart,
+  IconShare as Share2,
+  IconCopy as Copy,
+  IconCheck as Check,
+  IconPackage as Package,
+  IconBuilding as Building,
+  IconShoppingBag as ShoppingBag,
+  IconMessage as MessageSquare,
+  IconBuildingStore as Store,
+  IconExternalLink as ExternalLink,
+} from '@tabler/icons-react';
 import './ProductDetailsPage.css';
 import { useShopping } from '../context/ShoppingContext';
 import ContactSellerModal from '../components/ContactSellerModal';

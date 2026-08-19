@@ -1,7 +1,7 @@
 import React from 'react';
 import PageLoader from './ui/PageLoader';
 import EmptyState from './ui/EmptyState';
-import { CheckCircle } from 'lucide-react';
+import { IconCircleCheck as CheckCircle } from '@tabler/icons-react';
 
 interface AnalyticsSectionProps {
   title: string;

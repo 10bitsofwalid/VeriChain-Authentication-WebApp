@@ -4,16 +4,16 @@ import StatusChip from '../../../components/ui/StatusChip';
 import MetricCard from '../../../components/ui/MetricCard';
 import client from '../../../api/client';
 import {
-  ShieldCheck,
-  ShieldAlert,
-  Search,
-  CheckCircle,
-  XCircle,
-  AlertTriangle,
-  Eye,
-  X,
-  FileCheck,
-} from 'lucide-react';
+  IconShieldCheck as ShieldCheck,
+  IconShieldExclamation as ShieldAlert,
+  IconSearch as Search,
+  IconCircleCheck as CheckCircle,
+  IconCircleX as XCircle,
+  IconAlertTriangle as AlertTriangle,
+  IconEye as Eye,
+  IconX as X,
+  IconFileCheck as FileCheck,
+} from '@tabler/icons-react';
 
 interface ModerationItem {
   id: string;

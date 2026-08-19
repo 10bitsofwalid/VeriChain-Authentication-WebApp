@@ -1,6 +1,14 @@
 import { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bell, Menu, MessageCircle, ShieldCheck, Zap, Search, X } from 'lucide-react';
+import {
+  IconBell as Bell,
+  IconMenu as Menu,
+  IconMessageCircle as MessageCircle,
+  IconShieldCheck as ShieldCheck,
+  IconBolt as Zap,
+  IconSearch as Search,
+  IconX as X,
+} from '@tabler/icons-react';
 import type { User } from '../../context/AuthContext';
 import CartIcon from '../CartIcon';
 import ActionButton from '../ui/ActionButton';

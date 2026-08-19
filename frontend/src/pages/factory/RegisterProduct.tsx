@@ -3,7 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import AlertBanner from '../../components/ui/AlertBanner';
 import client from '../../api/client';
 import { useAuth } from '../../context/AuthContext';
-import { Package, ArrowLeft, Loader, Plus, Trash2 } from 'lucide-react';
+import {
+  IconPackage as Package,
+  IconArrowLeft as ArrowLeft,
+  IconLoader as Loader,
+  IconPlus as Plus,
+  IconTrash as Trash2,
+} from '@tabler/icons-react';
 import FileUpload from '../../components/FileUpload';
 import NavBar from '../../components/NavBar';
 import Footer from '../../components/Footer';

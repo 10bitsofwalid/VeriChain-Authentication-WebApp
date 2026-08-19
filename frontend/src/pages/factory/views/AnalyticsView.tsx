@@ -1,5 +1,11 @@
 import { useState, useEffect } from 'react';
-import { BarChart2, TrendingUp, Package, ShieldCheck, ShoppingCart } from 'lucide-react';
+import {
+  IconChartBar as BarChart2,
+  IconTrendingUp as TrendingUp,
+  IconPackage as Package,
+  IconShieldCheck as ShieldCheck,
+  IconShoppingCart as ShoppingCart,
+} from '@tabler/icons-react';
 import client from '../../../api/client';
 
 export default function AnalyticsView() {

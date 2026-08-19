@@ -1,5 +1,12 @@
 import React from 'react';
-import { CheckCircle, Heart, Building2, ShieldCheck, MapPin, Award } from 'lucide-react';
+import {
+  IconCircleCheck as CheckCircle,
+  IconHeart as Heart,
+  IconBuildingCommunity as Building2,
+  IconShieldCheck as ShieldCheck,
+  IconMapPin as MapPin,
+  IconAward as Award,
+} from '@tabler/icons-react';
 
 interface Factory {
   _id: string;

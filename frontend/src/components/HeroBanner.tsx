@@ -1,5 +1,12 @@
 import { useState } from 'react';
-import { ArrowRight, CheckCircle2, PackageSearch, Search, ShieldCheck, Sparkles } from 'lucide-react';
+import {
+  IconArrowRight as ArrowRight,
+  IconCircleCheck as CheckCircle2,
+  IconPackage as PackageSearch,
+  IconSearch as Search,
+  IconShieldCheck as ShieldCheck,
+  IconSparkles as Sparkles,
+} from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
 import logoSvg from '../assets/logo.svg';
 import ActionButton from './ui/ActionButton';

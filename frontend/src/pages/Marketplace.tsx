@@ -3,7 +3,12 @@ import { Link, useSearchParams } from 'react-router-dom';
 import PageLoader from '../components/ui/PageLoader';
 import AlertBanner from '../components/ui/AlertBanner';
 import client from '../api/client';
-import { ShoppingBag, Plus, Filter, ArrowUpDown } from 'lucide-react';
+import {
+  IconShoppingBag as ShoppingBag,
+  IconPlus as Plus,
+  IconFilter as Filter,
+  IconArrowsSort as ArrowUpDown,
+} from '@tabler/icons-react';
 import SearchBar from '../design-system/components/SearchBar';
 import CategoryFilter from '../design-system/components/CategoryFilter';
 import ProductCard from '../components/ProductCard';

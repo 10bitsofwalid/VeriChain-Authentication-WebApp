@@ -4,17 +4,17 @@ import ActionButton from '../../../components/ui/ActionButton';
 import StatusChip from '../../../components/ui/StatusChip';
 import client from '../../../api/client';
 import {
-  ShieldCheck,
-  Server,
-  Activity,
-  Zap,
-  CheckCircle2,
-  AlertTriangle,
-  RefreshCw,
-  SlidersHorizontal,
-  Lock,
-  Search,
-} from 'lucide-react';
+  IconShieldCheck as ShieldCheck,
+  IconServer as Server,
+  IconActivity as Activity,
+  IconBolt as Zap,
+  IconCircleCheck as CheckCircle2,
+  IconAlertTriangle as AlertTriangle,
+  IconRefresh as RefreshCw,
+  IconAdjustmentsHorizontal as SlidersHorizontal,
+  IconLock as Lock,
+  IconSearch as Search,
+} from '@tabler/icons-react';
 
 interface MissionLog {
   id: string;
