@@ -140,7 +140,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(newToken);
       setUser(normalized);
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Login failed. Please try again.';
+      const isNetworkErr = !err.response || err.code === 'ERR_NETWORK' || err.message === 'Network Error';
+      const msg = err.response?.data?.message 
+        || (isNetworkErr 
+            ? 'Unable to connect to the backend server. Please verify your internet connection or server status.' 
+            : 'Login failed. Please try again.');
       setError(msg);
       throw new Error(msg);
     }
@@ -158,7 +162,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(newToken);
       setUser(normalized);
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Signup failed. Please try again.';
+      const isNetworkErr = !err.response || err.code === 'ERR_NETWORK' || err.message === 'Network Error';
+      const msg = err.response?.data?.message 
+        || (isNetworkErr 
+            ? 'Unable to connect to the backend server. Please verify your internet connection or server status.' 
+            : 'Signup failed. Please try again.');
       setError(msg);
       throw new Error(msg);
     }
@@ -176,7 +184,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setToken(newToken);
       setUser(normalized);
     } catch (err: any) {
-      const msg = err.response?.data?.message || 'Accepting invitation failed.';
+      const isNetworkErr = !err.response || err.code === 'ERR_NETWORK' || err.message === 'Network Error';
+      const msg = err.response?.data?.message 
+        || (isNetworkErr 
+            ? 'Unable to connect to the backend server. Please verify your internet connection or server status.' 
+            : 'Accepting invitation failed.');
       setError(msg);
       throw new Error(msg);
     }
