@@ -4,7 +4,7 @@
 
 .verify-page {
   min-height: 100vh;
-  padding: var(--space-xl) var(--space-md);
+  padding: 0 0 var(--space-2xl) 0;
   position: relative;
   overflow: hidden;
   background-color: var(--bg-primary);
@@ -69,6 +69,8 @@
 .verify-content {
   width: 100%;
   max-width: 1000px;
+  margin: var(--space-xl) auto 0;
+  padding: 0 var(--space-md);
   position: relative;
   z-index: 2;
   display: flex;
@@ -80,6 +82,9 @@
 .verify-title-section {
   text-align: center;
   margin-bottom: var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .verify-shield-container {
@@ -87,7 +92,9 @@
   justify-content: center;
   align-items: center;
   position: relative;
-  margin-bottom: var(--space-md);
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--space-md);
 }
 
 .verify-shield-icon {
@@ -98,6 +105,8 @@
 
 .shield-ring {
   position: absolute;
+  top: 0;
+  left: 0;
   width: 72px;
   height: 72px;
   border: 1.5px dashed rgba(245, 158, 11, 0.4);
@@ -222,26 +231,45 @@
 .quick-suggestions {
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
-  margin-top: var(--space-sm);
-  font-size: 0.8rem;
+  gap: 8px;
+  margin-top: var(--space-md);
+  font-size: 0.82rem;
   color: var(--text-muted);
   flex-wrap: wrap;
 }
 
-.quick-suggestions button {
-  background: none;
-  border: none;
-  color: var(--accent-purple);
-  text-decoration: underline;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-size: 0.8rem;
+.quick-suggestions span {
   font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  margin-right: 2px;
+}
+
+.quick-suggestions button {
+  background: var(--bg-secondary, #F3F4F6);
+  border: 1px solid var(--border-default, #E2E8F0);
+  border-radius: var(--radius-full, 9999px);
+  color: var(--text-primary);
+  text-decoration: none;
+  cursor: pointer;
+  font-family: var(--font-mono, monospace);
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 5px 12px;
+  line-height: 1.2;
+  transition: all var(--transition-fast, 0.15s ease);
 }
 
 .quick-suggestions button:hover {
+  background: rgba(245, 158, 11, 0.15);
+  border-color: #F59E0B;
   color: #16233B;
+  transform: translateY(-1px);
+}
+
+.quick-suggestions button:focus-visible {
+  outline: 2px solid var(--accent-purple, #F59E0B);
+  outline-offset: 2px;
 }
 
 /* Result Card Layout */
@@ -1123,3 +1151,98 @@
     max-width: 100%;
   }
 }
+
+/* ============================================================
+   Print Media Styles — Physical QR Label Tag Format
+   ============================================================ */
+@media print {
+  body, html {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  nav,
+  header,
+  footer,
+  .site-navbar,
+  .vc-topbar,
+  .site-footer,
+  .verify-header,
+  .back-link,
+  .verify-glow-1,
+  .verify-glow-2,
+  .verify-title-section,
+  .verify-controls-card,
+  .quick-suggestions,
+  .verify-tabs,
+  .scanner-modal,
+  .camera-scanner-modal,
+  .verify-side-column > *:not(.qr-result-card),
+  .verify-main-column,
+  .btn,
+  button {
+    display: none !important;
+  }
+
+  .verify-page {
+    padding: 0 !important;
+    margin: 0 !important;
+    background: transparent !important;
+    min-height: auto !important;
+    display: block !important;
+  }
+
+  .verify-content {
+    max-width: 100% !important;
+    margin: 0 auto !important;
+    display: block !important;
+  }
+
+  .verify-side-column {
+    display: block !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    margin: 40px auto !important;
+  }
+
+  .qr-result-card {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    border-radius: 12px !important;
+    padding: 24px !important;
+    box-shadow: none !important;
+    text-align: center !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+
+  .qr-result-card h3 {
+    color: #000000 !important;
+    font-size: 1.2rem !important;
+    margin-bottom: 12px !important;
+  }
+
+  .styled-qr-svg path,
+  .styled-qr-svg rect {
+    fill: #000000 !important;
+  }
+
+  .styled-qr-svg rect[fill="var(--bg-card)"],
+  .styled-qr-svg rect[fill="transparent"] {
+    fill: #FFFFFF !important;
+  }
+
+  .qr-details-text p {
+    color: #444444 !important;
+    font-size: 0.85rem !important;
+  }
+
+  .qr-link-copy {
+    background: #F3F4F6 !important;
+    color: #000000 !important;
+    border: 1px solid #CCCCCC !important;
+    font-size: 0.8rem !important;
+  }
+}
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
 import client from '../api/client';
@@ -50,17 +50,18 @@ interface VerifiedProductDetail {
     location?: string;
   };
   journey?: Array<{
+    actor?: { _id?: string; name: string; role: string };
     action: string;
     location?: string;
     timestamp: string;
     txHash?: string;
-    actor?: { name: string };
   }>;
-  specs?: Record<string, string>;
+  specs?: Record<string, any>;
 }
 
 export default function ProductDetailsPage() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { dispatch, wishlist: currentWishlist } = useShopping();
   
   const [product, setProduct] = useState<VerifiedProductDetail | null>(null);
@@ -306,7 +307,7 @@ export default function ProductDetailsPage() {
             action={
               <button
                 className="btn btn-primary"
-                onClick={() => window.location.href = '/dashboard/marketplace'}
+                onClick={() => navigate('/dashboard/marketplace')}
               >
                 Explore Marketplace
               </button>

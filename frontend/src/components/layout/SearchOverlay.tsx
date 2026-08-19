@@ -89,8 +89,18 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
   if (!open) return null;
 
   return (
-    <div className="vc-search-overlay" role="dialog" aria-modal="true" aria-label="Global search">
-      <div className="vc-search-panel" ref={panelRef}>
+    <div
+      className="vc-search-overlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Global search"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="vc-search-panel" ref={panelRef} onClick={(e) => e.stopPropagation()}>
         <form
           className="vc-search-input-row"
           onSubmit={(e) => {
@@ -117,16 +127,6 @@ export default function SearchOverlay({ open, onClose }: SearchOverlayProps) {
               key={item}
               type="button"
               className="vc-search-chip-btn"
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-secondary)',
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                padding: '2px 6px',
-                borderRadius: 'var(--radius-sm)',
-                transition: 'color 0.15s ease',
-              }}
               onClick={() => handleExecuteSearch(item)}
             >
               {item}

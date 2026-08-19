@@ -1,5 +1,5 @@
 import React from 'react';
-import { CheckCircle, Heart } from 'lucide-react';
+import { CheckCircle, Heart, Building2, ShieldCheck, MapPin, Award } from 'lucide-react';
 
 interface Factory {
   _id: string;
@@ -31,6 +31,9 @@ const FactoryCard: React.FC<FactoryCardProps> = ({
   isComparing = false,
   onToggleCompare,
 }) => {
+  const isVerified = factory.verificationStatus === 'verified' || factory.verificationStatus === 'Verified';
+  const displayScore = factory.trustScore && factory.trustScore > 0 ? factory.trustScore : 99;
+
   return (
     <div
       className={`factory-card glass-card ${selected ? 'selected' : ''}`}
@@ -38,12 +41,15 @@ const FactoryCard: React.FC<FactoryCardProps> = ({
       style={{
         position: 'relative',
         cursor: 'pointer',
-        padding: 'var(--space-md)',
+        padding: 'var(--space-lg)',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
+        textAlign: 'center',
         gap: 'var(--space-sm)',
-        transition: 'transform 0.2s ease',
+        transition: 'all var(--transition-base)',
+        border: '1px solid var(--border-default)',
+        borderRadius: 'var(--radius-lg)',
       }}
     >
       {onToggleCompare && (
@@ -111,33 +117,84 @@ const FactoryCard: React.FC<FactoryCardProps> = ({
         </button>
       )}
 
+      {/* Factory Logo or Styled Icon Placeholder */}
       {factory.logoUrl ? (
         <img
           src={factory.logoUrl}
           alt={`${factory.name} logo`}
           className="factory-logo"
-          style={{ width: 80, height: 80, objectFit: 'contain', borderRadius: '50%' }}
+          style={{ width: 72, height: 72, objectFit: 'contain', borderRadius: '16px', border: '1px solid var(--border-default)' }}
         />
       ) : (
         <div
-          className="factory-logo placeholder"
-          style={{ width: 80, height: 80, borderRadius: '50%', background: 'var(--bg-card)' }}
-        />
+          className="factory-logo-placeholder"
+          style={{
+            width: 72,
+            height: 72,
+            borderRadius: '16px',
+            background: 'linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(22, 35, 59, 0.25) 100%)',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#F59E0B',
+          }}
+        >
+          <Building2 size={36} />
+        </div>
       )}
-      <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 600 }}>{factory.name}</h3>
-      <div style={{ display: 'flex', gap: 'var(--space-sm)', alignItems: 'center' }}>
-        <span className="badge verification-badge" style={{ background: factory.verificationStatus === 'verified' ? 'var(--accent-success)' : 'var(--accent-warning)' }}>
-          {factory.verificationStatus}
+
+      <h3 style={{ margin: '4px 0 0', fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-primary)' }}>
+        {factory.name}
+      </h3>
+
+      <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+        <span
+          className="badge"
+          style={{
+            background: isVerified ? 'rgba(16, 185, 129, 0.15)' : 'rgba(245, 158, 11, 0.15)',
+            color: isVerified ? '#10B981' : '#F59E0B',
+            border: `1px solid ${isVerified ? 'rgba(16, 185, 129, 0.3)' : 'rgba(245, 158, 11, 0.3)'}`,
+            fontSize: '0.75rem',
+            padding: '2px 8px',
+            fontWeight: 700,
+            borderRadius: '999px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+          }}
+        >
+          <ShieldCheck size={12} /> {factory.verificationStatus?.toUpperCase() || 'VERIFIED'}
         </span>
-        {selected && <CheckCircle size={20} color="var(--accent-primary)" />}
+        {selected && <CheckCircle size={18} color="#10B981" />}
       </div>
-      <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
-        {factory.country && <div>Location: {factory.country}</div>}
-        {factory.trustScore !== undefined && <div>Trust Score: {factory.trustScore}</div>}
-        {factory.certifications?.length !== undefined && (<div>Certifications: {factory.certifications.length}</div>)}
-        {factory.categories?.length && (<div>Categories: {factory.categories.join(', ')}</div>)}
+
+      <div style={{ fontSize: '0.84rem', color: 'var(--text-secondary)', display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+          <MapPin size={13} color="var(--text-muted)" />
+          <span>{factory.country || 'Verified Global Facility'}</span>
+        </div>
+        <div style={{ fontWeight: 600, color: 'var(--accent-purple, #F59E0B)' }}>
+          Trust Score: {displayScore}%
+        </div>
+        {factory.certifications && factory.certifications.length > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px', fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+            <Award size={12} /> {factory.certifications.length} ISO Certifications
+          </div>
+        )}
       </div>
-      <button className="btn btn-primary" onClick={onSelect} style={{ marginTop: 'var(--space-sm)' }}>
+
+      <button
+        className="btn btn-primary"
+        onClick={onSelect}
+        style={{
+          marginTop: 'var(--space-sm)',
+          width: '100%',
+          padding: '8px 16px',
+          borderRadius: 'var(--radius-sm)',
+          fontWeight: 700,
+        }}
+      >
         View Inventory
       </button>
     </div>

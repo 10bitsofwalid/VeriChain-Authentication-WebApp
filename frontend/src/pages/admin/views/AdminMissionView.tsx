@@ -122,16 +122,16 @@ export default function AdminMissionView() {
       )}
 
       {/* Mission Banner */}
-      <div className="admin-card" style={{ background: 'linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.9))' }}>
+      <div className="admin-card" style={{ background: 'linear-gradient(135deg, #16233B 0%, #0B0F19 100%)', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
           <div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8 }}>
               <ShieldCheck size={26} color="var(--accent-primary)" />
-              <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: '#f8fafc' }}>
+              <h2 style={{ fontSize: '1.25rem', fontWeight: 800, margin: 0, color: '#FFFFFF' }}>
                 VeriChain Platform Mission & Integrity
               </h2>
             </div>
-            <p style={{ color: 'var(--text-secondary, #94a3b8)', margin: 0, maxWidth: '780px', fontSize: '0.9rem', lineHeight: '1.5' }}>
+            <p style={{ color: '#CBD5E1', margin: 0, maxWidth: '780px', fontSize: '0.9rem', lineHeight: '1.5' }}>
               Safeguarding global product authenticity via cryptographic item tracking, anti-counterfeit proofing, and factory-to-consumer trust monitoring.
             </p>
           </div>

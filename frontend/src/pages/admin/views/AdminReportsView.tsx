@@ -147,32 +147,38 @@ export default function AdminReportsView() {
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
-          background: 'rgba(30, 41, 59, 0.5)',
+          background: 'var(--bg-secondary)',
           padding: '12px 16px',
-          borderRadius: 8,
-          border: '1px solid rgba(255,255,255,0.06)'
+          borderRadius: 'var(--radius-md, 8px)',
+          border: '1px solid var(--border-default)',
+          flexWrap: 'wrap',
+          gap: 12,
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <Calendar size={18} color="#94a3b8" />
-            <span style={{ color: '#cbd5e1', fontSize: '0.875rem' }}>
-              Automated Scheduled Digest: <strong>Weekly Executive Summary to Admins</strong>
+            <Calendar size={18} color="var(--accent-purple, #F59E0B)" />
+            <span style={{ color: 'var(--text-primary)', fontSize: '0.875rem' }}>
+              Automated Scheduled Digest: <strong style={{ color: 'var(--text-primary)' }}>Weekly Executive Summary to Admins</strong>
             </span>
           </div>
           <button
             type="button"
-            className="btn btn-ghost"
             onClick={() => {
               setAutoEmailEnabled(!autoEmailEnabled);
               showToast(`Automated digest ${!autoEmailEnabled ? 'ENABLED' : 'DISABLED'}`);
             }}
             style={{
-              padding: '4px 12px',
+              padding: '6px 14px',
               fontSize: '0.8rem',
-              color: autoEmailEnabled ? '#34d399' : '#94a3b8',
-              border: autoEmailEnabled ? '1px solid rgba(52, 211, 153, 0.4)' : '1px solid rgba(255,255,255,0.1)',
+              fontWeight: 700,
+              borderRadius: 'var(--radius-full)',
+              background: autoEmailEnabled ? 'rgba(16, 185, 129, 0.12)' : 'var(--bg-secondary)',
+              color: autoEmailEnabled ? '#047857' : 'var(--text-muted)',
+              border: autoEmailEnabled ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid var(--border-default)',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
             }}
           >
-            {autoEmailEnabled ? 'Active (Every Mon 08:00)' : 'Disabled'}
+            {autoEmailEnabled ? '● Active (Every Mon 08:00)' : 'Disabled'}
           </button>
         </div>
       </div>

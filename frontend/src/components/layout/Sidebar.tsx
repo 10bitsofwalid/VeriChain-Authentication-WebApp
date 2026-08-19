@@ -1,5 +1,4 @@
-import {} from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import type { LucideIcon } from 'lucide-react';
 import {
   Bell,
@@ -68,7 +67,33 @@ export default function Sidebar({
   onLogout,
 }: SidebarProps) {
   const navigate = useNavigate();
+  const location = useLocation();
   const navSections = getNavSections(user?.role || 'buyer');
+
+  const isItemActive = (to: string, end?: boolean) => {
+    const currentPath = location.pathname;
+    const currentSearch = location.search;
+    const [targetPath, targetSearch] = to.split('?');
+
+    if (targetSearch) {
+      if (currentPath !== targetPath) return false;
+      const targetKey = targetSearch.split('=')[0];
+      if (targetKey === 'category') {
+        return currentSearch.includes('category=');
+      }
+      return currentSearch.includes(targetSearch);
+    }
+
+    if (currentPath !== targetPath) {
+      return !end && currentPath.startsWith(targetPath + '/');
+    }
+
+    if (currentSearch && (currentSearch.includes('category=') || currentSearch.includes('tab='))) {
+      return false;
+    }
+
+    return true;
+  };
 
   return (
     <>
@@ -124,25 +149,28 @@ export default function Sidebar({
               )}
               {collapsed && section.title && <div className="vc-nav-divider" />}
               <ul className="vc-nav-list">
-                {section.items.map((item) => (
-                  <li key={`${item.to}-${item.label}`}>
-                    <NavLink
-                      to={item.to}
-                      end={item.end}
-                      className={({ isActive }) => `vc-nav-item ${isActive ? 'vc-nav-active' : ''}`}
-                      onClick={onClose}
-                      title={collapsed ? item.label : undefined}
-                    >
-                      <item.icon size={18} className="vc-nav-icon" aria-hidden="true" />
-                      {!collapsed && <span className="vc-nav-label">{item.label}</span>}
-                      {item.badge !== undefined && (
-                        <span className={`vc-nav-badge ${collapsed ? 'badge-dot' : ''}`}>
-                          {collapsed ? '' : item.badge}
-                        </span>
-                      )}
-                    </NavLink>
-                  </li>
-                ))}
+                {section.items.map((item) => {
+                  const active = isItemActive(item.to, item.end);
+                  return (
+                    <li key={`${item.to}-${item.label}`}>
+                      <NavLink
+                        to={item.to}
+                        end={item.end}
+                        className={`vc-nav-item ${active ? 'vc-nav-active' : ''}`}
+                        onClick={onClose}
+                        title={collapsed ? item.label : undefined}
+                      >
+                        <item.icon size={18} className="vc-nav-icon" aria-hidden="true" />
+                        {!collapsed && <span className="vc-nav-label">{item.label}</span>}
+                        {item.badge !== undefined && (
+                          <span className={`vc-nav-badge ${collapsed ? 'badge-dot' : ''}`}>
+                            {collapsed ? '' : item.badge}
+                          </span>
+                        )}
+                      </NavLink>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}
@@ -162,9 +190,9 @@ export default function Sidebar({
               </div>
             </>
           ) : (
-            <div className="vc-trust-compact" title="Ledger Network: Active">
-              <ShieldCheck size={18} color="var(--accent-primary)" />
-              <small style={{ fontSize: '0.65rem', fontWeight: 800, color: 'var(--text-primary)' }}>Live</small>
+            <div className="vc-trust-compact" title="Ledger Network: Active (Consensus 100%)">
+              <ShieldCheck size={18} color="#10B981" />
+              <small style={{ fontSize: '0.65rem', fontWeight: 800, color: '#10B981' }}>Live</small>
             </div>
           )}
         </div>
@@ -197,9 +225,9 @@ function getNavSections(role: string): NavSection[] {
     items: [
       { to: '/dashboard/marketplace', label: 'Marketplace', icon: ShoppingBag },
       { to: '/verify', label: 'Verify Product', icon: Search },
-      { to: '/dashboard/marketplace', label: 'Categories', icon: Tags },
+      { to: '/dashboard/marketplace?category=all', label: 'Categories', icon: Tags },
       { to: '/trust-center', label: 'Trust Center', icon: Shield },
-      { to: '/dashboard/recalls', label: 'Recall Management', icon: AlertTriangle, badge: 'Active' },
+      { to: '/dashboard/recalls', label: 'Recall Management', icon: AlertTriangle },
       { to: '/dashboard/order-management', label: 'Order Management', icon: ClipboardList },
       { to: '/dashboard/ai', label: 'AI Center', icon: Bot },
       { to: '/dashboard/community', label: 'Community', icon: Users },
@@ -268,12 +296,24 @@ function getNavSections(role: string): NavSection[] {
     },
   };
 
+  const getSettingsRoute = (r: string) => {
+    switch (r) {
+      case 'seller': return '/dashboard/inventory?tab=analytics';
+      case 'factory': return '/factory';
+      case 'admin': return '/dashboard/admin?tab=settings';
+      case 'moderator': return '/dashboard/product-verification';
+      case 'buyer':
+      default:
+        return '/buyer/profile';
+    }
+  };
+
   const accountSection: NavSection = {
     title: 'ACCOUNT',
     items: [
       { to: '/trust-center', label: 'Notifications', icon: Bell },
       { to: '/buyer/profile', label: 'Profile', icon: UserCircle },
-      { to: '/dashboard', label: 'Settings', icon: Settings },
+      { to: getSettingsRoute(role), label: 'Settings', icon: Settings },
     ],
   };
 

@@ -492,7 +492,7 @@ export default function VerifyItem() {
                       {/* Top Right Finder Pattern */}
                       <rect x="64" y="12" width="24" height="24" fill="var(--text-primary)" rx="2" />
                       <rect x="70" y="18" width="12" height="12" fill="var(--bg-card)" rx="1" />
-                      <rect x="74" y="74" width="4" height="4" fill="var(--accent-cyan)" />
+                      <rect x="74" y="22" width="4" height="4" fill="var(--accent-cyan)" />
 
                       {/* Bottom Left Finder Pattern */}
                       <rect x="12" y="64" width="24" height="24" fill="var(--text-primary)" rx="2" />

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, Link } from 'react-router-dom';
 import PageLoader from '../components/ui/PageLoader';
 import AlertBanner from '../components/ui/AlertBanner';
 import Modal from '../components/ui/Modal';
@@ -14,6 +14,7 @@ import {
   Plus,
   Loader,
   Eye,
+  LogIn,
 } from 'lucide-react';
 import './MarketplaceHome.css';
 
@@ -198,6 +199,11 @@ export default function Complaints() {
             <Plus size={16} /> File a Complaint
           </button>
         )}
+        {!user && (
+          <Link to="/login" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+            <LogIn size={16} /> Sign in to File Complaint
+          </Link>
+        )}
       </div>
 
       {success && (
@@ -232,6 +238,11 @@ export default function Complaints() {
               <Plus size={16} /> File First Complaint
             </button>
           )}
+          {!user && (
+            <Link to="/login" className="btn btn-secondary" style={{ marginTop: 'var(--space-md)', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+              <LogIn size={16} /> Sign in to Submit a Claim
+            </Link>
+          )}
         </div>
       ) : (
         <div className="table-container">
@@ -240,7 +251,7 @@ export default function Complaints() {
               <tr>
                 <th>Item Serial</th>
                 <th>Reason</th>
-                <th>{isModOrAdmin ? 'Buyer / Seller' : isModOrAdmin ? 'Parties' : 'Opposing Party'}</th>
+                <th>{isModOrAdmin ? 'Buyer / Seller' : 'Opposing Party'}</th>
                 <th>Filed Date</th>
                 <th>Status</th>
                 {isModOrAdmin && <th style={{ textAlign: 'right' }}>Actions</th>}

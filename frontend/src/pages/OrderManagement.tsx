@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   ShieldCheck,
   CheckCircle,
@@ -83,7 +84,7 @@ export interface OrderData {
 
   timeline: {
     id: string;
-    type: 'buyer' | 'seller' | 'factory' | 'ship' | 'system';
+    type: 'system' | 'custody' | 'iot';
     title: string;
     timestamp: string;
     actor: string;
@@ -93,6 +94,7 @@ export interface OrderData {
 }
 
 export default function OrderManagement() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState<OrderData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrderIndex, setSelectedOrderIndex] = useState<number>(0);
@@ -194,78 +196,84 @@ export default function OrderManagement() {
 
       const res = await client.get('/items/my');
       if (res.data?.items && Array.isArray(res.data.items) && res.data.items.length > 0) {
-        const transformed: OrderData[] = res.data.items.map((it: any, idx: number) => ({
-          id: `ORD-${it.serialNumber || it._id.slice(-6).toUpperCase()}`,
-          status: (it.status === 'sold' ? 'delivered' : it.status === 'in_transit' ? 'shipped' : 'processing') as any,
-          statusLabel: it.status === 'sold' ? 'Delivered' : it.status === 'in_transit' ? 'In Transit' : 'Processing',
-          progressPercent: it.status === 'sold' ? 100 : it.status === 'in_transit' ? 70 : 40,
-          authenticityScore: 100,
-          blockNumber: `#${18492000 + idx * 12}`,
-          transactionHash: (it.journey && it.journey[0]?.txHash) || '0x8f2a9c4b7e1d3f6a5b8c9d0e1f2a3b4c5d6e7f8a',
-          createdDate: new Date(it.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-          buyer: {
-            name: it.currentOwner?.name || 'Verified Buyer',
-            email: it.currentOwner?.email || 'buyer@verichain.network',
-            avatarInitials: (it.currentOwner?.name || 'VB').slice(0, 2).toUpperCase(),
-            verified: true,
-            shippingAddress: it.location || 'Verified Custody Address',
-            billingAddress: 'Same as shipping address',
-            paymentMethod: 'VeriChain Escrow',
-            paymentStatus: `Settled ($${it.product?.price || '0.00'})`,
-          },
-          seller: {
-            id: 'SEL-VERIFIED',
-            name: (it.journey && it.journey.find((j: any) => j.action === 'listed')?.actor?.name) || 'Authorized Merchant',
-            avatarInitials: 'AM',
-            verified: true,
-            tier: 'Verified Merchant',
-            rating: '4.95',
-            reviewCount: 120,
-            dispatchFacility: 'Regional Hub',
-            fulfillmentRate: '100%',
-            supportEmail: 'support@verichain.network',
-          },
-          factory: {
-            id: 'FAC-ORIGIN',
-            name: (it.journey && it.journey[0]?.actor?.name) || 'Origin Manufacturing Plant',
-            location: (it.journey && it.journey[0]?.location) || 'Certified Facility',
-            batchHash: it.serialNumber ? `0x${it.serialNumber}` : '0x7f8a9b1c2d3e4f5a',
-            nfcTag: `NFC-${it.serialNumber || 'A1'}`,
-            manufacturedDate: new Date(it.createdAt || Date.now()).toLocaleDateString(),
-            qcScore: '100%',
-            certification: 'ISO-9001',
-            defectRate: '0.00%',
-          },
-          shipment: {
-            carrier: 'VeriExpress',
-            trackingId: `TRK-${it.serialNumber || it._id.slice(-6)}`,
-            estDelivery: 'Completed',
-            currentLocation: it.location || 'Delivered',
-            steps: [
-              { title: 'Item Minted & Sealed', time: 'Factory', status: 'done' },
-              { title: 'Passed QA & Custody Check', time: 'Warehouse', status: 'done' },
-              { title: 'Ownership Transferred to Buyer', time: 'Final', status: 'done' },
-            ],
-          },
-          items: [
-            {
-              id: it._id,
-              name: it.product?.name || 'Verified Authentic Item',
-              sku: it.product?.sku || 'VC-SKU',
-              quantity: 1,
-              price: Number(it.product?.price) || 0,
+        const transformed: OrderData[] = res.data.items.map((it: any, idx: number) => {
+          const itemPrice = Number(it.product?.price) || Number(it.price) || (it.product?.name?.toLowerCase().includes('watch') ? 1450 : 350);
+          const itemQty = 1;
+          const totalVal = itemPrice * itemQty;
+
+          return {
+            id: `ORD-${it.serialNumber || it._id.slice(-6).toUpperCase()}`,
+            status: (it.status === 'sold' ? 'delivered' : it.status === 'in_transit' ? 'shipped' : 'processing') as any,
+            statusLabel: it.status === 'sold' ? 'Delivered' : it.status === 'in_transit' ? 'In Transit' : 'Processing',
+            progressPercent: it.status === 'sold' ? 100 : it.status === 'in_transit' ? 70 : 40,
+            authenticityScore: 100,
+            blockNumber: `#${18492000 + idx * 12}`,
+            transactionHash: (it.journey && it.journey[0]?.txHash) || '0x8f2a9c4b7e1d3f6a5b8c9d0e1f2a3b4c5d6e7f8a',
+            createdDate: new Date(it.createdAt || Date.now()).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+            buyer: {
+              name: it.currentOwner?.name || 'Verified Buyer',
+              email: it.currentOwner?.email || 'buyer@verichain.network',
+              avatarInitials: (it.currentOwner?.name || 'VB').slice(0, 2).toUpperCase(),
+              verified: true,
+              shippingAddress: it.location || 'Verified Custody Address',
+              billingAddress: 'Same as shipping address',
+              paymentMethod: 'VeriChain Escrow',
+              paymentStatus: `Settled ($${totalVal.toFixed(2)})`,
             },
-          ],
-          timeline: (it.journey || []).map((j: any, jIdx: number) => ({
-            id: `t-${jIdx}`,
-            type: 'system' as const,
-            title: `Event: ${j.action}`,
-            timestamp: new Date(j.timestamp).toLocaleString(),
-            actor: j.actor?.name || 'VeriChain Ledger',
-            tag: j.action,
-            details: j.details,
-          })),
-        }));
+            seller: {
+              id: 'SEL-VERIFIED',
+              name: (it.journey && it.journey.find((j: any) => j.action === 'listed')?.actor?.name) || 'Authorized Merchant',
+              avatarInitials: 'AM',
+              verified: true,
+              tier: 'Verified Merchant',
+              rating: '4.95',
+              reviewCount: 120,
+              dispatchFacility: 'Regional Hub',
+              fulfillmentRate: '100%',
+              supportEmail: 'support@verichain.network',
+            },
+            factory: {
+              id: 'FAC-ORIGIN',
+              name: (it.journey && it.journey[0]?.actor?.name) || 'Origin Manufacturing Plant',
+              location: (it.journey && it.journey[0]?.location) || 'Certified Facility',
+              batchHash: it.serialNumber ? `0x${it.serialNumber}` : '0x7f8a9b1c2d3e4f5a',
+              nfcTag: `NFC-${it.serialNumber || 'A1'}`,
+              manufacturedDate: new Date(it.createdAt || Date.now()).toLocaleDateString(),
+              qcScore: '100%',
+              certification: 'ISO-9001',
+              defectRate: '0.00%',
+            },
+            shipment: {
+              carrier: 'VeriExpress',
+              trackingId: `TRK-${it.serialNumber || it._id.slice(-6)}`,
+              estDelivery: 'Completed',
+              currentLocation: it.location || 'Delivered',
+              steps: [
+                { title: 'Item Minted & Sealed', time: 'Factory', status: 'done' },
+                { title: 'Passed QA & Custody Check', time: 'Warehouse', status: 'done' },
+                { title: 'Ownership Transferred to Buyer', time: 'Final', status: 'done' },
+              ],
+            },
+            items: [
+              {
+                id: it._id,
+                name: it.product?.name || 'Verified Authentic Item',
+                sku: it.product?.sku || 'VC-SKU001',
+                quantity: itemQty,
+                price: itemPrice,
+              },
+            ],
+            timeline: (it.journey || []).map((j: any, jIdx: number) => ({
+              id: `t-${jIdx}`,
+              type: 'system' as const,
+              title: `Event: ${j.action}`,
+              timestamp: new Date(j.timestamp).toLocaleString(),
+              actor: j.actor?.name || 'VeriChain Ledger',
+              tag: j.action,
+              details: j.details,
+            })),
+          };
+        });
         setOrders(transformed);
       } else {
         setOrders([]);
@@ -315,7 +323,7 @@ export default function OrderManagement() {
             action={
               <button
                 className="btn btn-primary"
-                onClick={() => window.location.href = '/dashboard/marketplace'}
+                onClick={() => navigate('/dashboard/marketplace')}
               >
                 Explore Marketplace
               </button>

@@ -46,15 +46,7 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
     };
   }, []);
 
-  const handleMessagesClick = () => {
-    if (user?.role === 'seller') {
-      navigate('/dashboard/inventory?tab=inquiries');
-    } else {
-      navigate('/dashboard/complaints');
-    }
-  };
-
-  const sampleNotifications = [
+  const [notifications, setNotifications] = useState([
     {
       id: 'n1',
       title: 'Ledger Consensus Live',
@@ -69,7 +61,47 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
       time: '1h ago',
       unread: false,
     },
-  ];
+  ]);
+
+  const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const markAllRead = () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, unread: false })));
+  };
+
+  const toggleRead = (id: string) => {
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, unread: false } : n)));
+  };
+
+  const handleMessagesClick = () => {
+    if (user?.role === 'seller') {
+      navigate('/dashboard/inventory?tab=inquiries');
+    } else if (user?.role === 'factory') {
+      navigate('/factory?tab=seller-requests');
+    } else if (user?.role === 'admin') {
+      navigate('/dashboard/admin?tab=complaints');
+    } else if (user?.role === 'moderator') {
+      navigate('/dashboard/complaints-moderator');
+    } else {
+      navigate('/dashboard/complaints');
+    }
+  };
+
+  const handleProfileClick = () => {
+    if (user?.role === 'buyer') {
+      navigate('/buyer/profile');
+    } else if (user?.role === 'seller') {
+      navigate('/dashboard/inventory?tab=analytics');
+    } else if (user?.role === 'factory') {
+      navigate('/factory');
+    } else if (user?.role === 'admin') {
+      navigate('/dashboard/admin?tab=settings');
+    } else if (user?.role === 'moderator') {
+      navigate('/dashboard/product-verification');
+    } else {
+      navigate('/dashboard');
+    }
+  };
 
   return (
     <>
@@ -117,7 +149,7 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
               title="Notifications"
             >
               <Bell size={18} />
-              <span className="vc-action-badge">2</span>
+              {unreadCount > 0 && <span className="vc-action-badge">{unreadCount}</span>}
             </ActionButton>
 
             {notificationsOpen && (
@@ -139,35 +171,63 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
                   <strong style={{ fontSize: '0.95rem', color: 'var(--text-primary)' }}>System Notifications</strong>
-                  <button
-                    type="button"
-                    onClick={() => setNotificationsOpen(false)}
-                    style={{ background: 'none', border: 0, cursor: 'pointer', color: 'var(--text-muted)' }}
-                  >
-                    <X size={16} />
-                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={markAllRead}
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: 'var(--accent-purple, #F59E0B)',
+                          fontSize: '0.75rem',
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                          padding: '2px 4px',
+                        }}
+                      >
+                        Mark read
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setNotificationsOpen(false)}
+                      style={{ background: 'none', border: 0, cursor: 'pointer', color: 'var(--text-muted)' }}
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
                 </div>
 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-xs)' }}>
-                  {sampleNotifications.map((n) => (
-                    <div
-                      key={n.id}
-                      style={{
-                        padding: '8px 10px',
-                        borderRadius: 'var(--radius-md)',
-                        background: n.unread ? 'rgba(245, 158, 11, 0.08)' : 'var(--bg-secondary)',
-                        borderLeft: n.unread ? '3px solid #F59E0B' : '3px solid transparent',
-                      }}
-                    >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>{n.title}</span>
-                        <small style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{n.time}</small>
+                  {notifications.length === 0 ? (
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', textAlign: 'center', padding: '12px 0' }}>
+                      No new notifications
+                    </p>
+                  ) : (
+                    notifications.map((n) => (
+                      <div
+                        key={n.id}
+                        onClick={() => toggleRead(n.id)}
+                        style={{
+                          padding: '8px 10px',
+                          borderRadius: 'var(--radius-md)',
+                          background: n.unread ? 'rgba(245, 158, 11, 0.08)' : 'var(--bg-secondary)',
+                          borderLeft: n.unread ? '3px solid #F59E0B' : '3px solid transparent',
+                          cursor: 'pointer',
+                          transition: 'background 0.2s ease',
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--text-primary)' }}>{n.title}</span>
+                          <small style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{n.time}</small>
+                        </div>
+                        <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '3px 0 0', lineHeight: 1.3 }}>
+                          {n.detail}
+                        </p>
                       </div>
-                      <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', margin: '3px 0 0', lineHeight: 1.3 }}>
-                        {n.detail}
-                      </p>
-                    </div>
-                  ))}
+                    ))
+                  )}
                 </div>
 
                 <button
@@ -187,7 +247,7 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
           <div
             className="vc-topbar-profile"
             aria-label="Current user"
-            onClick={() => navigate(user?.role === 'buyer' ? '/buyer/profile' : '/dashboard')}
+            onClick={handleProfileClick}
             style={{ cursor: 'pointer' }}
           >
             <div className="vc-avatar vc-avatar-sm">{user?.name?.charAt(0).toUpperCase() || 'V'}</div>

@@ -193,7 +193,7 @@ const TrustCenter: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {sellers.map(s => (
-                    <SellerInfoCard key={s._id} seller={s} />
+                    <SellerInfoCard key={s._id} seller={s} title="Verified Merchant Partner" />
                   ))}
                 </div>
               )}

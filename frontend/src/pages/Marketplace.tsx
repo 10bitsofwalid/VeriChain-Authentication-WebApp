@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import PageLoader from '../components/ui/PageLoader';
 import AlertBanner from '../components/ui/AlertBanner';
 import client from '../api/client';
@@ -43,6 +43,10 @@ export interface ListedItem {
 
 export default function Marketplace() {
   const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const categoryParam = searchParams.get('category');
+  const searchParam = searchParams.get('search');
+
   const [items, setItems] = useState<ListedItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -53,6 +57,19 @@ export default function Marketplace() {
   const [successMessage, setSuccessMessage] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 12;
+
+  useEffect(() => {
+    if (categoryParam) {
+      if (categoryParam.toLowerCase() === 'all') {
+        setSelectedCategory('All');
+      } else {
+        setSelectedCategory(categoryParam);
+      }
+    }
+    if (searchParam) {
+      setSearch(searchParam);
+    }
+  }, [categoryParam, searchParam]);
 
   const fetchMarketplace = async () => {
     try {

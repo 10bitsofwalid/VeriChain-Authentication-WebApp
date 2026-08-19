@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, Loader } from 'lucide-react';
+import { Mail, Lock, Loader, Eye, EyeOff } from 'lucide-react';
 import Logo from '../components/Logo';
 import './Auth.css';
 
@@ -11,6 +11,7 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -70,13 +71,22 @@ export default function Login() {
               <Lock size={16} className="input-icon" />
               <input
                 id="login-password"
-                type="password"
-                className="form-input input-with-icon"
+                type={showPassword ? 'text' : 'password'}
+                className="form-input input-with-icon-and-action"
                 placeholder="••••••••"
                 value={password}
                 onChange={e => { setPassword(e.target.value); clearError(); }}
                 required
               />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
             </div>
           </div>
 

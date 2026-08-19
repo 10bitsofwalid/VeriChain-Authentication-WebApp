@@ -162,11 +162,11 @@ export default function AdminSettingsView() {
 
         <div className="admin-grid-2" style={{ marginTop: 12 }}>
           {/* AI Moderation Sensitivity */}
-          <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 16, borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)' }}>
-            <label style={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
+          <div style={{ background: 'var(--bg-secondary)', padding: 16, borderRadius: 12, border: '1px solid var(--border-default)' }}>
+            <label style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: 8, marginBottom: 8 }}>
               <Zap size={16} color="var(--accent-primary)" /> AI Auto-Moderation Sensitivity
             </label>
-            <p style={{ color: '#94a3b8', fontSize: '0.825rem', marginBottom: 14 }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.825rem', marginBottom: 14 }}>
               Controls automatic flagging threshold for unverified product templates and duplicate serial patterns.
             </p>
             <div style={{ display: 'flex', gap: 8 }}>
@@ -179,12 +179,13 @@ export default function AdminSettingsView() {
                     flex: 1,
                     padding: '8px 12px',
                     borderRadius: 6,
-                    border: aiSensitivity === sens ? '1px solid var(--accent-purple)' : '1px solid rgba(255,255,255,0.1)',
-                    background: aiSensitivity === sens ? 'var(--accent-bg)' : 'transparent',
-                    color: aiSensitivity === sens ? 'var(--text-primary)' : '#94a3b8',
-                    fontWeight: aiSensitivity === sens ? 700 : 400,
+                    border: aiSensitivity === sens ? '1.5px solid #F59E0B' : '1px solid var(--border-default)',
+                    background: aiSensitivity === sens ? 'rgba(245, 158, 11, 0.12)' : 'var(--bg-card)',
+                    color: aiSensitivity === sens ? '#B45309' : 'var(--text-secondary)',
+                    fontWeight: aiSensitivity === sens ? 800 : 600,
                     cursor: 'pointer',
                     fontSize: '0.85rem',
+                    transition: 'all 0.15s ease',
                   }}
                 >
                   {sens.toUpperCase()}
@@ -194,38 +195,38 @@ export default function AdminSettingsView() {
           </div>
 
           {/* Security Toggles */}
-          <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 16, borderRadius: 12, border: '1px solid rgba(255,255,255,0.06)', display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <label style={{ color: '#f8fafc', fontWeight: 600, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: 8 }}>
+          <div style={{ background: 'var(--bg-secondary)', padding: 16, borderRadius: 12, border: '1px solid var(--border-default)', display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <label style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: '0.95rem', display: 'flex', alignItems: 'center', gap: 8 }}>
               <Lock size={16} color="#10b981" /> Automated System Rules
             </label>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>Block Instant Scan Bursting (Anti-Bot)</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>Block Instant Scan Bursting (Anti-Bot)</span>
               <input
                 type="checkbox"
                 checked={blockDuplicateScans}
                 onChange={e => setBlockDuplicateScans(e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: '#F5A623', cursor: 'pointer' }}
+                style={{ width: 18, height: 18, accentColor: '#F59E0B', cursor: 'pointer' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>Auto-Flag Sellers with &gt; 3 Complaints</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>Auto-Flag Sellers with &gt; 3 Complaints</span>
               <input
                 type="checkbox"
                 checked={autoFlagSeller}
                 onChange={e => setAutoFlagSeller(e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: '#F5A623', cursor: 'pointer' }}
+                style={{ width: 18, height: 18, accentColor: '#F59E0B', cursor: 'pointer' }}
               />
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ fontSize: '0.85rem', color: '#cbd5e1' }}>Enforce Mandatory 2FA for Admin Roles</span>
+              <span style={{ fontSize: '0.85rem', color: 'var(--text-primary)', fontWeight: 600 }}>Enforce Mandatory 2FA for Admin Roles</span>
               <input
                 type="checkbox"
                 checked={require2FA}
                 onChange={e => setRequire2FA(e.target.checked)}
-                style={{ width: 18, height: 18, accentColor: '#F5A623', cursor: 'pointer' }}
+                style={{ width: 18, height: 18, accentColor: '#F59E0B', cursor: 'pointer' }}
               />
             </div>
           </div>

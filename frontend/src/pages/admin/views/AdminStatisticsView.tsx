@@ -153,24 +153,24 @@ export default function AdminStatisticsView() {
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
-            <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Registered Buyers</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{userCounts.buyers}</div>
+            <div style={{ background: 'var(--bg-secondary)', padding: 14, borderRadius: 10, border: '1px solid var(--border-default)' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Registered Buyers</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>{userCounts.buyers}</div>
             </div>
 
-            <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Verified Merchants / Sellers</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{userCounts.sellers}</div>
+            <div style={{ background: 'var(--bg-secondary)', padding: 14, borderRadius: 10, border: '1px solid var(--border-default)' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Verified Merchants / Sellers</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>{userCounts.sellers}</div>
             </div>
 
-            <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Certified Factories</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{userCounts.factories}</div>
+            <div style={{ background: 'var(--bg-secondary)', padding: 14, borderRadius: 10, border: '1px solid var(--border-default)' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Certified Factories</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>{userCounts.factories}</div>
             </div>
 
-            <div style={{ background: 'rgba(30, 41, 59, 0.6)', padding: 14, borderRadius: 10, border: '1px solid rgba(255,255,255,0.06)' }}>
-              <div style={{ fontSize: '0.8rem', color: '#94a3b8' }}>Platform Administrators</div>
-              <div style={{ fontSize: '1.4rem', fontWeight: 700, color: '#f8fafc', marginTop: 4 }}>{userCounts.moderators}</div>
+            <div style={{ background: 'var(--bg-secondary)', padding: 14, borderRadius: 10, border: '1px solid var(--border-default)' }}>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 600 }}>Platform Administrators</div>
+              <div style={{ fontSize: '1.4rem', fontWeight: 800, color: 'var(--text-primary)', marginTop: 4 }}>{userCounts.moderators}</div>
             </div>
           </div>
         </div>

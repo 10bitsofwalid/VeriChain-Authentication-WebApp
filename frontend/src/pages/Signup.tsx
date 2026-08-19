@@ -2,7 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import AlertBanner from '../components/ui/AlertBanner';
 import { useAuth } from '../context/AuthContext';
-import { Mail, Lock, User, Loader, MapPin, Award, Hash } from 'lucide-react';
+import { Mail, Lock, User, Loader, MapPin, Award, Hash, Eye, EyeOff } from 'lucide-react';
 import FileUpload from '../components/FileUpload';
 import Logo from '../components/Logo';
 import './Auth.css';
@@ -21,15 +21,23 @@ export default function Signup() {
     logoUrl: '',
     certificateUrl: '',
   });
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [validationError, setValidationError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const update = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
     clearError();
+    setValidationError('');
   };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (form.password !== confirmPassword) {
+      setValidationError('Passwords do not match. Please re-enter your password.');
+      return;
+    }
     setSubmitting(true);
     try {
       await signup(form);
@@ -53,11 +61,11 @@ export default function Signup() {
           <p>Join the authenticity network</p>
         </div>
 
-        {error && (
+        {(validationError || error) && (
           <AlertBanner
             type="error"
-            message={error}
-            onDismiss={clearError}
+            message={validationError || error}
+            onDismiss={() => { clearError(); setValidationError(''); }}
             style={{ marginBottom: 'var(--space-md)' }}
           />
         )}
@@ -101,11 +109,37 @@ export default function Signup() {
               <Lock size={16} className="input-icon" />
               <input
                 id="signup-password"
-                type="password"
-                className="form-input input-with-icon"
+                type={showPassword ? 'text' : 'password'}
+                className="form-input input-with-icon-and-action"
                 placeholder="Min 6 characters"
                 value={form.password}
                 onChange={e => update('password', e.target.value)}
+                required
+                minLength={6}
+              />
+              <button
+                type="button"
+                className="password-toggle-btn"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+                title={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+              </button>
+            </div>
+          </div>
+
+          <div className="form-group">
+            <label className="form-label" htmlFor="signup-confirm-password">Confirm Password</label>
+            <div className="input-icon-wrapper">
+              <Lock size={16} className="input-icon" />
+              <input
+                id="signup-confirm-password"
+                type={showPassword ? 'text' : 'password'}
+                className="form-input input-with-icon-and-action"
+                placeholder="Re-type your password"
+                value={confirmPassword}
+                onChange={e => { setConfirmPassword(e.target.value); setValidationError(''); }}
                 required
                 minLength={6}
               />

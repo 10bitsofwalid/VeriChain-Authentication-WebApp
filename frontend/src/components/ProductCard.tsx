@@ -124,7 +124,7 @@ export const ProductCard = ({ item }: ProductCardProps) => {
           </div>
           <div>
             <span>Price</span>
-            <strong>${placeholder.price}</strong>
+            <strong>${item.product?.price != null ? Number(item.product.price).toFixed(2) : placeholder.price}</strong>
           </div>
           <div>
             <span>Stock</span>

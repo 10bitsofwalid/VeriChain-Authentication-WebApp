@@ -438,6 +438,12 @@
   gap: var(--space-md);
 }
 
+.bx-profile-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-md);
+}
+
 /* ── Product grid (wishlist) ───────────────────────────────── */
 .bx-product-grid {
   display: grid;

@@ -163,7 +163,7 @@ export default function ProfilePage() {
                 </div>
               </form>
             ) : (
-              <div className="bx-form-row">
+              <div className="bx-profile-details-grid">
                 <div>
                   <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: 4 }}>Full Name</div>
                   <div style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--text-primary)' }}>{form.name || user?.name || '—'}</div>
