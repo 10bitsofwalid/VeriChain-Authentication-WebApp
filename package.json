@@ -1,0 +1,9 @@
+{
+  "name": "verichain-project",
+  "private": true,
+  "scripts": {
+    "install:frontend": "npm --prefix frontend install",
+    "build": "npm --prefix frontend install && npm --prefix frontend run build",
+    "dev": "npm --prefix frontend run dev"
+  }
+}
