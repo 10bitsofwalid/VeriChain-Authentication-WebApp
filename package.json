@@ -2,8 +2,7 @@
   "name": "verichain-project",
   "private": true,
   "scripts": {
-    "install:frontend": "npm --prefix frontend install",
-    "build": "npm --prefix frontend install && npm --prefix frontend run build",
-    "dev": "npm --prefix frontend run dev"
+    "build": "cd frontend && npm install --include=dev && npm run build",
+    "dev": "cd frontend && npm run dev"
   }
 }
