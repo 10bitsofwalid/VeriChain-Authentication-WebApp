@@ -532,9 +532,20 @@
 }
 
 .product-serial {
-  color: var(--accent-purple, #F59E0B) !important;
+  color: #16233B !important;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-default);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
   font-family: var(--font-mono);
+  font-size: 0.74rem;
   font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .product-card-actions {

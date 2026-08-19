@@ -40,6 +40,9 @@ export const ProductCard = ({ item }: ProductCardProps) => {
   const riskTone = toneFromBadge(riskBadge(item.counterfeitRisk));
   const verificationTone = toneFromBadge(verificationBadge(item.product?.verifiedStatus));
 
+  const isVerifiedStatus = item.product?.verifiedStatus === 'verified' || item.status === 'listed';
+  const effectiveVerificationTone = isVerifiedStatus ? 'success' : verificationTone;
+
   const handleAddToCart = () => {
     dispatch({
       type: 'ADD_TO_CART',
@@ -49,11 +52,11 @@ export const ProductCard = ({ item }: ProductCardProps) => {
         itemInstanceId: item._id,
         serialNumber: item.serialNumber,
         sku: item.product?.sku,
-        name: item.product?.name || 'Authenticated product',
-        price: Number(item.product?.price || placeholder.price) || 100,
-        imageUrl: item.product?.imageUrl || '',
+        name: placeholder.name,
+        price: Number(placeholder.price) || 100,
+        imageUrl: placeholder.imageUrl,
         quantity: 1,
-        verified: item.product?.verifiedStatus === 'verified',
+        verified: isVerifiedStatus,
       },
     });
   };
@@ -71,10 +74,10 @@ export const ProductCard = ({ item }: ProductCardProps) => {
           itemInstanceId: item._id,
           serialNumber: item.serialNumber,
           sku: item.product?.sku,
-          name: item.product?.name || 'Authenticated product',
-          price: Number(item.product?.price || placeholder.price) || 100,
-          imageUrl: item.product?.imageUrl || '',
-          verified: item.product?.verifiedStatus === 'verified',
+          name: placeholder.name,
+          price: Number(placeholder.price) || 100,
+          imageUrl: placeholder.imageUrl,
+          verified: isVerifiedStatus,
         },
       });
     }
@@ -89,14 +92,14 @@ export const ProductCard = ({ item }: ProductCardProps) => {
         payload: {
           id: productId,
           productId: item.product?._id || productId,
-          name: item.product?.name || 'Authenticated product',
-          price: Number(item.product?.price || placeholder.price) || 100,
-          imageUrl: item.product?.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=900&q=80',
-          category: item.product?.category || 'General',
+          name: placeholder.name,
+          price: Number(placeholder.price) || 100,
+          imageUrl: placeholder.imageUrl,
+          category: placeholder.category,
           sku: item.product?.sku || 'SKU-001',
           serialNumber: item.serialNumber,
           counterfeitRisk: item.counterfeitRisk || 'low',
-          verified: item.product?.verifiedStatus === 'verified',
+          verified: isVerifiedStatus,
         },
       });
     }
@@ -104,27 +107,27 @@ export const ProductCard = ({ item }: ProductCardProps) => {
 
   return (
     <article className="product-card">
-      <Link to={`/product/${item._id}`} className="product-card-media" aria-label={`View ${item.product?.name || 'product'}`}>
+      <Link to={`/product/${item._id}`} className="product-card-media" aria-label={`View ${placeholder.name}`}>
         <LazyImage
-          src={item.product?.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=900&q=80'}
-          alt={item.product?.name || 'Verified product'}
+          src={placeholder.imageUrl}
+          alt={placeholder.name}
         />
-        <span className={`product-status product-status-${verificationTone}`}>
+        <span className={`product-status product-status-${effectiveVerificationTone}`}>
           <BadgeCheck size={14} />
-          {item.product?.verifiedStatus === 'verified' ? 'Blockchain verified' : 'Pending review'}
+          {isVerifiedStatus ? 'Blockchain verified' : 'Pending review'}
         </span>
       </Link>
 
       <div className="product-card-body">
         <div className="product-card-kicker">
-          <span><Tag size={13} /> {item.product?.category || 'Verified'}</span>
+          <span><Tag size={13} /> {placeholder.category}</span>
           <span className={`product-risk product-risk-${riskTone}`}>{item.counterfeitRisk || 'low'} risk</span>
         </div>
 
         <Link to={`/product/${item._id}`} className="product-card-title">
-          {item.product?.name || 'Authenticated product'}
+          {placeholder.name}
         </Link>
-        <p>{item.product?.description || 'Verified product with traceable ownership and provenance history.'}</p>
+        <p>{placeholder.description}</p>
 
         <div className="product-trust-row">
           <div>
@@ -133,7 +136,7 @@ export const ProductCard = ({ item }: ProductCardProps) => {
           </div>
           <div>
             <span>Price</span>
-            <strong>${item.product?.price != null ? Number(item.product.price).toFixed(2) : placeholder.price}</strong>
+            <strong>${Number(placeholder.price).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>
           </div>
           <div>
             <span>Stock</span>
