@@ -22,8 +22,11 @@ export default function Wishlist() {
       payload: {
         id: item.id,
         productId: item.productId || item.id,
+        itemInstanceId: item.itemInstanceId || (item.serialNumber ? item.id : undefined),
+        serialNumber: item.serialNumber,
+        sku: item.sku,
         name: item.name,
-        price: item.price,
+        price: Number(item.price) || 0,
         imageUrl: item.imageUrl || item.image,
         quantity: 1,
         verified: item.verified !== false,
@@ -31,6 +34,25 @@ export default function Wishlist() {
     });
     setAddedMessage(`"${item.name}" added to cart!`);
     setTimeout(() => setAddedMessage(null), 3000);
+  };
+
+  const handleBuyNow = (item: any) => {
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: {
+        id: item.id,
+        productId: item.productId || item.id,
+        itemInstanceId: item.itemInstanceId || (item.serialNumber ? item.id : undefined),
+        serialNumber: item.serialNumber,
+        sku: item.sku,
+        name: item.name,
+        price: Number(item.price) || 0,
+        imageUrl: item.imageUrl || item.image,
+        quantity: 1,
+        verified: item.verified !== false,
+      },
+    });
+    navigate('/buyer/checkout');
   };
 
   const handleClearAll = () => {
@@ -228,6 +250,15 @@ export default function Wishlist() {
                       style={{ flex: 1, justifyContent: 'center' }}
                     >
                       <ShoppingBag size={14} /> Add to Cart
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      onClick={() => handleBuyNow(item)}
+                      style={{ padding: '0 12px', fontSize: '0.8rem', fontWeight: 600 }}
+                      title="Buy now"
+                    >
+                      Buy Now
                     </button>
                     <Link
                       to={`/product/${item.productId || item.id}`}

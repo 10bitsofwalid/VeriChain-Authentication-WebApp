@@ -1,9 +1,16 @@
 // Design tokens for UI components
 export const COLORS = {
   primary: "var(--accent-primary)",
+  navy: "var(--accent-navy)",
+  gold: "var(--accent-gold)",
+  amber: "var(--accent-amber)",
+  teal: "var(--accent-teal)",
   secondary: "var(--text-secondary)",
-  accent: "var(--accent-purple)",
+  muted: "var(--text-muted)",
+  accent: "var(--accent-gold)",
   background: "var(--bg-card)",
+  bgPrimary: "var(--bg-primary)",
+  bgSecondary: "var(--bg-secondary)",
   danger: "var(--color-danger)",
   success: "var(--color-success)",
   warning: "var(--color-warning)",

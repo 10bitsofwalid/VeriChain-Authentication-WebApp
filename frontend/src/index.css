@@ -19,16 +19,20 @@
   --text-muted: #64748B;
   --text-inverse: #FFFFFF;
 
-  /* Brand and Accent Colors — Palette 02 */
-  --accent-cyan: #16233B;
+  /* Brand and Accent Colors — Palette 02 Semantic Tokens */
   --accent-primary: #16233B;
-  --accent-purple: #F59E0B;
+  --accent-navy: #16233B;
   --accent-gold: #F59E0B;
+  --accent-amber: #F59E0B;
+  --accent-teal: #06B6D4;
+  --accent-cyan: #16233B; /* Backward-compatibility alias */
+  --accent-purple: #F59E0B; /* Backward-compatibility alias */
   --accent-bg: rgba(245, 158, 11, 0.12);
   --accent-border: rgba(245, 158, 11, 0.28);
   --accent-gradient: linear-gradient(135deg, #16233B 0%, #0B0F19 100%);
   --accent-gradient-hover: linear-gradient(135deg, #203254 0%, #16233B 100%);
   --accent-gold-gradient: linear-gradient(135deg, #F59E0B 0%, #D97706 100%);
+  --accent-teal-gradient: linear-gradient(135deg, #06B6D4 0%, #0891B2 100%);
 
   /* Status colors */
   --color-success: #10B981;
