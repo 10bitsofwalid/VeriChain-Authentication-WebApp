@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { ArrowRight, PackageOpen } from 'lucide-react';
 import ProductCard from './ProductCard';
 import EmptyState from './ui/EmptyState';
@@ -16,6 +17,8 @@ const sectionCopy: Record<string, string> = {
 };
 
 export default function ProductSection({ title, products, description }: ProductSectionProps) {
+  const navigate = useNavigate();
+
   return (
     <section className="marketplace-section">
       <div className="marketplace-section-header">
@@ -25,7 +28,11 @@ export default function ProductSection({ title, products, description }: Product
         </div>
         <p>{description || sectionCopy[title]}</p>
         {products.length > 0 && (
-          <button className="marketplace-text-button" type="button">
+          <button
+            className="marketplace-text-button"
+            type="button"
+            onClick={() => navigate('/dashboard/marketplace')}
+          >
             View all
             <ArrowRight size={16} />
           </button>

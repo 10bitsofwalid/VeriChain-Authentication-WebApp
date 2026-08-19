@@ -1,4 +1,5 @@
 import { useState, useEffect, type FormEvent } from 'react';
+import { Link } from 'react-router-dom';
 import client from '../api/client';
 import {
   Shield,
@@ -20,10 +21,13 @@ import {
   Truck,
   Database,
   RefreshCw,
+  ShoppingBag,
+  ExternalLink,
 } from 'lucide-react';
 import logoSvg from '../assets/logo.svg';
 import NavBar from '../components/NavBar';
 import Footer from '../components/Footer';
+import { useShopping } from '../context/ShoppingContext';
 import './VerifyItem.css';
 
 interface VerifyResult {
@@ -54,10 +58,35 @@ interface VerifyResult {
 }
 
 export default function VerifyItem() {
+  const { dispatch } = useShopping();
   const [serial, setSerial] = useState('');
   const [result, setResult] = useState<VerifyResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [addedToCart, setAddedToCart] = useState(false);
+
+  const handleAddToCart = () => {
+    if (!result) return;
+    dispatch({
+      type: 'ADD_TO_CART',
+      payload: {
+        id: result.item.serialNumber,
+        productId: result.item.serialNumber,
+        itemInstanceId: result.item.serialNumber,
+        serialNumber: result.item.serialNumber,
+        sku: result.item.product.sku,
+        name: result.item.product.name,
+        price: 150,
+        imageUrl: result.item.product.imageUrl,
+        quantity: 1,
+        verified: true,
+        category: result.item.product.category,
+        counterfeitRisk: result.item.counterfeitRisk,
+      },
+    });
+    setAddedToCart(true);
+    setTimeout(() => setAddedToCart(false), 3000);
+  };
 
   // Scanner Simulator States
   const [showScanner, setShowScanner] = useState(false);
@@ -336,6 +365,33 @@ export default function VerifyItem() {
 
                   {result.item.product.description && (
                     <p className="detail-description">{result.item.product.description}</p>
+                  )}
+
+                  {result.verified && (
+                    <div style={{
+                      marginTop: 'var(--space-md)',
+                      paddingTop: 'var(--space-md)',
+                      borderTop: '1px solid var(--border-subtle)',
+                      display: 'flex',
+                      gap: 'var(--space-sm)',
+                      flexWrap: 'wrap',
+                    }}>
+                      <Link
+                        to={`/dashboard/marketplace?search=${encodeURIComponent(result.item.product.sku || result.item.product.name)}`}
+                        className="btn btn-primary btn-sm"
+                        style={{ display: 'flex', alignItems: 'center', gap: 6, textDecoration: 'none' }}
+                      >
+                        <ExternalLink size={14} /> View in Marketplace
+                      </Link>
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={handleAddToCart}
+                        style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+                      >
+                        <ShoppingBag size={14} /> {addedToCart ? 'Added to Cart!' : 'Add to Cart ($150)'}
+                      </button>
+                    </div>
                   )}
                 </div>
 

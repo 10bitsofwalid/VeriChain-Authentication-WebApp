@@ -26,7 +26,6 @@ import FactoryDashboard from '../pages/factory/FactoryDashboard';
 import RegisterProduct from '../pages/factory/RegisterProduct';
 
 import BuyerDashboard from '../pages/buyer/BuyerDashboard';
-import CartPage from '../pages/buyer/CartPage';
 import CheckoutPage from '../pages/buyer/CheckoutPage';
 import WishlistPage from '../pages/buyer/WishlistPage';
 

@@ -169,7 +169,7 @@ const TrustCenter: React.FC = () => {
               ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {factories.map(f => (
-                    <FactoryCard key={f._id} factory={f} selected={false} onSelect={() => {}} />
+                    <FactoryCard key={f._id} factory={f} selected={false} onSelect={() => navigate(`/factory/${f._id}`)} />
                   ))}
                 </div>
               )}

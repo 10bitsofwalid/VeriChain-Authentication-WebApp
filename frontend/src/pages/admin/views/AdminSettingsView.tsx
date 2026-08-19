@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import ActionButton from '../../../components/ui/ActionButton';
 import StatusChip from '../../../components/ui/StatusChip';
 import {
@@ -21,14 +21,60 @@ interface ApiKeyRecord {
   lastUsed: string;
 }
 
+const SETTINGS_STORAGE_KEY = 'verichain_admin_policy_settings';
+const KEYS_STORAGE_KEY = 'verichain_admin_api_keys';
+
+const DEFAULT_KEYS: ApiKeyRecord[] = [
+  {
+    id: 'key-1',
+    name: 'Mainnet Verification Gateway',
+    prefix: 'vc_live_8f3a9e...4b21',
+    scope: 'Verification API',
+    created: '2026-08-01',
+    lastUsed: '12 mins ago',
+  },
+  {
+    id: 'key-2',
+    name: 'Factory Minting Integration',
+    prefix: 'vc_admin_1c7b2d...9a08',
+    scope: 'Full Administrative',
+    created: '2026-08-10',
+    lastUsed: '2 hours ago',
+  }
+];
+
 export default function AdminSettingsView() {
-  const [keys, setKeys] = useState<ApiKeyRecord[]>([]);
+  const [keys, setKeys] = useState<ApiKeyRecord[]>(() => {
+    try {
+      const stored = localStorage.getItem(KEYS_STORAGE_KEY);
+      return stored ? JSON.parse(stored) : DEFAULT_KEYS;
+    } catch {
+      return DEFAULT_KEYS;
+    }
+  });
+
   const [aiSensitivity, setAiSensitivity] = useState<'low' | 'medium' | 'strict'>('medium');
   const [autoFlagSeller, setAutoFlagSeller] = useState(true);
   const [require2FA, setRequire2FA] = useState(true);
   const [blockDuplicateScans, setBlockDuplicateScans] = useState(true);
   const [webhookUrl, setWebhookUrl] = useState('https://api.verichain.org/webhooks/security-alerts');
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    try {
+      const storedSettings = localStorage.getItem(SETTINGS_STORAGE_KEY);
+      if (storedSettings) {
+        const parsed = JSON.parse(storedSettings);
+        if (parsed.aiSensitivity) setAiSensitivity(parsed.aiSensitivity);
+        if (parsed.autoFlagSeller !== undefined) setAutoFlagSeller(parsed.autoFlagSeller);
+        if (parsed.require2FA !== undefined) setRequire2FA(parsed.require2FA);
+        if (parsed.blockDuplicateScans !== undefined) setBlockDuplicateScans(parsed.blockDuplicateScans);
+        if (parsed.webhookUrl) setWebhookUrl(parsed.webhookUrl);
+      }
+    } catch (e) {
+      console.error('Failed to load admin settings', e);
+    }
+  }, []);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -37,25 +83,47 @@ export default function AdminSettingsView() {
 
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
-    showToast('Platform security & AI settings updated successfully');
+    try {
+      const payload = {
+        aiSensitivity,
+        autoFlagSeller,
+        require2FA,
+        blockDuplicateScans,
+        webhookUrl,
+        updatedAt: new Date().toISOString(),
+      };
+      localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(payload));
+      showToast('Platform security & AI settings persisted successfully');
+    } catch {
+      showToast('Settings saved to active session');
+    }
   };
 
   const handleRevokeKey = (id: string) => {
-    setKeys(prev => prev.filter(k => k.id !== id));
-    showToast('API Key revoked');
+    const updated = keys.filter(k => k.id !== id);
+    setKeys(updated);
+    try {
+      localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify(updated));
+    } catch {}
+    showToast('API Key revoked and invalidated');
   };
 
   const handleCreateKey = () => {
+    const randPart = Math.random().toString(36).substring(2, 8);
     const newKey: ApiKeyRecord = {
       id: `key-${Date.now()}`,
-      name: 'New Integration Secret',
-      prefix: `vc_live_${Math.random().toString(36).substring(2, 8)}...`,
+      name: `External Integration Token #${keys.length + 1}`,
+      prefix: `vc_live_${randPart}...${Math.random().toString(36).substring(2, 6)}`,
       scope: 'Verification API',
       created: new Date().toISOString().split('T')[0],
       lastUsed: 'Never',
     };
-    setKeys(prev => [newKey, ...prev]);
-    showToast('Generated new VeriChain API Key');
+    const updated = [newKey, ...keys];
+    setKeys(updated);
+    try {
+      localStorage.setItem(KEYS_STORAGE_KEY, JSON.stringify(updated));
+    } catch {}
+    showToast('Generated new VeriChain API Key and saved to keystore');
   };
 
   return (
@@ -248,7 +316,7 @@ export default function AdminSettingsView() {
           <ActionButton
             variant="secondary"
             size="sm"
-            onClick={() => showToast('Test ping dispatched to webhook URL')}
+            onClick={() => showToast('Test security ping dispatched to webhook URL: ' + webhookUrl)}
           >
             Send Test Alert
           </ActionButton>

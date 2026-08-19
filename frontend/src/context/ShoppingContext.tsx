@@ -15,6 +15,9 @@ export interface Product {
   serialNumber?: string;
   sku?: string;
   verified?: boolean;
+  category?: string;
+  counterfeitRisk?: string;
+  specs?: Record<string, string>;
 }
 
 export interface ShoppingState {

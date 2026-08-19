@@ -1,4 +1,5 @@
-import { ShieldCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { ShieldCheck, ExternalLink } from 'lucide-react';
 
 interface SellerInfoCardProps {
   seller: any;
@@ -9,6 +10,7 @@ export default function SellerInfoCard({ seller }: SellerInfoCardProps) {
     return null;
   }
 
+  const sellerId = seller._id || seller.id;
   const name = seller.name || 'Unknown Seller';
   const role = seller.role || 'seller';
   const trustScore = seller.trustScore ?? 100;
@@ -16,7 +18,17 @@ export default function SellerInfoCard({ seller }: SellerInfoCardProps) {
 
   return (
     <section className="glass-card p-4">
-      <h3 style={{ fontSize: '16px', fontWeight: 600, marginBottom: 'var(--space-sm)' }}>Current Custodian / Seller</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 'var(--space-sm)' }}>
+        <h3 style={{ fontSize: '16px', fontWeight: 600, margin: 0 }}>Current Custodian / Seller</h3>
+        {sellerId && (
+          <Link
+            to={`/seller/${sellerId}`}
+            style={{ fontSize: '12px', color: 'var(--accent-cyan)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}
+          >
+            Storefront <ExternalLink size={12} />
+          </Link>
+        )}
+      </div>
       
       <div style={{ display: 'flex', gap: 'var(--space-md)', flexWrap: 'wrap', alignItems: 'center' }}>
         <div 
@@ -38,7 +50,13 @@ export default function SellerInfoCard({ seller }: SellerInfoCardProps) {
 
         <div style={{ flex: 1, minWidth: '150px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <h4 style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>{name}</h4>
+            {sellerId ? (
+              <Link to={`/seller/${sellerId}`} style={{ textDecoration: 'none', color: 'inherit' }}>
+                <h4 style={{ fontSize: '15px', fontWeight: 600, margin: 0, color: 'var(--text-primary)' }}>{name}</h4>
+              </Link>
+            ) : (
+              <h4 style={{ fontSize: '15px', fontWeight: 600, margin: 0 }}>{name}</h4>
+            )}
             {verified && (
               <span className="badge badge-success" style={{ fontSize: '9px', padding: '1px 4px' }}>
                 <ShieldCheck size={9} /> Verified

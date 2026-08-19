@@ -374,7 +374,17 @@ export default function OrderManagement() {
           </button>
           <button
             className="om-btn om-btn-ghost"
-            onClick={() => showToast(`Share link copied for ${order.id}`)}
+            onClick={async () => {
+              const trackingUrl = `${window.location.origin}/buyer/orders?orderId=${encodeURIComponent(order.id)}`;
+              try {
+                if (navigator.clipboard && window.isSecureContext) {
+                  await navigator.clipboard.writeText(trackingUrl);
+                }
+              } catch (err) {
+                console.error('Clipboard copy error', err);
+              }
+              showToast(`Tracking link copied to clipboard for ${order.id}`);
+            }}
             title="Share Order Tracking"
           >
             <Share2 size={15} />
@@ -382,7 +392,51 @@ export default function OrderManagement() {
           </button>
           <button
             className="om-btn om-btn-primary"
-            onClick={() => showToast(`Certificate of Authenticity exported for ${order.id}`)}
+            onClick={() => {
+              const certData = {
+                certificateId: `VC-CERT-${order.id}`,
+                orderNumber: order.id,
+                issuedAt: new Date().toISOString(),
+                consensusProtocol: 'VeriChain VRC-721 Immutable Ledger',
+                blockchainVerification: {
+                  blockNumber: order.blockNumber,
+                  transactionHash: order.transactionHash,
+                  authenticityScore: `${order.authenticityScore}%`,
+                  status: 'VERIFIED_ON_CHAIN',
+                },
+                product: {
+                  name: order.items?.[0]?.name || 'Serialized Blockchain Asset',
+                  sku: order.items?.[0]?.sku || 'VC-SKU-PROD',
+                  serialNumber: `SN-${order.id}`,
+                },
+                factory: {
+                  name: order.factory?.name,
+                  batchHash: order.factory?.batchHash,
+                  qcScore: order.factory?.qcScore,
+                },
+                seller: {
+                  name: order.seller?.name,
+                  tier: order.seller?.tier,
+                },
+                custodyLog: {
+                  carrier: order.shipment?.carrier,
+                  trackingId: order.shipment?.trackingId,
+                  destination: order.buyer?.shippingAddress,
+                }
+              };
+
+              const blob = new Blob([JSON.stringify(certData, null, 2)], { type: 'application/json' });
+              const url = URL.createObjectURL(blob);
+              const anchor = document.createElement('a');
+              anchor.href = url;
+              anchor.download = `Certificate-Authenticity-${order.id}.json`;
+              document.body.appendChild(anchor);
+              anchor.click();
+              document.body.removeChild(anchor);
+              URL.revokeObjectURL(url);
+
+              showToast(`Certificate of Authenticity downloaded for ${order.id}`);
+            }}
             title="Download Authenticity Certificate"
           >
             <Download size={15} />

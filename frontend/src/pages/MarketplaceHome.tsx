@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import PageLoader from '../components/ui/PageLoader';
 import client from '../api/client';
 import NavBar from '../components/NavBar';
@@ -74,10 +75,15 @@ const MarketplaceHome: React.FC = () => {
           <div className="leader-list">
             {factories.length > 0 ? (
               factories.map((fac) => (
-                <div key={fac._id}>
-                  <strong>{fac.name}</strong>
-                  <span>{fac.trustScore ?? 100}% trust score</span>
-                </div>
+                <Link
+                  key={fac._id}
+                  to={`/factory/${fac._id}`}
+                  style={{ textDecoration: 'none', color: 'inherit', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', transition: 'background 0.2s ease' }}
+                  className="leader-item-link"
+                >
+                  <strong style={{ color: 'var(--text-primary)' }}>{fac.name}</strong>
+                  <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{fac.trustScore ?? 100}% trust score</span>
+                </Link>
               ))
             ) : (
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 'var(--space-md) 0' }}>
@@ -92,10 +98,15 @@ const MarketplaceHome: React.FC = () => {
           <div className="leader-list">
             {sellers.length > 0 ? (
               sellers.map((seller) => (
-                <div key={seller._id}>
-                  <strong>{seller.name}</strong>
-                  <span>{seller.trustScore ?? 100}% trust score</span>
-                </div>
+                <Link
+                  key={seller._id}
+                  to={`/seller/${seller._id}`}
+                  style={{ textDecoration: 'none', color: 'inherit', display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', borderRadius: '8px', background: 'rgba(255,255,255,0.03)', transition: 'background 0.2s ease' }}
+                  className="leader-item-link"
+                >
+                  <strong style={{ color: 'var(--text-primary)' }}>{seller.name}</strong>
+                  <span style={{ color: 'var(--accent-cyan)', fontWeight: 600 }}>{seller.trustScore ?? 100}% trust score</span>
+                </Link>
               ))
             ) : (
               <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem', margin: 'var(--space-md) 0' }}>

@@ -1,4 +1,5 @@
 import React, { memo, useEffect, useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { AlertTriangle, Calendar, CheckCircle, Package, ShieldCheck, Star, TrendingUp, Users, ShoppingBag } from 'lucide-react';
 import AnalyticsCard from './AnalyticsCard';
 import EmptyState from './ui/EmptyState';
@@ -219,16 +220,18 @@ export const FactoryProductsGrid = memo(function FactoryProductsGrid({ products 
       ) : (
         <div className="grid-cards profile-product-grid">
           {visibleProducts.map((product) => (
-            <article key={product._id} className="glass-card profile-product-card">
-              <ProductImage src={product.imageUrl} name={product.name} />
-              <span className="badge badge-neutral">{product.category}</span>
-              <h3>{product.name}</h3>
-              <span className={`badge ${verificationBadge(product.verifiedStatus)}`}>Verified</span>
-              <dl>
-                <div><dt>Verified units</dt><dd>{product.verifiedUnits}</dd></div>
-                <div><dt>Authenticity</dt><dd>{product.authenticityPercentage}%</dd></div>
-              </dl>
-            </article>
+            <Link key={product._id} to={`/product/${product._id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+              <article className="glass-card profile-product-card" style={{ height: '100%', cursor: 'pointer', transition: 'transform 0.2s ease, border-color 0.2s ease' }}>
+                <ProductImage src={product.imageUrl} name={product.name} />
+                <span className="badge badge-neutral">{product.category}</span>
+                <h3>{product.name}</h3>
+                <span className={`badge ${verificationBadge(product.verifiedStatus)}`}>Verified</span>
+                <dl>
+                  <div><dt>Verified units</dt><dd>{product.verifiedUnits}</dd></div>
+                  <div><dt>Authenticity</dt><dd>{product.authenticityPercentage}%</dd></div>
+                </dl>
+              </article>
+            </Link>
           ))}
         </div>
       )}
@@ -247,16 +250,18 @@ export const SellerProductsGrid = memo(function SellerProductsGrid({ products }:
       ) : (
         <div className="grid-cards profile-product-grid">
           {visibleProducts.map((product) => (
-            <article key={product._id} className="glass-card profile-product-card">
-              <ProductImage src={product.imageUrl} name={product.name} />
-              <span className={`badge ${verificationBadge(product.authenticityStatus)}`}>{product.authenticityStatus}</span>
-              <h3>{product.name}</h3>
-              <dl>
-                <div><dt>Brand</dt><dd>{product.brand}</dd></div>
-                <div><dt>Available</dt><dd>{product.availableQuantity}</dd></div>
-                <div><dt>Price</dt><dd>{product.price === null ? 'Not listed' : formatCurrency(product.price)}</dd></div>
-              </dl>
-            </article>
+            <Link key={product._id} to={`/product/${product._id}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block' }}>
+              <article className="glass-card profile-product-card" style={{ height: '100%', cursor: 'pointer', transition: 'transform 0.2s ease, border-color 0.2s ease' }}>
+                <ProductImage src={product.imageUrl} name={product.name} />
+                <span className={`badge ${verificationBadge(product.authenticityStatus)}`}>{product.authenticityStatus}</span>
+                <h3>{product.name}</h3>
+                <dl>
+                  <div><dt>Brand</dt><dd>{product.brand}</dd></div>
+                  <div><dt>Available</dt><dd>{product.availableQuantity}</dd></div>
+                  <div><dt>Price</dt><dd>{product.price === null ? 'Not listed' : formatCurrency(product.price)}</dd></div>
+                </dl>
+              </article>
+            </Link>
           ))}
         </div>
       )}

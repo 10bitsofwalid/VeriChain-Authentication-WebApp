@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { Gem, Laptop, Pill, Shirt, Sparkles, Watch } from 'lucide-react';
 
 const categories = [
@@ -10,6 +11,12 @@ const categories = [
 ];
 
 export default function CategoriesSection() {
+  const navigate = useNavigate();
+
+  const handleCategoryClick = (categoryName: string) => {
+    navigate(`/dashboard/marketplace?category=${encodeURIComponent(categoryName)}`);
+  };
+
   return (
     <section className="marketplace-section">
       <div className="marketplace-section-header">
@@ -22,7 +29,12 @@ export default function CategoriesSection() {
 
       <div className="category-grid">
         {categories.map((cat) => (
-          <button key={cat.name} className={`category-card category-card-${cat.tone}`} type="button">
+          <button
+            key={cat.name}
+            className={`category-card category-card-${cat.tone}`}
+            type="button"
+            onClick={() => handleCategoryClick(cat.name)}
+          >
             <span className="category-icon">
               <cat.icon size={24} aria-hidden="true" />
             </span>

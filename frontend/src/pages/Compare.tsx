@@ -10,6 +10,7 @@ import {
   Trash2,
   ShieldCheck,
   CheckCircle,
+  AlertTriangle,
   ExternalLink,
   Plus,
 } from 'lucide-react';
@@ -364,25 +365,29 @@ export default function Compare() {
                   <td style={{ padding: 'var(--space-md)', fontWeight: 600, color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)' }}>
                     Ledger Status
                   </td>
-                  {compare.map((item) => (
-                    <td key={item.id} style={{ padding: 'var(--space-md)', textAlign: 'center', borderBottom: '1px solid var(--border-subtle)' }}>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 4,
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          padding: '3px 8px',
-                          borderRadius: '999px',
-                          background: 'rgba(16, 185, 129, 0.12)',
-                          color: '#059669',
-                        }}
-                      >
-                        <ShieldCheck size={13} /> Verified Authentic
-                      </span>
-                    </td>
-                  ))}
+                  {compare.map((item) => {
+                    const isVerified = item.verified !== false;
+                    return (
+                      <td key={item.id} style={{ padding: 'var(--space-md)', textAlign: 'center', borderBottom: '1px solid var(--border-subtle)' }}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            padding: '3px 8px',
+                            borderRadius: '999px',
+                            background: isVerified ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 166, 35, 0.12)',
+                            color: isVerified ? '#059669' : '#D97706',
+                          }}
+                        >
+                          {isVerified ? <ShieldCheck size={13} /> : <AlertTriangle size={13} />}
+                          {isVerified ? 'Verified Authentic' : 'Pending Audit'}
+                        </span>
+                      </td>
+                    );
+                  })}
                 </tr>
 
                 {/* Consensus Engine */}
@@ -392,7 +397,7 @@ export default function Compare() {
                   </td>
                   {compare.map((item) => (
                     <td key={item.id} style={{ padding: 'var(--space-md)', textAlign: 'center', fontSize: '0.85rem', color: 'var(--text-primary)', borderBottom: '1px solid var(--border-subtle)' }}>
-                      VRC-721 Immutable Token
+                      {item.category === 'Luxury Goods' ? 'VRC-721 Immutable Token' : item.category === 'Pharmaceuticals' ? 'VRC-1155 Batch Protocol' : 'VRC-721 Mainnet Standard'}
                     </td>
                   ))}
                 </tr>
@@ -402,25 +407,34 @@ export default function Compare() {
                   <td style={{ padding: 'var(--space-md)', fontWeight: 600, color: 'var(--text-secondary)', borderBottom: '1px solid var(--border-subtle)' }}>
                     Counterfeit Risk
                   </td>
-                  {compare.map((item) => (
-                    <td key={item.id} style={{ padding: 'var(--space-md)', textAlign: 'center', borderBottom: '1px solid var(--border-subtle)' }}>
-                      <span
-                        style={{
-                          display: 'inline-flex',
-                          alignItems: 'center',
-                          gap: 4,
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          padding: '3px 8px',
-                          borderRadius: '999px',
-                          background: 'rgba(16, 185, 129, 0.12)',
-                          color: '#059669',
-                        }}
-                      >
-                        <CheckCircle size={13} /> Low Risk (99.8%)
-                      </span>
-                    </td>
-                  ))}
+                  {compare.map((item) => {
+                    const risk = item.counterfeitRisk || (item.verified === false ? 'medium' : 'low');
+                    const isLow = risk === 'low';
+                    const isMed = risk === 'medium';
+                    const riskBg = isLow ? 'rgba(16, 185, 129, 0.12)' : isMed ? 'rgba(245, 166, 35, 0.15)' : 'rgba(239, 68, 68, 0.15)';
+                    const riskColor = isLow ? '#059669' : isMed ? '#D97706' : '#DC2626';
+                    const riskLabel = isLow ? 'Low Risk (99.8%)' : isMed ? 'Moderate Risk (84.2%)' : 'Elevated Risk (62.0%)';
+
+                    return (
+                      <td key={item.id} style={{ padding: 'var(--space-md)', textAlign: 'center', borderBottom: '1px solid var(--border-subtle)' }}>
+                        <span
+                          style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: 4,
+                            fontSize: '0.75rem',
+                            fontWeight: 700,
+                            padding: '3px 8px',
+                            borderRadius: '999px',
+                            background: riskBg,
+                            color: riskColor,
+                          }}
+                        >
+                          {isLow ? <CheckCircle size={13} /> : <AlertTriangle size={13} />} {riskLabel}
+                        </span>
+                      </td>
+                    );
+                  })}
                 </tr>
 
                 {/* Direct Actions */}

@@ -79,8 +79,15 @@ export const ProductCard = ({ item }: ProductCardProps) => {
         type: 'ADD_TO_COMPARE',
         payload: {
           id: productId,
+          productId: item.product?._id || productId,
           name: item.product?.name || 'Authenticated product',
-          price: Number(placeholder.price),
+          price: Number(item.product?.price || placeholder.price) || 100,
+          imageUrl: item.product?.imageUrl || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?auto=format&fit=crop&w=900&q=80',
+          category: item.product?.category || 'General',
+          sku: item.product?.sku || 'SKU-001',
+          serialNumber: item.serialNumber,
+          counterfeitRisk: item.counterfeitRisk || 'low',
+          verified: item.product?.verifiedStatus === 'verified',
         },
       });
     }
