@@ -1,21 +1,22 @@
 {
-  "name": "VeriSphere",
-  "short_name": "VeriSphere",
-  "description": "Product authenticity verification platform",
-  "start_url": ".",
+  "name": "VeriChain — Product Authenticity Platform",
+  "short_name": "VeriChain",
+  "description": "Blockchain-powered immutable product authenticity and supply chain verification platform.",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0d6efd",
+  "background_color": "#0A0F1D",
+  "theme_color": "#16233B",
   "icons": [
     {
-      "src": "icons/icon-192x192.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-512x512.png",
-      "sizes": "512x512",
-      "type": "image/png"
+      "src": "/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
     }
   ]
 }
